@@ -18,7 +18,7 @@ public enum ConversionType
 
 public class ExcelToScriptableConverter : EditorWindow
 {
-    private const string excelFilePath = "Assets/Data/Excel/GameData.xlsx";     // 엑셀 파일 하나에 시트로 관리할 예정
+    private const string excelFilePath = "Assets/Data/Excel/DUAL_DUEL_DataTable.xlsx";     // 엑셀 파일 하나에 시트로 관리할 예정
 
     private string outputFolder = "Assets/Data/Generated/Cards";
     private bool createDatabase = true;
