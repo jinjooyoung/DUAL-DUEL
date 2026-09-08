@@ -203,7 +203,7 @@ public class ExcelToScriptableConverter : EditorWindow
                     cardSO.values.Add(cardData.upgrade_4);
                     cardSO.values.Add(cardData.upgrade_5);
 
-                    string artworkPath = $"Assets/Resources/Card_{cardData.cardId}.png";
+                    string artworkPath = $"Assets/Resources/Cards/Card_{cardData.cardId}.png";
                     cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
 
                     if (cardSO.artwork == null)

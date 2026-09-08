@@ -16,7 +16,7 @@ MonoBehaviour:
   ownerType: 0
   cardType: 3
   rank: 1
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: ac847c3775eafb04cac385e0dc0052ca, type: 3}
   nameKey: NAME_P_1004
   descKey: DESC_P_1004
   values: 010000000200000003000000040000000500000007000000
