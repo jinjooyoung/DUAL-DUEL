@@ -15,6 +15,7 @@ MonoBehaviour:
   cardId: 1004
   ownerType: 0
   cardType: 3
+  rank: 1
   artwork: {fileID: 0}
   nameKey: NAME_P_1004
   descKey: DESC_P_1004

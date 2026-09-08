@@ -15,6 +15,7 @@ MonoBehaviour:
   cardId: 2003
   ownerType: 1
   cardType: 2
+  rank: 3
   artwork: {fileID: 0}
   nameKey: NAME_E_2003
   descKey: DESC_E_2003

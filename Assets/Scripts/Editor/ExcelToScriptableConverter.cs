@@ -182,6 +182,15 @@ public class ExcelToScriptableConverter : EditorWindow
                         DestroyImmediate(cardSO);
                         continue;
                     }
+                    
+                    if (!Enum.IsDefined(typeof(RankType), cardData.rank))
+                    {
+                        Debug.LogError($"Card ID {cardData.cardId}: Invalid RankType '{cardData.rank}'");
+                        DestroyImmediate(cardSO);
+                        continue;
+                    }
+
+                    cardSO.rank = (RankType)cardData.rank;
 
                     cardSO.nameKey = cardData.nameKey;
                     cardSO.descKey = cardData.descKey;
@@ -253,6 +262,7 @@ public class ExcelToScriptableConverter : EditorWindow
         data.cardId = Convert.ToInt32(row["cardId"]);
         data.ownerType = row["ownerType"].ToString();
         data.cardType = row["cardType"].ToString();
+        data.rank = Convert.ToInt32(row["rank"]);
         data.nameKey = row["nameKey"].ToString();
         data.descKey = row["descKey"].ToString();
         data.baseValue = Convert.ToInt32(row["baseValue"]);
