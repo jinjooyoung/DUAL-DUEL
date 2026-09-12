@@ -1,3 +1,4 @@
+using System;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEditor;
@@ -5,6 +6,9 @@ using UnityEngine;
 
 public class CardDisplay : MonoBehaviour
 {
+    // [정적 이벤트 선언] (배치된 카드, 배치된 슬롯)을 매개변수로 송출
+    public static event Action<CardDisplay, BattleSlot> OnCardPlaced;
+
     [Header("카드 데이터(SO)")]
     public CardSO cardSO;
 
@@ -20,16 +24,15 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro descriptionText;
 
     private bool isDragging = false;
+    private bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
     private Vector3 originalPosition;
 
     [Header("레이어 마스크")]
-    public LayerMask playerLayer;
-    public LayerMask enemyLayer;
+    public LayerMask slotLayer;
 
     void Start()
     {
-        playerLayer = LayerMask.GetMask("Player");
-        enemyLayer = LayerMask.GetMask("Enemy");
+        slotLayer = LayerMask.GetMask("Slot");
 
         //SetupCard(cardData);
     }
@@ -45,38 +48,29 @@ public class CardDisplay : MonoBehaviour
         if (descriptionText != null) descriptionText.text = data.descKey;
 
         // 카드 리소스
-        // 기본 배경
-        if (background != null)
-        {
-            string artworkPath = $"Assets/Resources/Cards/Public/Card_BG.png";
-            background.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
-        }
-
-        // 카드 리소스
         if (cardResource != null && cardSO.artwork != null)
         {
             cardResource.sprite = cardSO.artwork;
         }
 
-        // 카드 테두리
-        if (ownerBorder != null)
-        {
-            string artworkPath = $"Assets/Resources/Cards/Public/ownerBorder_{cardSO.ownerType}.png";
-            ownerBorder.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
-        }
+        if (background != null)
+            background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
 
-        // 카드 타입 아이콘
+        if (ownerBorder != null)
+            ownerBorder.sprite = Resources.Load<Sprite>($"Cards/Public/ownerBorder_{cardSO.ownerType}");
+
         if (typeIcon != null)
-        {
-            string artworkPath = $"Assets/Resources/Cards/Public/{cardSO.cardType}.png";
-            ownerBorder.sprite = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
-        }
+            typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{cardSO.cardType}");
 
         // 로컬라이징 후 설명 텍스트의 {value}를 cardSO.values로 Replace해주는 코드 여기 작성해야함
     }
 
     private void OnMouseDown()
     {
+        Debug.Log("마우스 다운");
+
+        if (isPlaced) return; // 이미 슬롯에 고정된 카드는 조작 불가. 나중에는 배치된거 다른곳으로 옮기거나 취소 가능하게 할건데 일단 1루프는 고정으로 해둠
+
         // 드래그 시작 시 원래 위치 저장
         originalPosition = transform.position;
         isDragging = true;
@@ -86,6 +80,8 @@ public class CardDisplay : MonoBehaviour
     {
         if (isDragging)
         {
+            Debug.Log("마우스 드래그중");
+
             // 마우스 위치로 카드 이동
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = Camera.main.WorldToScreenPoint(transform.position).z;
@@ -96,6 +92,8 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseUp()
     {
+        Debug.Log("마우스 업");
+
         isDragging = false;
 
         // 레이캐스트로 타겟 감지
@@ -105,30 +103,58 @@ public class CardDisplay : MonoBehaviour
         // 카드 사용 판정 지역 변수
         bool cardUsed = false;
 
-        // 적 슬롯 위에 드롭했는지 검사
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, enemyLayer))
+        /*if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
         {
-            if (cardSO.ownerType == OwnerType.Player)       // 이 카드가 플레이어 카드라면
+            BattleSlot slot = hit.collider.GetComponent<BattleSlot>();
+
+            // 슬롯 컴포넌트가 있고, 비어 있으며, 카드 OwnerType과 슬롯 타입이 일치할 때
+            if (slot != null && !slot.isOccupied && slot.slotOwnerType == cardSO.ownerType)
             {
-                // 놓을 수 없으니 위치 되돌리고 리턴
-                // 나중에 스무스 하게 되돌아가는 연출 함수 작성해서 여기에서 호출해줌
-                transform.position = originalPosition;
+                isPlaced = true;
+                slot.PlaceCard(this); // 슬롯에게 직접 배치 요청
+                                      //OnCardPlaced?.Invoke(this, slot);   // 카드 배치 성공(완료) 이벤트 방송 -> 이벤트 아직 안 필요한 것 같아서 주석해둠
+                cardUsed = true;
                 return;
             }
+        }*/
 
-            // 슬롯에 배치 리스트 추가, 위치 저장
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
+        {
+            Debug.Log($"[1. 레이 충돌 성공] 부딪힌 오브젝트: {hit.collider.gameObject.name}, 레이어: {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
+
+            BattleSlot slot = hit.collider.GetComponent<BattleSlot>();
+
+            // 2. BattleSlot 컴포넌트 부착 여부 확인
+            if (slot == null)
+            {
+                Debug.LogWarning("[2. 실패] 충돌한 오브젝트에 BattleSlot 컴포넌트가 없습니다! (자식/부모 오브젝트 확인 필요)");
+            }
+            else
+            {
+                Debug.Log($"[2. 슬롯 발견] slotOwnerType: {slot.slotOwnerType}, isOccupied: {slot.isOccupied} / 카드 ownerType: {cardSO.ownerType}");
+
+                // 3. 조건문 세부 검사
+                if (slot.isOccupied)
+                {
+                    Debug.LogWarning("[3. 실패] 슬롯이 이미 차지되어 있습니다 (isOccupied == true)");
+                }
+                else if (slot.slotOwnerType != cardSO.ownerType)
+                {
+                    Debug.LogWarning($"[3. 실패] 타입 불일치! 슬롯 타입({slot.slotOwnerType}) != 카드 타입({cardSO.ownerType})");
+                }
+                else
+                {
+                    // 모든 조건 통과
+                    Debug.Log("<color=green>[성공] 모든 조건 통과! 슬롯에 배치합니다.</color>");
+                    isPlaced = true;
+                    slot.PlaceCard(this);
+                    return;
+                }
+            }
         }
-        else if (Physics.Raycast(ray, out hit, Mathf.Infinity, playerLayer))
+        else
         {
-            if (cardSO.ownerType == OwnerType.Enemy)       // 이 카드가 적 카드라면
-            {
-                // 놓을 수 없으니 위치 되돌리고 리턴
-                // 나중에 스무스 하게 되돌아가는 연출 함수 작성해서 여기에서 호출해줌
-                transform.position = originalPosition;
-                return;
-            }
-
-            // 슬롯에 배치 리스트 추가, 위치 저장
+            Debug.LogWarning($"[1. 실패] 레이캐스트가 slotLayer({slotLayer.value})에 걸리지 않았습니다. 슬롯에 3D Collider가 있는지, Layer 설정이 맞는지 확인하세요.");
         }
 
         if (!cardUsed)      // 카드를 사용하지 않았다면 원래 위치로 되돌리기
