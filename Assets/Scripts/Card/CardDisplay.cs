@@ -92,75 +92,27 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseUp()
     {
-        Debug.Log("마우스 업");
-
+        if (!isDragging) return;
         isDragging = false;
 
-        // 레이캐스트로 타겟 감지
-        RaycastHit hit;
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-        // 카드 사용 판정 지역 변수
-        bool cardUsed = false;
-
-        /*if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
-        {
-            BattleSlot slot = hit.collider.GetComponent<BattleSlot>();
-
-            // 슬롯 컴포넌트가 있고, 비어 있으며, 카드 OwnerType과 슬롯 타입이 일치할 때
-            if (slot != null && !slot.isOccupied && slot.slotOwnerType == cardSO.ownerType)
-            {
-                isPlaced = true;
-                slot.PlaceCard(this); // 슬롯에게 직접 배치 요청
-                                      //OnCardPlaced?.Invoke(this, slot);   // 카드 배치 성공(완료) 이벤트 방송 -> 이벤트 아직 안 필요한 것 같아서 주석해둠
-                cardUsed = true;
-                return;
-            }
-        }*/
+        RaycastHit hit;
 
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
         {
-            Debug.Log($"[1. 레이 충돌 성공] 부딪힌 오브젝트: {hit.collider.gameObject.name}, 레이어: {LayerMask.LayerToName(hit.collider.gameObject.layer)}");
-
             BattleSlot slot = hit.collider.GetComponent<BattleSlot>();
 
-            // 2. BattleSlot 컴포넌트 부착 여부 확인
-            if (slot == null)
+            // [변경] 카드의 ownerType 검사 제거!
+            // 슬롯이 존재하고 비어있기만 하면 어디든(적 슬롯이든 아군 슬롯이든) 배치 가능
+            if (slot != null && !slot.isOccupied)
             {
-                Debug.LogWarning("[2. 실패] 충돌한 오브젝트에 BattleSlot 컴포넌트가 없습니다! (자식/부모 오브젝트 확인 필요)");
-            }
-            else
-            {
-                Debug.Log($"[2. 슬롯 발견] slotOwnerType: {slot.slotOwnerType}, isOccupied: {slot.isOccupied} / 카드 ownerType: {cardSO.ownerType}");
-
-                // 3. 조건문 세부 검사
-                if (slot.isOccupied)
-                {
-                    Debug.LogWarning("[3. 실패] 슬롯이 이미 차지되어 있습니다 (isOccupied == true)");
-                }
-                else if (slot.slotOwnerType != cardSO.ownerType)
-                {
-                    Debug.LogWarning($"[3. 실패] 타입 불일치! 슬롯 타입({slot.slotOwnerType}) != 카드 타입({cardSO.ownerType})");
-                }
-                else
-                {
-                    // 모든 조건 통과
-                    Debug.Log("<color=green>[성공] 모든 조건 통과! 슬롯에 배치합니다.</color>");
-                    isPlaced = true;
-                    slot.PlaceCard(this);
-                    return;
-                }
+                isPlaced = true;
+                slot.PlaceCard(this); // 슬롯에 안착
+                return;
             }
         }
-        else
-        {
-            Debug.LogWarning($"[1. 실패] 레이캐스트가 slotLayer({slotLayer.value})에 걸리지 않았습니다. 슬롯에 3D Collider가 있는지, Layer 설정이 맞는지 확인하세요.");
-        }
 
-        if (!cardUsed)      // 카드를 사용하지 않았다면 원래 위치로 되돌리기
-        {
-            transform.position = originalPosition;
-            return;
-        }
+        // 빈 슬롯에 닿지 않았으면 원위치 복귀
+        transform.position = originalPosition;
     }
 }
