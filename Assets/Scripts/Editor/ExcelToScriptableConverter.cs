@@ -151,7 +151,7 @@ public class ExcelToScriptableConverter : EditorWindow
 
                     CardData cardData = ReadCardData(row);
 
-                    if (cardData.cardId <= 0)
+                    if (cardData.cardId < 0)
                     {
                         Debug.LogWarning("Invalid Card ID. Skipping row.");
                         continue;
@@ -160,17 +160,6 @@ public class ExcelToScriptableConverter : EditorWindow
                     CardSO cardSO = ScriptableObject.CreateInstance<CardSO>();
 
                     cardSO.cardId = cardData.cardId;
-
-                    if (Enum.TryParse(cardData.ownerType, true, out OwnerType ownerType))
-                    {
-                        cardSO.ownerType = ownerType;
-                    }
-                    else
-                    {
-                        Debug.LogError($"Card ID {cardData.cardId}: Invalid OwnerType '{cardData.ownerType}'");
-                        DestroyImmediate(cardSO);
-                        continue;
-                    }
 
                     if (Enum.TryParse(cardData.cardType, true, out CardType cardType))
                     {
@@ -260,7 +249,6 @@ public class ExcelToScriptableConverter : EditorWindow
         CardData data = new CardData();
 
         data.cardId = Convert.ToInt32(row["cardId"]);
-        data.ownerType = row["ownerType"].ToString();
         data.cardType = row["cardType"].ToString();
         data.rank = Convert.ToInt32(row["rank"]);
         data.nameKey = row["nameKey"].ToString();

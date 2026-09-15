@@ -1,12 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum OwnerType
-{
-    Player,
-    Enemy
-}
-
 public enum CardType
 {
     Attack,
@@ -31,7 +25,6 @@ public class CardSO : ScriptableObject
 {
     public int cardId;
 
-    public OwnerType ownerType;
     public CardType cardType;
     public RankType rank;           // 데이터테이블은 숫자로 작성하고 SO에는 타입으로 불러옴
 

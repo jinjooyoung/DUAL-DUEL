@@ -10,13 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 962033c1fcd8c81489fa435310ead0cf, type: 3}
-  m_Name: Card_1003
+  m_Name: Card_0003
   m_EditorClassIdentifier: Assembly-CSharp::CardSO
-  cardId: 1003
-  ownerType: 0
-  cardType: 2
-  rank: 3
-  artwork: {fileID: 21300000, guid: ac847c3775eafb04cac385e0dc0052ca, type: 3}
-  nameKey: NAME_P_1003
-  descKey: DESC_P_1003
-  values: 030000000400000005000000060000000700000008000000
+  cardId: 3
+  cardType: 3
+  rank: 1
+  artwork: {fileID: 0}
+  nameKey: NAME_3
+  descKey: DESC_3
+  values: 010000000200000003000000040000000500000007000000

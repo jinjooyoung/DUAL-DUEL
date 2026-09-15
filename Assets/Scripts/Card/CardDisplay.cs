@@ -56,9 +56,6 @@ public class CardDisplay : MonoBehaviour
         if (background != null)
             background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
 
-        if (ownerBorder != null)
-            ownerBorder.sprite = Resources.Load<Sprite>($"Cards/Public/ownerBorder_{cardSO.ownerType}");
-
         if (typeIcon != null)
             typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{cardSO.cardType}");
 

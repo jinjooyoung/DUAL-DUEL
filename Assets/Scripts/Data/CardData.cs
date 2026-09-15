@@ -5,7 +5,6 @@ using UnityEngine;
 public class CardData
 {
     public int cardId;
-    public string ownerType;    // 카드의 주인 타입 (플레이어 / 적)
     public string cardType;     // 카드의 타입 (공격, 방어, 버프 등)
     public int rank;            // 1~6까지의 등급을 나타냄. 높을수록 희귀(좋은) 등급
 

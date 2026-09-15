@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class BattleSlot : MonoBehaviour
 {
-    public OwnerType slotOwnerType; // Player 또는 Enemy
+    public bool IsPlayerType = true;
     public int slotIndex;           // 0 ~ 4 (좌측부터 순서대로)
     public bool isOccupied = false; // 카드가 이미 배치되어 있는지 여부
     public CardDisplay currentCard; // 배치된 카드 참조
