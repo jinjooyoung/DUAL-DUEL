@@ -92,7 +92,7 @@ public class ExcelToScriptableConverter : EditorWindow
                     break;
 
                 case ConversionType.Localization:
-                    EditorUtility.DisplayDialog("Not Implemented", "Localization conversion is not implemented yet.", "OK");
+                    ConvertExcelToLocalizationSO();
                     break;
             }
         }
@@ -244,6 +244,126 @@ public class ExcelToScriptableConverter : EditorWindow
         }
     }
 
+    private void ConvertExcelToLocalizationSO()
+    {
+        if (!Directory.Exists(outputFolder))
+        {
+            Directory.CreateDirectory(outputFolder);
+        }
+
+        try
+        {
+            string fullPath = Path.GetFullPath(excelFilePath);
+
+            using (var stream = File.Open(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            using (var reader = ExcelReaderFactory.CreateReader(stream))
+            {
+                DataSet result = reader.AsDataSet(new ExcelDataSetConfiguration
+                    {
+                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration
+                        {
+                            UseHeaderRow = true
+                        }
+                    });
+
+                DataTable localizationTable = null;
+
+                string sheetName = conversionType.ToString();
+
+                foreach (DataTable table in result.Tables)
+                {
+                    if (table.TableName == sheetName)
+                    {
+                        localizationTable = table;
+                        break;
+                    }
+                }
+
+                if (localizationTable == null)
+                {
+                    EditorUtility.DisplayDialog(
+                        "Error",
+                        "Could not find 'Localization' sheet.",
+                        "OK"
+                    );
+
+                    return;
+                }
+
+                List<LocalizationSO> createdLocalizations = new List<LocalizationSO>();
+
+                foreach (DataRow row in localizationTable.Rows)
+                {
+                    if (row["nameKey"] == DBNull.Value)
+                    {
+                        continue;
+                    }
+
+                    LocalizationData data = ReadLocalizationData(row);
+
+                    if (string.IsNullOrEmpty(data.key))
+                    {
+                        continue;
+                    }
+
+                    LocalizationSO localizationSO = ScriptableObject.CreateInstance<LocalizationSO>();
+
+                    localizationSO.key = data.key;
+                    localizationSO.ko = data.ko;
+                    localizationSO.en = data.en;
+                    localizationSO.jp = data.jp;
+
+                    string assetName = $"Localization_{data.key}.asset";
+
+                    string assetPath = $"{outputFolder}/{assetName}";
+
+                    AssetDatabase.CreateAsset(localizationSO, assetPath);
+
+                    localizationSO.name = $"Localization_{data.key}";
+
+                    createdLocalizations.Add(localizationSO);
+
+                    EditorUtility.SetDirty(localizationSO);
+                }
+
+                if (createDatabase && createdLocalizations.Count > 0)
+                {
+                    LocalizationDatabaseSO database = ScriptableObject.CreateInstance<LocalizationDatabaseSO>();
+
+                    database.words = createdLocalizations;
+
+                    string databasePath = $"{outputFolder}/LocalizationDatabase.asset";
+
+                    AssetDatabase.CreateAsset(database, databasePath);
+
+                    EditorUtility.SetDirty(database);
+                }
+
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+
+                EditorUtility.DisplayDialog(
+                    "Success",
+                    $"Created {createdLocalizations.Count} " +
+                    "Localization SOs!",
+                    "OK"
+                );
+            }
+        }
+        catch (Exception e)
+        {
+            EditorUtility.DisplayDialog(
+                "Error",
+                $"Failed to convert Excel: {e.Message}",
+                "OK"
+            );
+
+            Debug.LogError(
+                $"Localization conversion error: {e}"
+            );
+        }
+    }
+
     private CardData ReadCardData(DataRow row)
     {
         CardData data = new CardData();
@@ -261,6 +381,30 @@ public class ExcelToScriptableConverter : EditorWindow
         data.upgrade_5 = Convert.ToInt32(row["upgrade_5"]);
 
         return data;
+    }
+
+    private LocalizationData ReadLocalizationData(DataRow row)
+    {
+        LocalizationData data =
+            new LocalizationData();
+
+        data.key = row["nameKey"].ToString();
+
+        data.ko = GetCellString(row, "KO");
+        data.en = GetCellString(row, "EN");
+        data.jp = GetCellString(row, "JP");
+
+        return data;
+    }
+
+    private string GetCellString(DataRow row, string columnName)
+    {
+        if (row[columnName] == DBNull.Value)
+        {
+            return string.Empty;
+        }
+
+        return row[columnName].ToString();
     }
 }
 

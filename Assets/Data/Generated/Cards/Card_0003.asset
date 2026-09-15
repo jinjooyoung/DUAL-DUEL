@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Card_0003
   m_EditorClassIdentifier: Assembly-CSharp::CardSO
   cardId: 3
-  cardType: 3
-  rank: 1
+  cardType: 0
+  rank: 4
   artwork: {fileID: 0}
-  nameKey: NAME_3
-  descKey: DESC_3
-  values: 010000000200000003000000040000000500000007000000
+  nameKey: CARDNAME_3
+  descKey: CARDDESC_3
+  values: 0c0000000e00000010000000120000001400000018000000
