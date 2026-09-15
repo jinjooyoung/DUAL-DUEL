@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class BattleSlotManager : MonoBehaviour
 {
-    [Header("고정 슬롯 5개 (좌측 0번 ~ 우측 4번)")]
+    [Header("고정 슬롯 5개 (순서대로)")]
     public List<BattleSlot> slots = new List<BattleSlot>();
 
     // 10층 기준 슬롯 타입 가중치 테이블 (Key: 몬스터 슬롯 개수 0~5, Value: 가중치)
@@ -32,6 +32,7 @@ public class BattleSlotManager : MonoBehaviour
     {
         // 1. 보정 클래스에서 이번 턴에 등장할 적 슬롯 개수(0~5) 추첨
         int enemyCount = slotCorrector.EvaluateNext();
+        // 확률 클래스 디버깅용 코드 Debug.Log(slotCorrector.GetStatusReport());
         int playerCount = slots.Count - enemyCount;
 
         // 2. 슬롯 수량만큼 타입 리스트 구성

@@ -11,6 +11,7 @@ public class CardDisplay : MonoBehaviour
 
     [Header("카드 데이터(SO)")]
     public CardSO cardSO;
+    public int cardIndex;
 
     [Header("이미지")]
     public SpriteRenderer background;
@@ -23,7 +24,7 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro typeText;
     public TextMeshPro descriptionText;
 
-    private bool isDragging = false;
+    public bool isDragging = false;
     private bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
     private Vector3 originalPosition;
 
