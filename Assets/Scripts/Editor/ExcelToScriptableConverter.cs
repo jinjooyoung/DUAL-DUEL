@@ -1,5 +1,4 @@
 #if UNITY_EDITOR
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -18,8 +17,7 @@ public enum ConversionType
 
 public class ExcelToScriptableConverter : EditorWindow
 {
-    private const string excelFilePath = "Assets/Data/Excel/DUAL_DUEL_DataTable.xlsx";     // 엑셀 파일 하나에 시트로 관리할 예정
-
+    private const string excelFilePath = "Assets/Data/Excel/DUAL_DUEL_DataTable.xlsx";
     private string outputFolder = "Assets/Data/Generated/Cards";
     private bool createDatabase = true;
 
@@ -41,25 +39,7 @@ public class ExcelToScriptableConverter : EditorWindow
 
         if (conversionType != prevConversionType)
         {
-            switch (conversionType)
-            {
-                case ConversionType.Card:
-                    outputFolder = "Assets/Data/Generated/Cards";
-                    break;
-
-                case ConversionType.Character:
-                    outputFolder = "Assets/Data/Generated/Characters";
-                    break;
-
-                case ConversionType.Reward:
-                    outputFolder = "Assets/Data/Generated/Rewards";
-                    break;
-
-                case ConversionType.Localization:
-                    outputFolder = "Assets/Data/Generated/Localization";
-                    break;
-            }
-
+            outputFolder = $"Assets/Data/Generated/{conversionType}s";
             prevConversionType = conversionType;
         }
 
@@ -70,40 +50,81 @@ public class ExcelToScriptableConverter : EditorWindow
 
         if (GUILayout.Button("Convert to Scriptable Objects"))
         {
-            if (string.IsNullOrEmpty(excelFilePath))
-            {
-                EditorUtility.DisplayDialog("Error", "Please select an Excel file first.", "OK");
-                return;
-            }
-
-            switch (conversionType)
-            {
-                case ConversionType.Card:
-                    ConvertExcelToCardSO();
-                    break;
-
-                    // 추후 구현. 일단 카드만
-                case ConversionType.Character:
-                    EditorUtility.DisplayDialog("Not Implemented", "Character conversion is not implemented yet.", "OK");
-                    break;
-
-                case ConversionType.Reward:
-                    EditorUtility.DisplayDialog("Not Implemented", "Reward conversion is not implemented yet.", "OK");
-                    break;
-
-                case ConversionType.Localization:
-                    ConvertExcelToLocalizationSO();
-                    break;
-            }
+            ExecuteConversion();
         }
     }
 
-    private void ConvertExcelToCardSO()
+    // 변환 분기점: 달라지는 부분(데이터 파싱 및 SO 값 채우기)만 정의하여 공통 엔진 호출
+    private void ExecuteConversion()
     {
-        if (!Directory.Exists(outputFolder))
+        switch (conversionType)
         {
-            Directory.CreateDirectory(outputFolder);
+            case ConversionType.Card:
+                // CardSO 생성 로직만 넘김
+                ConvertSheet<CardSO, CardDatabaseSO>("Card", "CardDatabase", (row) =>
+                {
+                    if (row["cardId"] == DBNull.Value) return (null, null);
+
+                    CardData data = ReadCardData(row);
+                    if (data.cardId < 0) return (null, null);
+
+                    CardSO cardSO = CreateInstance<CardSO>();
+                    cardSO.cardId = data.cardId;
+
+                    if (Enum.TryParse(data.cardType, true, out CardType type)) cardSO.cardType = type;
+                    if (Enum.IsDefined(typeof(RankType), data.rank)) cardSO.rank = (RankType)data.rank;
+
+                    cardSO.nameKey = data.nameKey;
+                    cardSO.descKey = data.descKey;
+                    cardSO.values = new List<int> { data.baseValue, data.upgrade_1, data.upgrade_2, data.upgrade_3, data.upgrade_4, data.upgrade_5 };
+
+                    string artworkPath = $"Assets/Resources/Cards/Card_{data.cardId}.png";
+                    cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
+
+                    string assetName = $"Card_{data.cardId:D4}";
+                    return (cardSO, assetName);
+                });
+                break;
+
+            case ConversionType.Localization:
+                // LocalizationSO 생성 로직만 넘김
+                ConvertSheet<LocalizationSO, LocalizationDatabaseSO>("Localization", "LocalizationDatabase", (row) =>
+                {
+                    if (row["nameKey"] == DBNull.Value) return (null, null);
+
+                    LocalizationData data = ReadLocalizationData(row);
+                    if (string.IsNullOrEmpty(data.key)) return (null, null);
+
+                    LocalizationSO locSO = CreateInstance<LocalizationSO>();
+                    locSO.key = data.key;
+                    locSO.ko = data.ko;
+                    locSO.en = data.en;
+                    locSO.jp = data.jp;
+
+                    string assetName = $"Localization_{data.key}";
+                    return (locSO, assetName);
+                });
+                break;
+
+            case ConversionType.Character:
+            case ConversionType.Reward:
+                EditorUtility.DisplayDialog("Not Implemented", $"{conversionType} is not implemented yet.", "OK");
+                break;
         }
+    }
+
+    /// <summary>
+    /// [모든 데이터 타입 공통 변환 엔진]
+    /// 엑셀 열기 -> 시트 탐색 -> 폴더 체크 -> SO 루프 생성 -> DB 생성 -> 저장/새로고침 -> 이 공통 로직을 하나의 함수로 처리
+    /// </summary>
+    private void ConvertSheet<TScriptable, TDatabase>(
+        string sheetName,
+        string dbFileName,
+        Func<DataRow, (TScriptable so, string assetName)> parseRowFunc)
+        where TScriptable : ScriptableObject
+        where TDatabase : ScriptableObject, IInitializableDatabase
+    {
+        if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
         try
         {
@@ -114,298 +135,105 @@ public class ExcelToScriptableConverter : EditorWindow
             {
                 DataSet result = reader.AsDataSet(new ExcelDataSetConfiguration
                 {
-                    ConfigureDataTable = (_) => new ExcelDataTableConfiguration
-                    {
-                        UseHeaderRow = true     // 엑셀의 첫 번째 행을 칼럼 이름으로 사용
-                    }
+                    ConfigureDataTable = (_) => new ExcelDataTableConfiguration { UseHeaderRow = true }
                 });
 
-                DataTable cardTable = null;
-
-                string sheetName = conversionType.ToString();
-
-                // 읽은 엑셀 시트(테이블) 중에 시트 이름이 conversionType 타입인 시트를 찾아, cardTable에 할당
+                DataTable targetTable = null;
                 foreach (DataTable table in result.Tables)
                 {
                     if (table.TableName == sheetName)
                     {
-                        cardTable = table;
+                        targetTable = table;
                         break;
                     }
                 }
 
-                if (cardTable == null)
+                if (targetTable == null)
                 {
-                    EditorUtility.DisplayDialog("Error", "Could not find 'Card' sheet in the Excel file.", "OK");
+                    EditorUtility.DisplayDialog("Error", $"Could not find '{sheetName}' sheet in the Excel file.", "OK");
                     return;
                 }
 
-                List<CardSO> createdCards = new List<CardSO>();
+                List<TScriptable> createdList = new List<TScriptable>();
 
-                foreach (DataRow row in cardTable.Rows)
+                // 1. 각 행을 돌며 SO 생성
+                foreach (DataRow row in targetTable.Rows)
                 {
-                    if (row["cardId"] == DBNull.Value)
-                    {
-                        continue;
-                    }
+                    var (so, assetName) = parseRowFunc(row);
+                    if (so == null) continue;
 
-                    CardData cardData = ReadCardData(row);
+                    string assetPath = $"{outputFolder}/{assetName}.asset";
+                    AssetDatabase.CreateAsset(so, assetPath);
+                    so.name = assetName;
 
-                    if (cardData.cardId < 0)
-                    {
-                        Debug.LogWarning("Invalid Card ID. Skipping row.");
-                        continue;
-                    }
-
-                    CardSO cardSO = ScriptableObject.CreateInstance<CardSO>();
-
-                    cardSO.cardId = cardData.cardId;
-
-                    if (Enum.TryParse(cardData.cardType, true, out CardType cardType))
-                    {
-                        cardSO.cardType = cardType;
-                    }
-                    else
-                    {
-                        Debug.LogError($"Card ID {cardData.cardId}: Invalid CardType '{cardData.cardType}'");
-                        DestroyImmediate(cardSO);
-                        continue;
-                    }
-                    
-                    if (!Enum.IsDefined(typeof(RankType), cardData.rank))
-                    {
-                        Debug.LogError($"Card ID {cardData.cardId}: Invalid RankType '{cardData.rank}'");
-                        DestroyImmediate(cardSO);
-                        continue;
-                    }
-
-                    cardSO.rank = (RankType)cardData.rank;
-
-                    cardSO.nameKey = cardData.nameKey;
-                    cardSO.descKey = cardData.descKey;
-
-                    cardSO.values.Clear();
-                    cardSO.values.Add(cardData.baseValue);
-                    cardSO.values.Add(cardData.upgrade_1);
-                    cardSO.values.Add(cardData.upgrade_2);
-                    cardSO.values.Add(cardData.upgrade_3);
-                    cardSO.values.Add(cardData.upgrade_4);
-                    cardSO.values.Add(cardData.upgrade_5);
-
-                    string artworkPath = $"Assets/Resources/Cards/Card_{cardData.cardId}.png";
-                    cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
-
-                    if (cardSO.artwork == null)
-                    {
-                        Debug.LogWarning($"Card ID {cardData.cardId}: Artwork not found at {artworkPath}");
-                    }
-
-                    string assetName = $"Card_{cardData.cardId:D4}.asset";
-                    string assetPath = $"{outputFolder}/{assetName}";
-
-                    AssetDatabase.CreateAsset(cardSO, assetPath);
-
-                    cardSO.name = $"Card_{cardData.cardId:D4}";
-
-                    createdCards.Add(cardSO);
-                    EditorUtility.SetDirty(cardSO);
+                    createdList.Add(so);
+                    EditorUtility.SetDirty(so);
                 }
 
-                if (createDatabase && createdCards.Count > 0)
+                // 2. 데이터베이스 SO 생성 및 할당 (items에 공통 주입)
+                if (createDatabase && createdList.Count > 0)
                 {
-                    CardDatabaseSO database = ScriptableObject.CreateInstance<CardDatabaseSO>();
-                    database.items = createdCards;
+                    TDatabase database = CreateInstance<TDatabase>();
 
-                    string databasePath = $"{outputFolder}/CardDatabase.asset";
+                    // 앞서 통일한 BaseDatabaseSO의 items 필드를 찾아 동적 할당
+                    var itemsField = typeof(TDatabase).GetField("items");
+                    if (itemsField != null)
+                    {
+                        itemsField.SetValue(database, createdList);
+                    }
+
+                    string databasePath = $"{outputFolder}/{dbFileName}.asset";
                     AssetDatabase.CreateAsset(database, databasePath);
-
                     EditorUtility.SetDirty(database);
                 }
 
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
 
-                EditorUtility.DisplayDialog(
-                    "Success",
-                    $"Created {createdCards.Count} Card SOs!",
-                    "OK"
-                );
+                EditorUtility.DisplayDialog("Success", $"Created {createdList.Count} {sheetName} SOs & Database!", "OK");
             }
         }
         catch (Exception e)
         {
-            EditorUtility.DisplayDialog(
-                "Error",
-                $"Failed to convert Excel: {e.Message}",
-                "OK"
-            );
-
+            EditorUtility.DisplayDialog("Error", $"Failed: {e.Message}", "OK");
             Debug.LogError($"Excel conversion error: {e}");
         }
     }
 
-    private void ConvertExcelToLocalizationSO()
-    {
-        if (!Directory.Exists(outputFolder))
-        {
-            Directory.CreateDirectory(outputFolder);
-        }
-
-        try
-        {
-            string fullPath = Path.GetFullPath(excelFilePath);
-
-            using (var stream = File.Open(fullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            using (var reader = ExcelReaderFactory.CreateReader(stream))
-            {
-                DataSet result = reader.AsDataSet(new ExcelDataSetConfiguration
-                    {
-                        ConfigureDataTable = (_) => new ExcelDataTableConfiguration
-                        {
-                            UseHeaderRow = true
-                        }
-                    });
-
-                DataTable localizationTable = null;
-
-                string sheetName = conversionType.ToString();
-
-                foreach (DataTable table in result.Tables)
-                {
-                    if (table.TableName == sheetName)
-                    {
-                        localizationTable = table;
-                        break;
-                    }
-                }
-
-                if (localizationTable == null)
-                {
-                    EditorUtility.DisplayDialog(
-                        "Error",
-                        "Could not find 'Localization' sheet.",
-                        "OK"
-                    );
-
-                    return;
-                }
-
-                List<LocalizationSO> createdLocalizations = new List<LocalizationSO>();
-
-                foreach (DataRow row in localizationTable.Rows)
-                {
-                    if (row["nameKey"] == DBNull.Value)
-                    {
-                        continue;
-                    }
-
-                    LocalizationData data = ReadLocalizationData(row);
-
-                    if (string.IsNullOrEmpty(data.key))
-                    {
-                        continue;
-                    }
-
-                    LocalizationSO localizationSO = ScriptableObject.CreateInstance<LocalizationSO>();
-
-                    localizationSO.key = data.key;
-                    localizationSO.ko = data.ko;
-                    localizationSO.en = data.en;
-                    localizationSO.jp = data.jp;
-
-                    string assetName = $"Localization_{data.key}.asset";
-
-                    string assetPath = $"{outputFolder}/{assetName}";
-
-                    AssetDatabase.CreateAsset(localizationSO, assetPath);
-
-                    localizationSO.name = $"Localization_{data.key}";
-
-                    createdLocalizations.Add(localizationSO);
-
-                    EditorUtility.SetDirty(localizationSO);
-                }
-
-                if (createDatabase && createdLocalizations.Count > 0)
-                {
-                    LocalizationDatabaseSO database = ScriptableObject.CreateInstance<LocalizationDatabaseSO>();
-
-                    database.items = createdLocalizations;
-
-                    string databasePath = $"{outputFolder}/LocalizationDatabase.asset";
-
-                    AssetDatabase.CreateAsset(database, databasePath);
-
-                    EditorUtility.SetDirty(database);
-                }
-
-                AssetDatabase.SaveAssets();
-                AssetDatabase.Refresh();
-
-                EditorUtility.DisplayDialog(
-                    "Success",
-                    $"Created {createdLocalizations.Count} " +
-                    "Localization SOs!",
-                    "OK"
-                );
-            }
-        }
-        catch (Exception e)
-        {
-            EditorUtility.DisplayDialog(
-                "Error",
-                $"Failed to convert Excel: {e.Message}",
-                "OK"
-            );
-
-            Debug.LogError(
-                $"Localization conversion error: {e}"
-            );
-        }
-    }
+    // --- 각 시트별 순수 데이터 파싱 헬퍼 함수들 ---
 
     private CardData ReadCardData(DataRow row)
     {
-        CardData data = new CardData();
-
-        data.cardId = Convert.ToInt32(row["cardId"]);
-        data.cardType = row["cardType"].ToString();
-        data.rank = Convert.ToInt32(row["rank"]);
-        data.nameKey = row["nameKey"].ToString();
-        data.descKey = row["descKey"].ToString();
-        data.baseValue = Convert.ToInt32(row["baseValue"]);
-        data.upgrade_1 = Convert.ToInt32(row["upgrade_1"]);
-        data.upgrade_2 = Convert.ToInt32(row["upgrade_2"]);
-        data.upgrade_3 = Convert.ToInt32(row["upgrade_3"]);
-        data.upgrade_4 = Convert.ToInt32(row["upgrade_4"]);
-        data.upgrade_5 = Convert.ToInt32(row["upgrade_5"]);
-
-        return data;
+        return new CardData
+        {
+            cardId = Convert.ToInt32(row["cardId"]),
+            cardType = row["cardType"].ToString(),
+            rank = Convert.ToInt32(row["rank"]),
+            nameKey = row["nameKey"].ToString(),
+            descKey = row["descKey"].ToString(),
+            baseValue = Convert.ToInt32(row["baseValue"]),
+            upgrade_1 = Convert.ToInt32(row["upgrade_1"]),
+            upgrade_2 = Convert.ToInt32(row["upgrade_2"]),
+            upgrade_3 = Convert.ToInt32(row["upgrade_3"]),
+            upgrade_4 = Convert.ToInt32(row["upgrade_4"]),
+            upgrade_5 = Convert.ToInt32(row["upgrade_5"])
+        };
     }
 
     private LocalizationData ReadLocalizationData(DataRow row)
     {
-        LocalizationData data =
-            new LocalizationData();
-
-        data.key = row["nameKey"].ToString();
-
-        data.ko = GetCellString(row, "KO");
-        data.en = GetCellString(row, "EN");
-        data.jp = GetCellString(row, "JP");
-
-        return data;
+        return new LocalizationData
+        {
+            key = row["nameKey"].ToString(),
+            ko = GetCellString(row, "KO"),
+            en = GetCellString(row, "EN"),
+            jp = GetCellString(row, "JP")
+        };
     }
 
     private string GetCellString(DataRow row, string columnName)
     {
-        if (row[columnName] == DBNull.Value)
-        {
-            return string.Empty;
-        }
-
-        return row[columnName].ToString();
+        return (row[columnName] == DBNull.Value) ? string.Empty : row[columnName].ToString();
     }
 }
-
 #endif
