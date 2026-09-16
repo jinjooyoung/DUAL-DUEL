@@ -1,7 +1,12 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class BaseDatabaseSO<TKey, TItem> : ScriptableObject
+public interface IInitializableDatabase
+{
+    void Initialize();
+}
+
+public abstract class BaseDatabaseSO<TKey, TItem> : ScriptableObject, IInitializableDatabase
 {
     public List<TItem> items = new List<TItem>();
 

@@ -25,14 +25,16 @@ public class DataManager : MonoBehaviour
 
     private void InitDatabases()
     {
-        if (cardDatabase != null)
+        IInitializableDatabase[] allDatabases = new IInitializableDatabase[]
         {
-            cardDatabase.Initialize();
-        }
+            cardDatabase,
+            localizationDatabase
+            // 새 DB 변수 이름만 여기에 쉼표로 추가
+        };
 
-        if (localizationDatabase != null)
+        foreach (var db in allDatabases)
         {
-            localizationDatabase.Initialize();
+            db?.Initialize();
         }
     }
 
