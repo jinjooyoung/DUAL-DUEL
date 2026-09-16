@@ -51,11 +51,6 @@ public class BattleCardManager : MonoBehaviour
             DrawCard();
         }
 
-        if (Input.GetKeyDown(KeyCode.F))
-        {
-            DiscardCard(Random.Range(0, handCards.Count));
-        }
-
         ArrangeHand();
     }
 
@@ -103,7 +98,7 @@ public class BattleCardManager : MonoBehaviour
     {
         // 1. 카드 풀에서 비활성화된 Display 검색
         CardDisplay availableDisplay = cardPool.Find(c => !c.gameObject.activeSelf);
-        if (availableDisplay == null)
+        if (availableDisplay == null || handCards.Count >= 6)
         {
             Debug.LogWarning("손패 오브젝트 풀이 가득 차 더 이상 카드를 표시할 수 없습니다.");
             return;
@@ -132,41 +127,6 @@ public class BattleCardManager : MonoBehaviour
         availableDisplay.cardIndex = handCards.Count - 1;
 
         Debug.Log($"카드 드로우 완료: {drawnData.nameKey} (현재 손패: {handCards.Count}장)");
-    }
-
-    /// <summary>
-    /// 손패에 있는 특정 카드를 버림 덱으로 이동시키고 오브젝트를 풀로 반환(비활성화)합니다.
-    /// </summary>
-    /// <param name="handIndex">버릴 카드의 handCards 내 인덱스</param>
-    public void DiscardCard(int handIndex)
-    {
-        if (handIndex < 0 || handIndex >= handCards.Count)
-        {
-            Debug.LogError($"유효하지 않은 손패 인덱스입니다: {handIndex}");
-            return;
-        }
-
-        // 1. 데이터 이동
-        CardSO discardedData = handCards[handIndex];
-        handCards.RemoveAt(handIndex);
-        discardDeck.Add(discardedData);
-
-        // 2. 활성화된 오브젝트 중 해당 순서의 Display 반환
-        List<CardDisplay> activeDisplays = GetActiveDisplays();
-        if (handIndex < activeDisplays.Count)
-        {
-            CardDisplay targetDisplay = activeDisplays[handIndex];
-            targetDisplay.gameObject.SetActive(false);
-            activeDisplays.RemoveAt(handIndex);
-        }
-
-        // 3. 남은 활성 카드 인덱스 갱신
-        for (int i = 0; i < activeDisplays.Count; i++)
-        {
-            activeDisplays[i].cardIndex = i;
-        }
-
-        Debug.Log($"카드 버림 완료: {discardedData.nameKey} (남은 손패: {handCards.Count}장)");
     }
 
     /// <summary>

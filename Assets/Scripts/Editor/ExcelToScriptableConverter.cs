@@ -72,11 +72,15 @@ public class ExcelToScriptableConverter : EditorWindow
                     cardSO.cardId = data.cardId;
 
                     if (Enum.TryParse(data.cardType, true, out CardType type)) cardSO.cardType = type;
+                    cardSO.isSpecial = data.isSpecial == 1 ? true : false;
                     if (Enum.IsDefined(typeof(RankType), data.rank)) cardSO.rank = (RankType)data.rank;
 
                     cardSO.nameKey = data.nameKey;
                     cardSO.descKey = data.descKey;
                     cardSO.values = new List<int> { data.baseValue, data.upgrade_1, data.upgrade_2, data.upgrade_3, data.upgrade_4, data.upgrade_5 };
+
+                    cardSO.playerSlotValue = data.playerSlotValue;
+                    cardSO.enemySlotValue = data.enemySlotValue;
 
                     string artworkPath = $"Assets/Resources/Cards/Card_{data.cardId}.png";
                     cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
