@@ -7,7 +7,8 @@ public enum CardType
     Defense,
     Heal,
     Buff,
-    Debuff
+    Debuff,
+    Special
 }
 
 public enum RankType

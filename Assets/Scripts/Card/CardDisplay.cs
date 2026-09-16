@@ -44,9 +44,9 @@ public class CardDisplay : MonoBehaviour
         cardSO = data;
 
         // 3D 텍스트 업데이트
-        if (nameText != null) nameText.text = data.nameKey;                         // 추후 로컬라이징 추가 시 키 대신 로컬라이징 데이터베이스에서 찾아, 적용하는 방식으로 수정
-        if (typeText != null) typeText.text = data.cardType.ToString();
-        if (descriptionText != null) descriptionText.text = data.descKey;
+        if (nameText != null) nameText.text = LocalizationManager.Instance.GetText(data.nameKey);
+        if (typeText != null) typeText.text = LocalizationManager.Instance.GetText(data.cardType.ToString());
+        if (descriptionText != null) descriptionText.text = LocalizationManager.Instance.GetText(data.descKey);
 
         // 카드 리소스
         if (cardResource != null && cardSO.artwork != null)
