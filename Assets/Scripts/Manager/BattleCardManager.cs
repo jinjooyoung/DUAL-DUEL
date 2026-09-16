@@ -174,15 +174,17 @@ public class BattleCardManager : MonoBehaviour
     /// </summary>
     private void ArrangeHand()
     {
-        List<CardDisplay> activeDisplays = GetActiveDisplays();
-        if (activeDisplays.Count == 0 || handPosition == null) return;
+        // 활성화된 카드 중 아직 슬롯에 배치되지 않은(isPlaced == false)카드만 필터링
+        List<CardDisplay> activeHandDisplays = GetActiveDisplays().FindAll(c => !c.isPlaced);
 
-        float totalWidth = (activeDisplays.Count - 1) * cardSpacing;
+        if (activeHandDisplays.Count == 0 || handPosition == null) return;
+
+        float totalWidth = (activeHandDisplays.Count - 1) * cardSpacing;
         float startX = -totalWidth / 2f;
 
-        for (int i = 0; i < activeDisplays.Count; i++)
+        for (int i = 0; i < activeHandDisplays.Count; i++)
         {
-            CardDisplay display = activeDisplays[i];
+            CardDisplay display = activeHandDisplays[i];
 
             // 사용자가 드래그 중인 카드는 위치 보간에서 제외
             if (display.isDragging) continue;

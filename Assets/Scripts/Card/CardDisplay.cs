@@ -25,7 +25,7 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro descriptionText;
 
     public bool isDragging = false;
-    private bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
+    public bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
     private Vector3 originalPosition;
 
     [Header("레이어 마스크")]
