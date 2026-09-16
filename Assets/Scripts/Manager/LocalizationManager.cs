@@ -40,8 +40,8 @@ public class LocalizationManager : MonoBehaviour
         }
 
         // 2. GameManager의 언어 설정 참조 (없을 경우 기본값 KO)
-        LanguageType currentLang = GameManager.Instance != null
-            ? GameManager.Instance.languageType
+        LanguageType currentLang = SettingsManager.Instance != null
+            ? SettingsManager.Instance.languageType
             : LanguageType.KO;
 
         // 3. 언어 타입에 맞춰 해당 필드 텍스트 반환
