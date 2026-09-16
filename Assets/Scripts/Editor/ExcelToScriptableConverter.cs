@@ -214,7 +214,7 @@ public class ExcelToScriptableConverter : EditorWindow
                 if (createDatabase && createdCards.Count > 0)
                 {
                     CardDatabaseSO database = ScriptableObject.CreateInstance<CardDatabaseSO>();
-                    database.cards = createdCards;
+                    database.items = createdCards;
 
                     string databasePath = $"{outputFolder}/CardDatabase.asset";
                     AssetDatabase.CreateAsset(database, databasePath);
@@ -330,7 +330,7 @@ public class ExcelToScriptableConverter : EditorWindow
                 {
                     LocalizationDatabaseSO database = ScriptableObject.CreateInstance<LocalizationDatabaseSO>();
 
-                    database.words = createdLocalizations;
+                    database.items = createdLocalizations;
 
                     string databasePath = $"{outputFolder}/LocalizationDatabase.asset";
 
