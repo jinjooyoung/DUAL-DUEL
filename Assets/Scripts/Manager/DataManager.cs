@@ -1,5 +1,8 @@
 using UnityEngine;
 
+/// <summary>
+/// 데이터SO 검색용. 부가적인 로직 수행 X
+/// </summary>
 public class DataManager : MonoBehaviour
 {
     public static DataManager Instance { get; private set; }
@@ -46,5 +49,15 @@ public class DataManager : MonoBehaviour
     public CardSO GetCard(int cardId)
     {
         return cardDatabase != null ? cardDatabase.GetCardById(cardId) : null;
+    }
+
+    /// <summary>
+    /// 번역 문자열 받아오기
+    /// </summary>
+    /// <param name="key">번역 string 키</param>
+    /// <returns>찾은 번역SO</returns>
+    public LocalizationSO GetWord(string key)
+    {
+        return localizationDatabase != null ? localizationDatabase.GetWordById(key) : null;
     }
 }

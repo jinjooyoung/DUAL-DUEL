@@ -54,7 +54,7 @@ public class CardDatabaseSO : BaseDatabaseSO<int, CardSO>
 {
     protected override int GetKey(CardSO item) => item.cardId;
 
-    // 기존에 호출하던 GetCardById()와의 호환성을 위한 편의 메서드
+    // 함수 이름 직관적이게 변경
     public CardSO GetCardById(int id) => GetByKey(id);
 }
 
@@ -63,6 +63,5 @@ public class LocalizationDatabaseSO : BaseDatabaseSO<string, LocalizationSO>
 {
     protected override string GetKey(LocalizationSO item) => item.key;
 
-    // 기존에 호출하던 GetWordById()와의 호환성을 위한 편의 메서드
     public LocalizationSO GetWordById(string key) => GetByKey(key);
 }
