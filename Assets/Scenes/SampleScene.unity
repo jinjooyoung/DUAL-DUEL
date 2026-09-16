@@ -137,7 +137,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &49365345
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -150,7 +150,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: 80f7f450f6e39824aa5046a09ea0dbd1, type: 2}
+  cardSO: {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -158,6 +159,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -299,7 +301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &53795327
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -312,7 +314,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: 56e3f460dff6f9247ba7aeb8a9ea46f9, type: 2}
+  cardSO: {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -320,6 +323,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -461,7 +465,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &186735778
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -474,7 +478,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: 3be8a1177f8778048a43fb59f7f10d30, type: 2}
+  cardSO: {fileID: 11400000, guid: 9e7d56bcd31d9b24fa9a403f9c624438, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -482,6 +487,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -623,7 +629,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &199975448
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -636,7 +642,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: 0bf3d94a97e5ca9448425fba18e2ebef, type: 2}
+  cardSO: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -644,6 +651,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1024,7 +1032,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &383353312
 SpriteRenderer:
   serializedVersion: 2
@@ -1111,7 +1119,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: d4144c794b3a6f54aa8f8b0a44082d84, type: 2}
+  cardSO: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -1119,6 +1128,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1506,7 +1516,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSlot
   slotOwnerType: 1
-  slotIndex: 0
+  slotIndex: 4
   isOccupied: 0
   currentCard: {fileID: 0}
 --- !u!212 &685632121
@@ -1744,6 +1754,108 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &928314693
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 928314694}
+  - component: {fileID: 928314695}
+  m_Layer: 0
+  m_Name: BattleCardManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &928314694
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928314693}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1373977246}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &928314695
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 928314693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3bdbfbedb608dbc4787e7686edac214a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BattleCardManager
+  drawDeck:
+  - {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+  - {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
+  - {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
+  - {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
+  - {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+  - {fileID: 11400000, guid: 9e7d56bcd31d9b24fa9a403f9c624438, type: 2}
+  - {fileID: 11400000, guid: 9bbb4700f0b7db641bbfa7166fa5e007, type: 2}
+  - {fileID: 11400000, guid: 94992f96505ac644e9adfee51eab888c, type: 2}
+  - {fileID: 11400000, guid: 972bbe6dff6132b4d9b648fc75f884a8, type: 2}
+  - {fileID: 11400000, guid: a9386bf9b7584ff4a8fa7d570a6ecc1a, type: 2}
+  - {fileID: 11400000, guid: a2de4cfd1e037d8419f889f84863f469, type: 2}
+  - {fileID: 11400000, guid: 8145cd6490b600344bdee6da2ca056c7, type: 2}
+  - {fileID: 11400000, guid: af269d0f74d3ab84695601529b822be7, type: 2}
+  - {fileID: 11400000, guid: 1f61148541a4e0b41b858f6a69bb51c9, type: 2}
+  handCards: []
+  discardDeck: []
+  cardPool:
+  - {fileID: 383353315}
+  - {fileID: 53795327}
+  - {fileID: 49365345}
+  - {fileID: 1444476946}
+  - {fileID: 199975448}
+  - {fileID: 186735778}
+  handPosition: {fileID: 968608411}
+  cardSpacing: 2
+  arrangeSpeed: 10
+--- !u!1 &968608410
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 968608411}
+  m_Layer: 0
+  m_Name: HandPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &968608411
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 968608410}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: -2.15, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &975654311
 GameObject:
   m_ObjectHideFlags: 0
@@ -1850,7 +1962,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSlot
   slotOwnerType: 1
-  slotIndex: 0
+  slotIndex: 2
   isOccupied: 0
   currentCard: {fileID: 0}
 --- !u!65 &975654316
@@ -2016,7 +2128,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSlot
   slotOwnerType: 0
-  slotIndex: 0
+  slotIndex: 3
   isOccupied: 0
   currentCard: {fileID: 0}
 --- !u!65 &1114551978
@@ -2071,6 +2183,7 @@ Transform:
   m_Children:
   - {fileID: 646770129}
   - {fileID: 533102661}
+  - {fileID: 928314694}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1410019670
@@ -2170,7 +2283,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1444476946
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2183,7 +2296,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f876a7c34a9fc0469e7d9a77fbfab69, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
-  cardSO: {fileID: 11400000, guid: 7ad75e711b7defb49a8a4cbe4d578d86, type: 2}
+  cardSO: {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
+  cardIndex: 0
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -2191,6 +2305,7 @@ MonoBehaviour:
   nameText: {fileID: 0}
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
+  isDragging: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -2683,7 +2798,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleSlot
   slotOwnerType: 0
-  slotIndex: 0
+  slotIndex: 1
   isOccupied: 0
   currentCard: {fileID: 0}
 --- !u!65 &2063914339
@@ -2725,3 +2840,4 @@ SceneRoots:
   - {fileID: 1011682835}
   - {fileID: 1373977246}
   - {fileID: 335012545}
+  - {fileID: 968608411}

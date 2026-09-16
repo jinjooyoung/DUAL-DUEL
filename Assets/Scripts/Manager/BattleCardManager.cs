@@ -24,7 +24,7 @@ public class BattleCardManager : MonoBehaviour
     public Transform handPosition;
 
     [Header("핸드 정렬 옵션")]
-    [SerializeField] private float cardSpacing = 3.0f;
+    [SerializeField] private float cardSpacing = 2.0f;
     [SerializeField] private float arrangeSpeed = 10.0f;
 
     private void Awake()
@@ -46,6 +46,16 @@ public class BattleCardManager : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.D))
+        {
+            DrawCard();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            DiscardCard(Random.Range(0, handCards.Count));
+        }
+
         ArrangeHand();
     }
 
