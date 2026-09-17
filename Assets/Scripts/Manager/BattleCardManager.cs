@@ -155,6 +155,34 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 특정 카드 오브젝트를 버림 더미로 이동시키고 오브젝트를 풀로 반환(비활성화)합니다.
+    /// </summary>
+    /// <param name="targetDisplay">버릴 대상 CardDisplay 컴포넌트</param>
+    public void DiscardCard(CardDisplay targetDisplay)
+    {
+        if (targetDisplay == null || !targetDisplay.gameObject.activeSelf) return;
+
+        // 1. 슬롯에 꽂혀 있던 카드라면 슬롯 비우기
+        if (targetDisplay.currentSlot != null)
+        {
+            targetDisplay.currentSlot.ClearSlot();
+        }
+
+        // 2. 데이터 리스트 이동: handCards -> discardDeck
+        if (targetDisplay.cardSO != null)
+        {
+            handCards.Remove(targetDisplay.cardSO);
+            discardDeck.Add(targetDisplay.cardSO);
+        }
+
+        // 3. 카드 상태 초기화 후 오브젝트 비활성화 (풀 반환)
+        targetDisplay.ResetPlacement();
+        targetDisplay.gameObject.SetActive(false);
+
+        Debug.Log($"카드 버림 완료: {targetDisplay.cardSO?.nameKey} (남은 손패: {handCards.Count}장)");
+    }
+
+    /// <summary>
     /// 현재 풀에서 활성화되어 화면에 노출 중인 카드 오브젝트 목록을 반환합니다.
     /// </summary>
     private List<CardDisplay> GetActiveDisplays()

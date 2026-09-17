@@ -12,6 +12,7 @@ public class CardDisplay : MonoBehaviour
     [Header("카드 데이터(SO)")]
     public CardSO cardSO;
     public int cardIndex;
+    public BattleSlot currentSlot;
 
     [Header("이미지")]
     public SpriteRenderer background;
@@ -63,6 +64,16 @@ public class CardDisplay : MonoBehaviour
         // 로컬라이징 후 설명 텍스트의 {value}를 cardSO.values로 Replace해주는 코드 여기 작성해야함
     }
 
+    /// <summary>
+    /// 턴 종료 등으로 슬롯이나 매니저에 의해 강제로 배치가 초기화될 때 호출
+    /// </summary>
+    public void ResetPlacement()
+    {
+        isPlaced = false;      // "슬롯에 고정됨" 상태를 해제
+        currentSlot = null;    // 연결되어 있던 슬롯 참조 제거
+        isDragging = false;    // 드래그 중 플래그 안전 초기화
+    }
+
     private void OnMouseDown()
     {
         Debug.Log("마우스 다운");
@@ -105,6 +116,7 @@ public class CardDisplay : MonoBehaviour
             if (slot != null && !slot.isOccupied)
             {
                 isPlaced = true;
+                currentSlot = slot;
                 slot.PlaceCard(this); // 슬롯에 안착
                 return;
             }

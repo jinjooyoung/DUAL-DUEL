@@ -152,6 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -160,6 +161,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -316,6 +318,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -324,6 +327,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -480,6 +484,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: 9e7d56bcd31d9b24fa9a403f9c624438, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -488,6 +493,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -644,6 +650,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -652,6 +659,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1121,6 +1129,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -1129,6 +1138,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -1484,6 +1494,19 @@ MonoBehaviour:
   - {fileID: 975654315}
   - {fileID: 1114551977}
   - {fileID: 685632119}
+  playerStats:
+    currentHp: 0
+    maxHp: 0
+    guard: 0
+    buffValue: 0
+    debuffValue: 0
+  monsterStats:
+    currentHp: 0
+    maxHp: 0
+    guard: 0
+    buffValue: 0
+    debuffValue: 0
+  slotActionDelay: 1
 --- !u!1 &685632118
 GameObject:
   m_ObjectHideFlags: 0
@@ -2181,9 +2204,10 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 928314694}
   - {fileID: 646770129}
   - {fileID: 533102661}
-  - {fileID: 928314694}
+  - {fileID: 2082990891}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1410019670
@@ -2298,6 +2322,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardDisplay
   cardSO: {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
   cardIndex: 0
+  currentSlot: {fileID: 0}
   background: {fileID: 0}
   cardResource: {fileID: 0}
   ownerBorder: {fileID: 0}
@@ -2306,6 +2331,7 @@ MonoBehaviour:
   typeText: {fileID: 0}
   descriptionText: {fileID: 0}
   isDragging: 0
+  isPlaced: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -2822,6 +2848,52 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 5.1199994, y: 7.6799994, z: 0.19999999}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &2082990890
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2082990891}
+  - component: {fileID: 2082990892}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2082990891
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082990890}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1373977246}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2082990892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2082990890}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba2a4e9d4bbba7740bf4f95864eb34af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  character: {fileID: 11400000, guid: 3824bad56fec45d41a49f774bbc954dc, type: 2}
+  monster: {fileID: 11400000, guid: 373cb5ebd5bab9040b7a451ea61f3a72, type: 2}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
