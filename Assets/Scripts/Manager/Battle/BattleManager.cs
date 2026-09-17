@@ -157,6 +157,7 @@ public class BattleManager : MonoBehaviour
 
         BattleCardManager.Instance?.DiscardCard(slot.currentCard);
         slot.ClearSlot();
+        BattleUIManager.Instance.UpdateAllUI();
     }
 
     public void ModifyHealth(CombatEntityStats entity, int amount)

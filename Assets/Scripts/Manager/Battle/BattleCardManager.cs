@@ -70,6 +70,7 @@ public class BattleCardManager : MonoBehaviour
         for (int i = 0; i < count; i++)
         {
             DrawCard();
+            BattleUIManager.Instance.UpdateAllUI();
             yield return new WaitForSeconds(drawInterval);
         }
     }
