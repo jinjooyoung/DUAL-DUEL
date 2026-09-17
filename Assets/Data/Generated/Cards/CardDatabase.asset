@@ -9,10 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4092e31c7ef62a3419a1f3792404ac5e, type: 3}
+  m_Script: {fileID: 0}
   m_Name: CardDatabase
   m_EditorClassIdentifier: Assembly-CSharp::CardDatabaseSO
-  cards:
+  items:
   - {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
   - {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
   - {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}

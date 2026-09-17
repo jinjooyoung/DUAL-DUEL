@@ -14,8 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardSO
   cardId: 7
   cardType: 1
+  isSpecial: 0
   rank: 4
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: b500158f77bd024478302d72be775685, type: 3}
   nameKey: CARDNAME_7
   descKey: CARDDESC_7
   values: 0a0000000c0000000e000000100000001200000015000000
+  playerSlotValue: 0
+  enemySlotValue: 0

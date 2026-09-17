@@ -10,6 +10,8 @@ public class DataManager : MonoBehaviour
     [Header("데이터베이스 SO")]
     [SerializeField] private CardDatabaseSO cardDatabase;
     [SerializeField] private LocalizationDatabaseSO localizationDatabase;
+    [SerializeField] private CharacterDatabaseSO characterDatabaseSO;
+    [SerializeField] private MonsterDatabaseSO monsterDatabase;
     // 추후에 엑셀에 데이터 더 생기면 추가
 
     private void Awake()
