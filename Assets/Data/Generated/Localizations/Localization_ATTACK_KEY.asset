@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 601252960128c914588f647b85c498b3, type: 3}
-  m_Name: Localization_ATTAK_KEY
+  m_Name: Localization_ATTACK_KEY
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationSO
-  key: ATTAK_KEY
+  key: ATTACK_KEY
   ko: "\uACF5\uACA9"
   en: Attack
   jp: 

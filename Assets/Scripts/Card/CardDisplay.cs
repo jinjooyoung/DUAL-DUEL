@@ -17,7 +17,6 @@ public class CardDisplay : MonoBehaviour
     [Header("이미지")]
     public SpriteRenderer background;
     public SpriteRenderer cardResource;
-    public SpriteRenderer ownerBorder;
     public SpriteRenderer typeIcon;
 
     [Header("텍스트")]
@@ -46,8 +45,12 @@ public class CardDisplay : MonoBehaviour
 
         // 3D 텍스트 업데이트
         if (nameText != null) nameText.text = LocalizationManager.Instance.GetText(data.nameKey);
-        if (typeText != null) typeText.text = LocalizationManager.Instance.GetText(data.cardType.ToString());
-        if (descriptionText != null) descriptionText.text = LocalizationManager.Instance.GetText(data.descKey);
+        if (typeText != null) typeText.text = LocalizationManager.Instance.GetText($"{data.cardType.ToString().ToUpper()}_KEY");
+
+        string desTemp = LocalizationManager.Instance.GetText(data.descKey);
+        desTemp = desTemp.Replace("[Value]", data.values[0].ToString());
+
+        if (descriptionText != null) descriptionText.text = desTemp;
 
         // 카드 리소스
         if (cardResource != null && cardSO.artwork != null)
