@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6cb181100f020184a96f6e70d1fb71a1, type: 3}
+  m_Name: Character_1001
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterSO
+  characterID: 1001
+  characterName: CHARNAME_1001
+  descriptionText: CHARDES_1001
+  playStyleText: CHARPLAYST_1001
+  startDeckID: 0000000001000000020000000400000005000000080000000a0000000c000000
+  signatureCardID: 1
+  maxHp: 50
+  startingLife: 3

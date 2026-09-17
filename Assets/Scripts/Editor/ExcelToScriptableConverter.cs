@@ -6,11 +6,13 @@ using System.IO;
 using UnityEditor;
 using UnityEngine;
 using ExcelDataReader;
+using System.Linq;
 
 public enum ConversionType
 {
     Card,
     Character,
+    Monster,
     Reward,
     Localization
 }
@@ -111,6 +113,57 @@ public class ExcelToScriptableConverter : EditorWindow
                 break;
 
             case ConversionType.Character:
+                ConvertSheet<CharacterSO, CharacterDatabaseSO>("Character", "CharacterDatabase", (row) =>
+                {
+                    if (row["characterID"] == DBNull.Value) return (null, null);
+
+                    CharacterData data = ReadCharacterData(row);
+                    if (data.characterID < 0) return (null, null);
+
+                    CharacterSO charSO = CreateInstance<CharacterSO>();
+                    charSO.characterID = data.characterID;
+                    charSO.characterName = data.characterName;
+                    charSO.descriptionText = data.descriptionText;
+                    charSO.playStyleText = data.playStyleText;
+                    charSO.signatureCardID = data.signatureCardID;
+                    charSO.maxHp = data.maxHp;
+                    charSO.startingLife = data.startingLife;
+
+                    // "1001,1002,1003" 문자열을 List<int>로 파싱
+                    charSO.startDeckID = ParseIdList(data.startDeckID);
+
+                    string assetName = $"Character_{data.characterID:D4}";
+                    return (charSO, assetName);
+                });
+                break;
+
+            case ConversionType.Monster:
+                ConvertSheet<MonsterSO, MonsterDatabaseSO>("Monster", "MonsterDatabase", (row) =>
+                {
+                    if (row["monsterID"] == DBNull.Value) return (null, null);
+
+                    MonsterData data = ReadMonsterData(row);
+                    if (data.monsterID < 0) return (null, null);
+
+                    MonsterSO monSO = CreateInstance<MonsterSO>();
+                    monSO.monsterID = data.monsterID;
+                    monSO.monsterName = data.monsterName;
+                    monSO.maxHp = data.maxHp;
+                    monSO.slotCreateType = data.slotCreateType;
+                    monSO.rewardCardRank = data.rewardCardRank;
+                    monSO.gimmickValue = data.gimmickValue;
+
+                    if (Enum.TryParse(data.gimmickType, true, out GimmickType gimmick))
+                        monSO.gimmickType = gimmick;
+
+                    // "2001,2002" 문자열을 List<int>로 파싱
+                    monSO.monsterDeckID = ParseIdList(data.monsterDeckID);
+
+                    string assetName = $"Monster_{data.monsterID:D4}";
+                    return (monSO, assetName);
+                });
+                break;
+
             case ConversionType.Reward:
                 EditorUtility.DisplayDialog("Not Implemented", $"{conversionType} is not implemented yet.", "OK");
                 break;
@@ -233,6 +286,48 @@ public class ExcelToScriptableConverter : EditorWindow
             en = GetCellString(row, "EN"),
             jp = GetCellString(row, "JP")
         };
+    }
+
+    private CharacterData ReadCharacterData(DataRow row)
+    {
+        return new CharacterData
+        {
+            characterID = Convert.ToInt32(row["characterID"]),
+            characterName = row["characterName"].ToString(),
+            descriptionText = row["descriptionText"].ToString(),
+            playStyleText = row["playStyleText"].ToString(),
+            startDeckID = row["startDeckID"].ToString(),
+            signatureCardID = Convert.ToInt32(row["signatureCardID"]),
+            maxHp = Convert.ToInt32(row["maxHp"]),
+            startingLife = Convert.ToInt32(row["startingLife"])
+        };
+    }
+
+    private MonsterData ReadMonsterData(DataRow row)
+    {
+        return new MonsterData
+        {
+            monsterID = Convert.ToInt32(row["monsterID"]),
+            monsterName = row["monsterName"].ToString(),
+            maxHp = Convert.ToInt32(row["maxHp"]),
+            slotCreateType = Convert.ToInt32(row["slotCreateType"]),
+            monsterDeckID = row["monsterDeckID"].ToString(),
+            rewardCardRank = Convert.ToInt32(row["rewardCardRank"]),
+            gimmickType = row["gimmickType"].ToString(),
+            gimmickValue = Convert.ToInt32(row["gimmickValue"])
+        };
+    }
+
+    // ;로 구분된 ID 문자열을 List<int>로 안전하게 변환하는 공통 함수
+    private List<int> ParseIdList(string rawString)
+    {
+        if (string.IsNullOrWhiteSpace(rawString)) return new List<int>();
+
+        return rawString.Split(';')
+            .Select(id => id.Trim())
+            .Where(id => int.TryParse(id, out _))
+            .Select(int.Parse)
+            .ToList();
     }
 
     private string GetCellString(DataRow row, string columnName)

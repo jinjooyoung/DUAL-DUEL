@@ -65,3 +65,19 @@ public class LocalizationDatabaseSO : BaseDatabaseSO<string, LocalizationSO>
 
     public LocalizationSO GetWordById(string key) => GetByKey(key);
 }
+
+[CreateAssetMenu(fileName = "CharacterDatabaseSO", menuName = "SO/Database/CharacterDatabaseSO")]
+public class CharacterDatabaseSO : BaseDatabaseSO<int, CharacterSO>
+{
+    protected override int GetKey(CharacterSO item) => item.characterID;
+
+    public CharacterSO GetWordById(int id) => GetByKey(id);
+}
+
+[CreateAssetMenu(fileName = "MonsterDatabaseSO", menuName = "SO/Database/MonsterDatabaseSO")]
+public class MonsterDatabaseSO : BaseDatabaseSO<int, MonsterSO>
+{
+    protected override int GetKey(MonsterSO item) => item.monsterID;
+
+    public MonsterSO GetWordById(int id) => GetByKey(id);
+}
