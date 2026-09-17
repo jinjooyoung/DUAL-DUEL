@@ -114,8 +114,8 @@ public class BattleManager : MonoBehaviour
     {
         Debug.Log("[새 턴 시작] 다음 턴 슬롯 재배정 및 6장 드로우 시작");
 
-        // 1) 턴 슬롯 타입 재배정 (필요 시 BattleSlotManager 호출)
-        // BattleSlotManager.Instance?.GenerateTurnSlots();
+        // 다음 턴 슬롯 5개 타입(아군/적) 새로 배정
+        BattleSlotManager.Instance?.GenerateTurnSlotTypes();
 
         // 2) 0.5초 간격으로 6장 다시 드로우 시작
         if (BattleCardManager.Instance != null)

@@ -3,6 +3,8 @@ using UnityEngine;
 
 public class BattleSlotManager : MonoBehaviour
 {
+    public static BattleSlotManager Instance { get; private set; }
+
     [Header("고정 슬롯 5개 (순서대로)")]
     public List<BattleSlot> slots = new List<BattleSlot>();
 
@@ -21,8 +23,17 @@ public class BattleSlotManager : MonoBehaviour
 
     void Awake()
     {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+
         // 작성해 둔 확률 보정 시스템 초기화
         slotCorrector = new ProbabilityCorrector<int>(floor10Weights);
+    }
+
+    void Start()
+    {
+        // 게임 시작 시 첫 턴 슬롯 타입 무작위 생성
+        GenerateTurnSlotTypes();
     }
 
     /// <summary>
