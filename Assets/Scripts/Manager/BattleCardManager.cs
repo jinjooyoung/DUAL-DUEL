@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,6 +28,10 @@ public class BattleCardManager : MonoBehaviour
     [SerializeField] private float cardSpacing = 2.0f;
     [SerializeField] private float arrangeSpeed = 10.0f;
 
+    [Header("드로우 / 디스카드 연출 딜레이")]
+    [SerializeField] private float drawInterval = 0.5f;     // 드로우 간격 (0.5초)
+    [SerializeField] private float discardInterval = 0.5f;  // 버리기 간격 (0.5초)
+
     private void Awake()
     {
         if (Instance == null)
@@ -41,17 +46,51 @@ public class BattleCardManager : MonoBehaviour
 
     private void Start()
     {
+        foreach (var card in cardPool)
+        {
+            if (card != null) card.gameObject.SetActive(false);
+        }
+
         ShuffleDeck();
+
+        // 게임 시작 시 0.5초마다 1장씩 총 6장 드로우 시작
+        StartCoroutine(Co_DrawCards(6));
     }
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.D))
+        ArrangeHand();
+    }
+
+    /// <summary>
+    /// 지정된 장수만큼 0.5초 간격으로 순차 드로우
+    /// </summary>
+    public IEnumerator Co_DrawCards(int count)
+    {
+        for (int i = 0; i < count; i++)
         {
             DrawCard();
+            yield return new WaitForSeconds(drawInterval);
+        }
+    }
+
+    /// <summary>
+    /// 현재 손패(슬롯 미배치 상태)에 남아있는 모든 카드를 0.5초 간격으로 순차 버림
+    /// </summary>
+    public IEnumerator Co_DiscardAllHandCards()
+    {
+        // 손패에 남아있는(isPlaced == false) 카드들을 복사해 순차적으로 버림 처리
+        while (true)
+        {
+            List<CardDisplay> activeHandDisplays = cardPool.FindAll(c => c != null && c.gameObject.activeSelf && !c.isPlaced);
+            if (activeHandDisplays.Count == 0) break;
+
+            // 맨 앞의 카드부터 1장씩 버림
+            DiscardCard(activeHandDisplays[0]);
+            yield return new WaitForSeconds(discardInterval);
         }
 
-        ArrangeHand();
+        Debug.Log("[손패 정리 완료] 모든 잔여 손패 버림 완료");
     }
 
     /// <summary>

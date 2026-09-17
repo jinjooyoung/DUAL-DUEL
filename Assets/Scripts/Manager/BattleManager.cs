@@ -35,6 +35,9 @@ public class BattleManager : MonoBehaviour
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 1.0f;
 
+    [Header("턴 전환 대기 시간")]
+    [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
+
     private Coroutine turnExecutionCoroutine;
 
     private void Start()
@@ -78,6 +81,7 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator Co_ExecuteTurnSlots()
     {
+        // 1. 슬롯 5개 순차 발동 (1초 간격)
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
             BattleSlot slot = fieldCardSlots[i];
@@ -89,8 +93,35 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+        // 2. 슬롯 발동 완료 후, 손패에 남아있는 잉여 카드들 0.5초 간격으로 모두 버림
+        if (BattleCardManager.Instance != null)
+        {
+            yield return StartCoroutine(BattleCardManager.Instance.Co_DiscardAllHandCards());
+        }
+
+        // 3. 손패 정리 완료 후 2초 대기 (턴 전환 딜레이 연출)
+        yield return new WaitForSeconds(nextTurnDelay);
+
+        // 4. 모든 정산 완료 및 새 턴 시작
         OnAllSlotsFinished();
         turnExecutionCoroutine = null;
+    }
+
+    /// <summary>
+    /// 한 턴의 모든 연출과 버리기가 끝나고 새 턴이 시작될 때 호출
+    /// </summary>
+    private void OnAllSlotsFinished()
+    {
+        Debug.Log("[새 턴 시작] 다음 턴 슬롯 재배정 및 6장 드로우 시작");
+
+        // 1) 턴 슬롯 타입 재배정 (필요 시 BattleSlotManager 호출)
+        // BattleSlotManager.Instance?.GenerateTurnSlots();
+
+        // 2) 0.5초 간격으로 6장 다시 드로우 시작
+        if (BattleCardManager.Instance != null)
+        {
+            StartCoroutine(BattleCardManager.Instance.Co_DrawCards(6));
+        }
     }
 
     private void ExecuteSlotAction(BattleSlot slot)
@@ -191,10 +222,5 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
         }
-    }
-
-    private void OnAllSlotsFinished()
-    {
-        Debug.Log("[턴 종료 연산 완료] 모든 슬롯 정산 끝");
     }
 }
