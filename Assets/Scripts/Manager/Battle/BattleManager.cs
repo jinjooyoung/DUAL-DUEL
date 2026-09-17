@@ -80,7 +80,34 @@ public class BattleManager : MonoBehaviour
     public void TurnEnd()
     {
         if (turnExecutionCoroutine != null) return;
+
+        // 5개 슬롯 완충 여부 검사
+        if (!IsAllSlotsOccupied())
+        {
+            Debug.LogWarning("[턴 종료 불가] 모든 슬롯에 카드를 배치해야 턴을 마칠 수 있습니다.");
+            return;
+        }
+
         turnExecutionCoroutine = StartCoroutine(Co_ExecuteTurnSlots());
+    }
+
+    /// <summary>
+    /// 모든 슬롯이 정상적으로 카드를 장착하고 있는지 확인
+    /// </summary>
+    private bool IsAllSlotsOccupied()
+    {
+        // 슬롯 리스트가 비어있거나 5개가 아니면 실행 불가
+        if (fieldCardSlots == null || fieldCardSlots.Count < 5) return false;
+
+        foreach (var slot in fieldCardSlots)
+        {
+            if (slot == null || !slot.isOccupied || slot.currentCard == null)
+            {
+                return false; // 빈 슬롯 발견 시 즉시 false 반환
+            }
+        }
+
+        return true;
     }
 
     private IEnumerator Co_ExecuteTurnSlots()
