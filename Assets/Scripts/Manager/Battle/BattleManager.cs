@@ -99,6 +99,8 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(BattleCardManager.Instance.Co_DiscardAllHandCards());
         }
 
+        TurnResetGuardBuff();
+
         // 3. 손패 정리 완료 후 2초 대기 (턴 전환 딜레이 연출)
         yield return new WaitForSeconds(nextTurnDelay);
 
@@ -133,31 +135,44 @@ public class BattleManager : MonoBehaviour
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
 
-        int cardValue = (card.values != null && card.values.Count > 0) ? card.values[0] : 0;
+        // 1. 카드의 기본 밸류 확인
+        int baseCardValue = (card.values != null && card.values.Count > 0) ? card.values[0] : 0;
 
+        // 2. 주체의 버프/디버프 확인 및 최종 밸류 계산 (음수면 0으로 보정)
+        int finalValue = Mathf.Max(0, baseCardValue + user.buffValue - user.debuffValue);
+
+        // 3. 이번 행동에 반영했으므로 주체의 버프/디버프 소진 (0으로 초기화)
+        user.buffValue = 0;
+        user.debuffValue = 0;
+
+        // 4. 최종 밸류를 바탕으로 카드 효과 실행 (0이면 실질적으로 효과 없음)
         switch (card.cardType)
         {
             case CardType.Attack:
-                int finalDamage = Mathf.Max(0, cardValue + user.buffValue - user.debuffValue);
-                ApplyDamage(target, finalDamage);
+                ApplyDamage(target, finalValue);
                 break;
 
             case CardType.Defense:
-                ModifyGuard(user, cardValue);
+                ModifyGuard(user, finalValue);
+                break;
+
+            case CardType.Heal:
+                ModifyHealth(user, finalValue);
                 break;
 
             case CardType.Buff:
-                ModifyBuff(user, cardValue);
+                ModifyBuff(user, finalValue);
                 break;
 
             case CardType.Debuff:
-                ModifyDebuff(target, cardValue);
+                ModifyDebuff(target, finalValue);
                 break;
         }
 
+        // 5. 카드 회수 및 슬롯 정리, UI 갱신
         BattleCardManager.Instance?.DiscardCard(slot.currentCard);
         slot.ClearSlot();
-        BattleUIManager.Instance.UpdateAllUI();
+        BattleUIManager.Instance?.UpdateAllUI();
     }
 
     public void ModifyHealth(CombatEntityStats entity, int amount)
@@ -171,25 +186,31 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 공격 데미지 처리 (방어도를 먼저 소진하고, 초과분만 체력에서 차감)
+    /// </summary>
     public void ApplyDamage(CombatEntityStats target, int damage)
     {
         if (damage <= 0) return;
 
+        // 1. 방어도가 존재하는 경우
         if (target.guard > 0)
         {
-            if (target.guard >= damage)
+            // 공격력이 방어도보다 큰 경우 (방어도 전량 파괴 + 잔여 피해 체력 차감)
+            if (damage > target.guard)
             {
-                target.guard -= damage;
-                damage = 0;
+                int remainingDamage = damage - target.guard;
+                target.guard = 0;
+                ModifyHealth(target, -remainingDamage);
             }
+            // 방어도가 공격력 이상인 경우 (방어도만 공격력만큼 차감되고 체력 피해 없음)
             else
             {
-                damage -= target.guard;
-                target.guard = 0;
+                target.guard -= damage;
             }
         }
-
-        if (damage > 0)
+        // 2. 방어도가 0인 경우 (데미지 전량 체력 차감)
+        else
         {
             ModifyHealth(target, -damage);
         }
@@ -223,5 +244,16 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
         }
+    }
+
+    private void TurnResetGuardBuff()
+    {
+        playerStats.guard = 0;
+        playerStats.buffValue = 0;
+        playerStats.debuffValue = 0;
+        monsterStats.guard = 0;
+        monsterStats.buffValue = 0;
+        monsterStats.debuffValue = 0;
+        BattleUIManager.Instance?.UpdateAllUI();
     }
 }
