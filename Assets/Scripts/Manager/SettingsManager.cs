@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Events;
-using static Unity.VisualScripting.Icons;
 
 /// <summary>
 /// 게임의 설정값(볼륨, 언어 등) 관리하는 싱글턴 매니저

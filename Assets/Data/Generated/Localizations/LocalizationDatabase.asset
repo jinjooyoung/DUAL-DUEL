@@ -9,11 +9,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: eedca25c67a5caf42ad9c49db5111b36, type: 3}
   m_Name: LocalizationDatabase
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationDatabaseSO
   items:
-  - {fileID: 11400000, guid: f9db806dc751b334d9aed0649d3e565d, type: 2}
+  - {fileID: 11400000, guid: c3a01f3ad4eba7f48a81fa47a5e2c716, type: 2}
   - {fileID: 11400000, guid: 422ec60db9081d346a6e17c50022c415, type: 2}
   - {fileID: 11400000, guid: ebd54d6f053fdce4faa871fa689301a1, type: 2}
   - {fileID: 11400000, guid: be8de778d034b2b4f9dd4fc8647ebeb1, type: 2}
