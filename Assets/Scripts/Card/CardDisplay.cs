@@ -77,12 +77,21 @@ public class CardDisplay : MonoBehaviour
         isDragging = false;    // 드래그 중 플래그 안전 초기화
     }
 
+    /// <summary>
+    /// 현재 꽂혀있던 슬롯과의 연결을 끊고 핸드로 복귀 가능한 상태로 전환
+    /// </summary>
+    public void DetachFromCurrentSlot()
+    {
+        if (currentSlot != null)
+        {
+            currentSlot.ClearSlot();
+            currentSlot = null;
+        }
+        isPlaced = false;
+    }
+
     private void OnMouseDown()
     {
-        Debug.Log("마우스 다운");
-
-        if (isPlaced) return; // 이미 슬롯에 고정된 카드는 조작 불가. 나중에는 배치된거 다른곳으로 옮기거나 취소 가능하게 할건데 일단 1루프는 고정으로 해둠
-
         // 드래그 시작 시 원래 위치 저장
         originalPosition = transform.position;
         isDragging = true;
@@ -92,8 +101,6 @@ public class CardDisplay : MonoBehaviour
     {
         if (isDragging)
         {
-            Debug.Log("마우스 드래그중");
-
             // 마우스 위치로 카드 이동
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = Camera.main.WorldToScreenPoint(transform.position).z;
@@ -110,22 +117,44 @@ public class CardDisplay : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
+        // 마우스 뗀 자리에 슬롯이 있는 경우
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
         {
-            BattleSlot slot = hit.collider.GetComponent<BattleSlot>();
+            BattleSlot targetSlot = hit.collider.GetComponent<BattleSlot>();
 
-            // [변경] 카드의 ownerType 검사 제거!
-            // 슬롯이 존재하고 비어있기만 하면 어디든(적 슬롯이든 아군 슬롯이든) 배치 가능
-            if (slot != null && !slot.isOccupied)
+            if (targetSlot != null)
             {
+                // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
+                if (targetSlot == currentSlot)
+                {
+                    transform.position = targetSlot.transform.position;
+                    return;
+                }
+
+                // 기존에 다른 슬롯에 꽂혀있던 카드라면 이전 슬롯과의 연결을 먼저 끊음
+                DetachFromCurrentSlot();
+
+                // [분기 B] 목표 슬롯이 이미 다른 카드로 차 있는 경우 (바운스/교체)
+                if (targetSlot.isOccupied && targetSlot.currentCard != null)
+                {
+                    CardDisplay existingCard = targetSlot.currentCard;
+
+                    // 기존에 박혀있던 카드를 슬롯에서 분리 -> 핸드 정렬로 복귀시킴
+                    existingCard.DetachFromCurrentSlot();
+                }
+
+                // [분기 C] 목표 슬롯에 새 카드 안착
                 isPlaced = true;
-                currentSlot = slot;
-                slot.PlaceCard(this); // 슬롯에 안착
+                currentSlot = targetSlot;
+                targetSlot.PlaceCard(this);
+
+                OnCardPlaced?.Invoke(this, targetSlot);
                 return;
             }
         }
 
-        // 빈 슬롯에 닿지 않았으면 원위치 복귀
-        transform.position = originalPosition;
+        // 마우스 뗀 자리가 슬롯이 아닌 경우 (허공 또는 핸드 영역)
+        // 슬롯에 꽂혀있던 카드라면 슬롯 연결을 끊고 핸드로 복귀 (ArrangeHand가 알아서 정렬)
+        DetachFromCurrentSlot();
     }
 }
