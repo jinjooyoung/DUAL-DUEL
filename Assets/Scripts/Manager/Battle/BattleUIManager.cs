@@ -22,6 +22,9 @@ public class BattleUIManager : MonoBehaviour
     [Tooltip("몬스터 스탯 텍스트")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
 
+    [Tooltip("몬스터 이번 턴 공격력 텍스트")]
+    [SerializeField] private TextMeshProUGUI monsterTurnDamageText;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -44,6 +47,7 @@ public class BattleUIManager : MonoBehaviour
     {
         UpdateDeckUI();
         UpdateCombatStatsUI();
+        UpdateMonsterTurnDamage();
     }
 
     /// <summary>
@@ -82,5 +86,11 @@ public class BattleUIManager : MonoBehaviour
         {
             monsterStatText.text = $"몬스터 체력 : {battleManager.monsterStats.currentHp}\n몬스터 방어력 : {battleManager.monsterStats.guard}";
         }
+    }
+
+    public void UpdateMonsterTurnDamage()
+    {
+        if (monsterTurnDamageText != null)
+            monsterTurnDamageText.text = $"이번 턴 적 공격 : {battleManager.monsterBaseAttack}";
     }
 }

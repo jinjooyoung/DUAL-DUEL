@@ -32,6 +32,10 @@ public class BattleManager : MonoBehaviour
     public CombatEntityStats playerStats;
     public CombatEntityStats monsterStats;
 
+    [Header("몬스터 기본 액션")]
+    [Tooltip("슬롯 외 몬스터의 턴 종료 확정 기본 공격력")]
+    public int monsterBaseAttack = 5;
+
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 1.0f;
 
@@ -93,6 +97,12 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+        // 1-1. 슬롯 5개 연산 후 몬스터가 살아있다면 확정 기본 공격 실행
+        if (monsterStats.currentHp > 0)
+        {
+            yield return StartCoroutine(Co_ExecuteMonsterBaseAttack());
+        }
+
         // 2. 슬롯 발동 완료 후, 손패에 남아있는 잉여 카드들 0.5초 간격으로 모두 버림
         if (BattleCardManager.Instance != null)
         {
@@ -110,6 +120,29 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 슬롯 외 몬스터의 확정 기본 공격 연출 및 데미지 연산 코루틴
+    /// </summary>
+    private IEnumerator Co_ExecuteMonsterBaseAttack()
+    {
+        if (monsterBaseAttack <= 0) yield break;
+
+        Debug.Log($"[몬스터 기본 공격] 몬스터가 플레이어에게 기본 공격 {monsterBaseAttack} 시전!");
+
+        // 몬스터에게 남은 버프/디버프가 있다면 가산 적용
+        int finalDamage = Mathf.Max(0, monsterBaseAttack + monsterStats.buffValue - monsterStats.debuffValue);
+        monsterStats.buffValue = 0;
+        monsterStats.debuffValue = 0;
+
+        // 플레이어에게 데미지 적용 (방어도 우선 차감 후 잔여 피해 체력 차감)
+        ApplyDamage(playerStats, finalDamage);
+
+        BattleUIManager.Instance?.UpdateAllUI();
+
+        // 공격 액션 후 1초 연출 대기
+        yield return new WaitForSeconds(slotActionDelay);
+    }
+
+    /// <summary>
     /// 한 턴의 모든 연출과 버리기가 끝나고 새 턴이 시작될 때 호출
     /// </summary>
     private void OnAllSlotsFinished()
@@ -124,6 +157,8 @@ public class BattleManager : MonoBehaviour
         {
             StartCoroutine(BattleCardManager.Instance.Co_DrawCards(6));
         }
+
+        BattleUIManager.Instance?.UpdateAllUI();
     }
 
     private void ExecuteSlotAction(BattleSlot slot)
