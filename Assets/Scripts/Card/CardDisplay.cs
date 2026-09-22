@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using TMPro;
 using Unity.VisualScripting;
@@ -6,9 +7,6 @@ using UnityEngine;
 
 public class CardDisplay : MonoBehaviour
 {
-    // [정적 이벤트 선언] (배치된 카드, 배치된 슬롯)을 매개변수로 송출
-    public static event Action<CardDisplay, BattleSlot> OnCardPlaced;
-
     [Header("카드 데이터(SO)")]
     public CardSO cardSO;
     public int cardIndex;
@@ -24,18 +22,25 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro typeText;
     public TextMeshPro descriptionText;
 
+    [Header("상태 플래그")]
     public bool isDragging = false;
     public bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
+    [HideInInspector] public bool isTweening = false; // 드로우/디스카드 등 트윈 제어 중일 때 true
+
     private Vector3 originalPosition;
+    private Vector3 originalScale = Vector3.one;
 
     [Header("레이어 마스크")]
     public LayerMask slotLayer;
 
+    private void Awake()
+    {
+        originalScale = transform.localScale;
+    }
+
     void Start()
     {
         slotLayer = LayerMask.GetMask("Slot");
-
-        //SetupCard(cardData);
     }
 
     // 카드 데이터 설정
@@ -47,16 +52,17 @@ public class CardDisplay : MonoBehaviour
         if (nameText != null) nameText.text = LocalizationManager.Instance.GetText(data.nameKey);
         if (typeText != null) typeText.text = LocalizationManager.Instance.GetText($"{data.cardType.ToString().ToUpper()}_KEY");
 
-        string desTemp = LocalizationManager.Instance.GetText(data.descKey);
-        desTemp = desTemp.Replace("[Value]", data.values[0].ToString());
+        string desTemp = LocalizationManager.Instance != null ? LocalizationManager.Instance.GetText(data.descKey) : data.descKey;
+        if (data.values != null && data.values.Count > 0)
+        {
+            desTemp = desTemp.Replace("[Value]", data.values[0].ToString());
+        }
 
         if (descriptionText != null) descriptionText.text = desTemp;
 
         // 카드 리소스
         if (cardResource != null && cardSO.artwork != null)
-        {
             cardResource.sprite = cardSO.artwork;
-        }
 
         if (background != null)
             background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
@@ -75,6 +81,8 @@ public class CardDisplay : MonoBehaviour
         isPlaced = false;      // "슬롯에 고정됨" 상태를 해제
         currentSlot = null;    // 연결되어 있던 슬롯 참조 제거
         isDragging = false;    // 드래그 중 플래그 안전 초기화
+        isTweening = false;    // 연출 중 아님
+        transform.localScale = originalScale;   // 크기 초기화
     }
 
     /// <summary>
@@ -90,11 +98,32 @@ public class CardDisplay : MonoBehaviour
         isPlaced = false;
     }
 
+    // 마우스 호버 연출 (슬롯에 꽂히지 않고, 드래그 중이 아닐 때만)
+    private void OnMouseEnter()
+    {
+        if (isDragging || isPlaced || isTweening) return;
+
+        // 호버 시작 시 현재 손패 위치를 기준점으로 저장
+        originalPosition = transform.position;
+
+        DOTweenManager.CardHover(transform, originalPosition, originalScale, 1.08f, 0.2f, 0.12f, 0.04f, 0.8f);
+    }
+
+    private void OnMouseExit()
+    {
+        if (isDragging || isPlaced || isTweening) return;
+        // 저장해 둔 손패 원래 위치(hoverOriginPos)와 원래 스케일, 회전값으로 깔끔하게 복귀
+        DOTweenManager.CardHoverExit(transform, originalPosition, originalScale, Vector3.zero, 0.12f);
+    }
+
     private void OnMouseDown()
     {
-        // 드래그 시작 시 원래 위치 저장
-        originalPosition = transform.position;
+        if (isTweening) return;
+        DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
+
         isDragging = true;
+
+        DOTweenManager.CardDragStart(transform, originalScale * 1.05f, 0.08f);
     }
 
     private void OnMouseDrag()
@@ -127,7 +156,7 @@ public class CardDisplay : MonoBehaviour
                 // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
                 if (targetSlot == currentSlot)
                 {
-                    transform.position = targetSlot.transform.position;
+                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f);
                     return;
                 }
 
@@ -137,10 +166,7 @@ public class CardDisplay : MonoBehaviour
                 // [분기 B] 목표 슬롯이 이미 다른 카드로 차 있는 경우 (바운스/교체)
                 if (targetSlot.isOccupied && targetSlot.currentCard != null)
                 {
-                    CardDisplay existingCard = targetSlot.currentCard;
-
-                    // 기존에 박혀있던 카드를 슬롯에서 분리 -> 핸드 정렬로 복귀시킴
-                    existingCard.DetachFromCurrentSlot();
+                    targetSlot.currentCard.DetachFromCurrentSlot();
                 }
 
                 // [분기 C] 목표 슬롯에 새 카드 안착
@@ -148,7 +174,10 @@ public class CardDisplay : MonoBehaviour
                 currentSlot = targetSlot;
                 targetSlot.PlaceCard(this);
 
-                OnCardPlaced?.Invoke(this, targetSlot);
+                // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
+                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f);
+                DOTweenManager.SlotCardPlaced(targetSlot.transform);
+
                 return;
             }
         }
@@ -156,5 +185,6 @@ public class CardDisplay : MonoBehaviour
         // 마우스 뗀 자리가 슬롯이 아닌 경우 (허공 또는 핸드 영역)
         // 슬롯에 꽂혀있던 카드라면 슬롯 연결을 끊고 핸드로 복귀 (ArrangeHand가 알아서 정렬)
         DetachFromCurrentSlot();
+        DOTweenManager.CardDragEnd(transform, originalScale, 0.1f);
     }
 }

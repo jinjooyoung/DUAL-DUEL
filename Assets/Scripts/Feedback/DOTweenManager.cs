@@ -288,44 +288,74 @@ public static class DOTweenManager
     #region 3. Card 전용 효과 (Card Lifecycle)
 
     /// <summary>
-    /// 카드 위에 마우스를 올렸을 때의 연출입니다. 카드를 확대하고 Y축으로 들어 올립니다.
+    /// 카드 위에 마우스를 올렸을 때: 확대 및 상승 후 그 위치 기준으로 부드럽게 위아래로 둥실거립니다.
     /// </summary>
     /// <param name="card">대상 카드 Transform</param>
     /// <param name="originPos">카드 원본 위치</param>
     /// <param name="originScale">카드 원본 크기</param>
-    /// <param name="scaleMultiplier">호버 시 스케일 확대 배율</param>
-    /// <param name="moveY">호버 시 Y축 상승 거리</param>
-    /// <param name="duration">진행 시간 (초)</param>
-    public static Sequence CardHover(Transform card, Vector3 originPos, Vector3 originScale, float scaleMultiplier = 1.08f, float moveY = 0.05f, float duration = 0.12f)
+    /// <param name="scaleMultiplier">확대 배율</param>
+    /// <param name="moveY">최초 상승 높이</param>
+    /// <param name="duration">진입 시간 (초)</param>
+    /// <param name="floatDistance">공중에서 둥실거릴 위아래 왕복 진폭</param>
+    /// <param name="floatCycleTime">둥실거리는 1주기 시간 (초)</param>
+    public static Sequence CardHover(
+        Transform card,
+        Vector3 originPos,
+        Vector3 originScale,
+        float scaleMultiplier = 1.08f,
+        float moveY = 0.05f,
+        float duration = 0.12f,
+        float floatDistance = 0.015f,
+        float floatCycleTime = 0.8f)
     {
         if (card == null) return null;
+
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
         DOTween.Kill(tweenId);
 
+        Vector3 hoverBasePos = originPos + new Vector3(0f, moveY, -0.02f);
+        Vector3 hoverTopPos = hoverBasePos + new Vector3(0f, floatDistance, 0f);
+
         Sequence seq = DOTween.Sequence().SetId(tweenId);
-        seq.Join(card.DOMove(originPos + new Vector3(0f, moveY, -0.02f), duration).SetEase(Ease.OutQuad));
+
+        // 1단계: 마우스 진입 시 목표 공중 위치와 목표 크기로 빠르게 안착
+        seq.Append(card.DOMove(hoverBasePos, duration).SetEase(Ease.OutQuad));
         seq.Join(card.DOScale(originScale * scaleMultiplier, duration).SetEase(Ease.OutQuad));
+
+        // 2단계: 안착된 공중 위치에서 무한 루프로 둥실거리기 (InOutSine으로 부드러운 물결 느낌)
+        seq.Append(card.DOMove(hoverTopPos, floatCycleTime * 0.5f)
+            .SetEase(Ease.InOutSine)
+            .SetLoops(-1, LoopType.Yoyo));
+
         return seq;
     }
 
     /// <summary>
-    /// 카드 Hover 상태를 종료하고 초기 Transform 상태로 부드럽게 복귀시킵니다.
+    /// 카드 Hover 종료: 펀치나 흔들림 없이 원본 위치, 스케일, 회전값으로 부드럽게 복귀시킵니다.
     /// </summary>
     /// <param name="card">대상 카드 Transform</param>
     /// <param name="originPos">복귀할 원본 위치</param>
     /// <param name="originScale">복귀할 원본 스케일</param>
     /// <param name="originEuler">복귀할 원본 회전값 (Euler)</param>
-    /// <param name="duration">진행 시간 (초)</param>
-    public static Sequence CardHoverExit(Transform card, Vector3 originPos, Vector3 originScale, Vector3 originEuler, float duration = 0.12f)
+    /// <param name="duration">복귀 진행 시간 (초)</param>
+    public static Sequence CardHoverExit(
+        Transform card,
+        Vector3 originPos,
+        Vector3 originScale,
+        Vector3 originEuler,
+        float duration = 0.12f)
     {
         if (card == null) return null;
+
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
+        // Hover에서 돌고 있던 무한 루프 Tween을 즉시 중단
         DOTween.Kill(tweenId);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
         seq.Join(card.DOMove(originPos, duration).SetEase(Ease.OutQuad));
         seq.Join(card.DOScale(originScale, duration).SetEase(Ease.OutQuad));
         seq.Join(card.DORotate(originEuler, duration).SetEase(Ease.OutQuad));
+
         return seq;
     }
 
@@ -398,8 +428,8 @@ public static class DOTweenManager
         Sequence seq = DOTween.Sequence().SetId(tweenId);
         seq.Append(card.DOMove(slotPosition, duration).SetEase(Ease.OutCubic));
         seq.Join(card.DORotate(slotRotation, duration).SetEase(Ease.OutCubic));
-        seq.Join(card.DOScale(targetScale, duration).SetEase(Ease.OutCubic));
-        seq.Append(card.DOPunchScale(Vector3.one * 0.12f, 0.15f, 6, 0.5f));
+        seq.Join(card.DOScale(targetScale * 0.9f, duration).SetEase(Ease.OutCubic));
+        seq.Append(card.DOScale(targetScale, 0.2f).SetEase(Ease.OutQuint));
         seq.OnComplete(() => onComplete?.Invoke());
         return seq;
     }
@@ -449,6 +479,9 @@ public static class DOTweenManager
 
         card.position = startPos;
         card.localScale = targetScale * 0.5f;
+        
+        // 카드 버릴때 Fade 해서 투명해진거 복구
+        Fade(card.gameObject, 1f, 0f);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId).SetDelay(delay);
         seq.Append(card.DOMove(targetPos, duration).SetEase(Ease.OutCubic));

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,8 +22,12 @@ public class BattleCardManager : MonoBehaviour
     [Tooltip("최대 7개 할당 (기본 6개 사용, 확장 여유분 1개)")]
     public List<CardDisplay> cardPool = new List<CardDisplay>();
 
-    [Header("손패 배치 기준점")]
+    [Header("손패 배치 기준점 및 덱/버림 위치")]
     public Transform handPosition;
+    [Tooltip("드로우 덱 오브젝트 위치 (없으면 핸드 좌하단 기본값)")]
+    public Transform drawDeckTransform;
+    [Tooltip("버림 덱 오브젝트 위치 (없으면 핸드 우하단 기본값)")]
+    public Transform discardDeckTransform;
 
     [Header("핸드 정렬 옵션")]
     [SerializeField] private float cardSpacing = 2.0f;
@@ -34,14 +39,8 @@ public class BattleCardManager : MonoBehaviour
 
     private void Awake()
     {
-        if (Instance == null)
-        {
-            Instance = this;
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
     private void Start()
@@ -52,8 +51,6 @@ public class BattleCardManager : MonoBehaviour
         }
 
         ShuffleDeck();
-
-        // 게임 시작 시 0.5초마다 1장씩 총 6장 드로우 시작
         StartCoroutine(Co_DrawCards(6));
     }
 
@@ -63,120 +60,120 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 지정된 장수만큼 0.5초 간격으로 순차 드로우
+    /// 지정된 장수만큼 DOTweenManager.CardDraw를 통해 순차 드로우
     /// </summary>
     public IEnumerator Co_DrawCards(int count)
     {
+        Vector3 startSpawnPos = drawDeckTransform != null
+            ? drawDeckTransform.position
+            : (handPosition != null ? handPosition.position + new Vector3(-8f, -3f, 0f) : Vector3.zero);
+
         for (int i = 0; i < count; i++)
         {
-            DrawCard();
-            BattleUIManager.Instance.UpdateAllUI();
+            CardDisplay drawnDisplay = DrawCardInternal();
+            if (drawnDisplay == null) yield break;
+
+            // 손패 최종 목표 좌표 미리 계산
+            int totalCards = handCards.Count;
+            float totalWidth = (totalCards - 1) * cardSpacing;
+            float startX = -totalWidth / 2f;
+            Vector3 targetPos = handPosition.position + new Vector3(startX + ((totalCards - 1) * cardSpacing), 0, 0);
+
+            // 드로우 연출 시작 (DOTweenManager 호출)
+            drawnDisplay.isTweening = true;
+            Tween drawTween = DOTweenManager.CardDraw(
+                drawnDisplay.transform,
+                startSpawnPos,
+                targetPos,
+                Vector3.one,
+                0.3f
+            );
+
+            BattleUIManager.Instance?.UpdateDeckUI();
+
+            // 트윈 완료 시 정렬 참여 허용
+            if (drawTween != null)
+            {
+                drawTween.OnComplete(() => drawnDisplay.isTweening = false);
+            }
+            else
+            {
+                drawnDisplay.isTweening = false;
+            }
+
             yield return new WaitForSeconds(drawInterval);
         }
     }
 
     /// <summary>
-    /// 현재 손패(슬롯 미배치 상태)에 남아있는 모든 카드를 0.5초 간격으로 순차 버림
+    /// 남아있는 모든 손패 카드를 버림 덱으로 순차 축소/페이드아웃 이동
     /// </summary>
     public IEnumerator Co_DiscardAllHandCards()
     {
-        // 손패에 남아있는(isPlaced == false) 카드들을 복사해 순차적으로 버림 처리
+        Vector3 discardTargetPos = discardDeckTransform != null
+            ? discardDeckTransform.position
+            : (handPosition != null ? handPosition.position + new Vector3(8f, -3f, 0f) : Vector3.zero);
+
         while (true)
         {
             List<CardDisplay> activeHandDisplays = cardPool.FindAll(c => c != null && c.gameObject.activeSelf && !c.isPlaced);
             if (activeHandDisplays.Count == 0) break;
 
-            // 맨 앞의 카드부터 1장씩 버림
-            DiscardCard(activeHandDisplays[0]);
+            CardDisplay targetCard = activeHandDisplays[0];
+            targetCard.isTweening = true;
+
+            // 데이터 리스트 이동
+            if (targetCard.cardSO != null)
+            {
+                handCards.Remove(targetCard.cardSO);
+                discardDeck.Add(targetCard.cardSO);
+            }
+
+            // DOTweenManager.CardDiscard 실행 후 완료 대기
+            Tween discardTween = DOTweenManager.CardDiscard(targetCard.gameObject, discardTargetPos, 0.25f, () =>
+            {
+                targetCard.ResetPlacement();
+                targetCard.isTweening = false;
+            });
+
+            if (discardTween != null)
+            {
+                yield return discardTween.WaitForCompletion();
+            }
+
+            BattleUIManager.Instance?.UpdateDeckUI();
             yield return new WaitForSeconds(discardInterval);
         }
 
-        Debug.Log("[손패 정리 완료] 모든 잔여 손패 버림 완료");
+        Debug.Log("[손패 정리 완료] 모든 잔여 손패 정리 완료");
     }
 
-    /// <summary>
-    /// 현재 드로우 덱에 있는 카드들의 순서를 무작위로 섞습니다.
-    /// </summary>
-    private void ShuffleDeck()
+    private CardDisplay DrawCardInternal()
     {
-        List<CardSO> tempDeck = new List<CardSO>(drawDeck);
-        drawDeck.Clear();
-
-        while (tempDeck.Count > 0)
-        {
-            int randIndex = Random.Range(0, tempDeck.Count);
-            drawDeck.Add(tempDeck[randIndex]);
-            tempDeck.RemoveAt(randIndex);
-        }
-
-        Debug.Log($"덱 셔플 완료: 남은 카드 {drawDeck.Count}장");
-    }
-
-    /// <summary>
-    /// 버림 덱의 모든 카드를 드로우 덱으로 복구한 뒤 셔플합니다.
-    /// </summary>
-    private void RecycleDiscardToDraw()
-    {
-        if (discardDeck.Count == 0)
-        {
-            Debug.Log("버림 카드 더미가 비어 있어 재활용할 수 없습니다.");
-            return;
-        }
-
-        drawDeck.AddRange(discardDeck);
-        discardDeck.Clear();
-        ShuffleDeck();
-
-        Debug.Log($"버림 덱을 드로우 덱으로 회수 및 셔플 완료: 총 {drawDeck.Count}장");
-    }
-
-    /// <summary>
-    /// 덱에서 카드 1장을 뽑아 비활성화된 풀 오브젝트에 할당하고 손패에 추가합니다.
-    /// 덱이 비어 있다면 자동으로 버림 덱을 회수하여 드로우를 시도합니다.
-    /// </summary>
-    public void DrawCard()
-    {
-        // 1. 카드 풀에서 비활성화된 Display 검색
         CardDisplay availableDisplay = cardPool.Find(c => !c.gameObject.activeSelf);
-        if (availableDisplay == null || handCards.Count >= 6)
-        {
-            Debug.LogWarning("손패 오브젝트 풀이 가득 차 더 이상 카드를 표시할 수 없습니다.");
-            return;
-        }
+        if (availableDisplay == null || handCards.Count >= 6) return null;
 
-        // 2. 덱 고갈 시 버림 덱 회수 시도
         if (drawDeck.Count == 0)
         {
             RecycleDiscardToDraw();
-
-            if (drawDeck.Count == 0)
-            {
-                Debug.LogWarning("드로우 덱과 버림 덱이 모두 비어 카드를 뽑을 수 없습니다.");
-                return;
-            }
+            if (drawDeck.Count == 0) return null;
         }
 
-        // 3. 데이터 추출 및 핸드 등록
         CardSO drawnData = drawDeck[0];
         drawDeck.RemoveAt(0);
         handCards.Add(drawnData);
 
-        // 4. 오브젝트 활성화 및 데이터 바인딩
         availableDisplay.gameObject.SetActive(true);
         availableDisplay.SetupCard(drawnData);
         availableDisplay.cardIndex = handCards.Count - 1;
 
-        Debug.Log($"카드 드로우 완료: {drawnData.nameKey} (현재 손패: {handCards.Count}장)");
+        return availableDisplay;
     }
 
-    /// <summary>
-    /// 화면에 활성화된 손패 오브젝트들을 중앙 기준으로 정렬합니다.
-    /// </summary>
     private void ArrangeHand()
     {
-        // 활성화된 카드 중 아직 슬롯에 배치되지 않은(isPlaced == false)카드만 필터링
-        List<CardDisplay> activeHandDisplays = GetActiveDisplays().FindAll(c => !c.isPlaced);
-
+        // 배치되지 않았고, 드래그 중이 아니며, 드로우/디스카드 트윈 연출 중이 아닌 카드만 보간 정렬
+        List<CardDisplay> activeHandDisplays = cardPool.FindAll(c => c != null && c.gameObject.activeSelf && !c.isPlaced && !c.isDragging && !c.isTweening);
         if (activeHandDisplays.Count == 0 || handPosition == null) return;
 
         float totalWidth = (activeHandDisplays.Count - 1) * cardSpacing;
@@ -185,48 +182,48 @@ public class BattleCardManager : MonoBehaviour
         for (int i = 0; i < activeHandDisplays.Count; i++)
         {
             CardDisplay display = activeHandDisplays[i];
-
-            // 사용자가 드래그 중인 카드는 위치 보간에서 제외
-            if (display.isDragging) continue;
-
             Vector3 targetPosition = handPosition.position + new Vector3(startX + (i * cardSpacing), 0, 0);
             display.transform.position = Vector3.Lerp(display.transform.position, targetPosition, Time.deltaTime * arrangeSpeed);
         }
     }
 
-    /// <summary>
-    /// 특정 카드 오브젝트를 버림 더미로 이동시키고 오브젝트를 풀로 반환(비활성화)합니다.
-    /// </summary>
-    /// <param name="targetDisplay">버릴 대상 CardDisplay 컴포넌트</param>
     public void DiscardCard(CardDisplay targetDisplay)
     {
         if (targetDisplay == null || !targetDisplay.gameObject.activeSelf) return;
 
-        // 1. 슬롯에 꽂혀 있던 카드라면 슬롯 비우기
         if (targetDisplay.currentSlot != null)
         {
             targetDisplay.currentSlot.ClearSlot();
         }
 
-        // 2. 데이터 리스트 이동: handCards -> discardDeck
         if (targetDisplay.cardSO != null)
         {
             handCards.Remove(targetDisplay.cardSO);
             discardDeck.Add(targetDisplay.cardSO);
         }
 
-        // 3. 카드 상태 초기화 후 오브젝트 비활성화 (풀 반환)
         targetDisplay.ResetPlacement();
         targetDisplay.gameObject.SetActive(false);
-
-        Debug.Log($"카드 버림 완료: {targetDisplay.cardSO?.nameKey} (남은 손패: {handCards.Count}장)");
+        BattleUIManager.Instance?.UpdateDeckUI();
     }
 
-    /// <summary>
-    /// 현재 풀에서 활성화되어 화면에 노출 중인 카드 오브젝트 목록을 반환합니다.
-    /// </summary>
-    private List<CardDisplay> GetActiveDisplays()
+    private void ShuffleDeck()
     {
-        return cardPool.FindAll(c => c != null && c.gameObject.activeSelf);
+        List<CardSO> tempDeck = new List<CardSO>(drawDeck);
+        drawDeck.Clear();
+        while (tempDeck.Count > 0)
+        {
+            int randIndex = Random.Range(0, tempDeck.Count);
+            drawDeck.Add(tempDeck[randIndex]);
+            tempDeck.RemoveAt(randIndex);
+        }
+    }
+
+    private void RecycleDiscardToDraw()
+    {
+        if (discardDeck.Count == 0) return;
+        drawDeck.AddRange(discardDeck);
+        discardDeck.Clear();
+        ShuffleDeck();
     }
 }
