@@ -401,7 +401,7 @@ public static class DOTweenManager
     /// <param name="card">대상 카드 Transform</param>
     /// <param name="targetScale">복귀할 목표 스케일 Vector3</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Tween CardDragEnd(Transform card, Vector3 targetScale, float duration = 0.1f)
+    public static Tween CardDragEnd(Transform card, Vector3 targetScale, float duration = 0.1f, Action onComplete = null)
     {
         if (card == null) return null;
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
@@ -452,12 +452,9 @@ public static class DOTweenManager
         Vector3 targetForwardPos = originalPos + (forwardDir.normalized * advanceDist);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
-        // 1. 돌출 전진 및 스케일 펀치
-        seq.Append(card.DOMove(targetForwardPos, duration * 0.4f).SetEase(Ease.OutQuad));
-        seq.Join(card.DOPunchScale(Vector3.one * 0.15f, duration * 0.4f, 5));
-        // 2. 타격 지점 콜백
-        seq.AppendCallback(() => onHitMoment?.Invoke());
-        // 3. 복귀
+        // 1. 스케일 펀치
+        seq.Append(card.DOPunchScale(Vector3.one * 0.15f, duration * 0.4f, 5));
+        // 2. 복귀
         seq.Append(card.DOMove(originalPos, duration * 0.6f).SetEase(Ease.InOutQuad));
         return seq;
     }
@@ -481,7 +478,7 @@ public static class DOTweenManager
         card.localScale = targetScale * 0.5f;
         
         // 카드 버릴때 Fade 해서 투명해진거 복구
-        Fade(card.gameObject, 1f, 0f);
+        //Fade(card.gameObject, 1f, 0.25f);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId).SetDelay(delay);
         seq.Append(card.DOMove(targetPos, duration).SetEase(Ease.OutCubic));
@@ -505,7 +502,7 @@ public static class DOTweenManager
         Sequence seq = DOTween.Sequence().SetId(tweenId);
         seq.Append(cardObj.transform.DOMove(discardPos, duration).SetEase(Ease.InQuad));
         seq.Join(cardObj.transform.DOScale(Vector3.zero, duration).SetEase(Ease.InQuad));
-        seq.Join(Fade(cardObj, 0f, duration, Ease.InQuad));
+        //seq.Join(Fade(cardObj, 0f, duration, Ease.InQuad));
         seq.OnComplete(() =>
         {
             onComplete?.Invoke();

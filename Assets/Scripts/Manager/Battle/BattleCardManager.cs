@@ -191,6 +191,10 @@ public class BattleCardManager : MonoBehaviour
     {
         if (targetDisplay == null || !targetDisplay.gameObject.activeSelf) return;
 
+        Vector3 discardTargetPos = discardDeckTransform != null
+            ? discardDeckTransform.position
+            : (handPosition != null ? handPosition.position + new Vector3(8f, -3f, 0f) : Vector3.zero);
+
         if (targetDisplay.currentSlot != null)
         {
             targetDisplay.currentSlot.ClearSlot();
@@ -202,8 +206,12 @@ public class BattleCardManager : MonoBehaviour
             discardDeck.Add(targetDisplay.cardSO);
         }
 
+        Tween discardTween = DOTweenManager.CardDiscard(targetDisplay.gameObject, discardTargetPos, 0.25f, () =>
+        {
+            targetDisplay.ResetPlacement();
+            targetDisplay.isTweening = false;
+        });
         targetDisplay.ResetPlacement();
-        targetDisplay.gameObject.SetActive(false);
         BattleUIManager.Instance?.UpdateDeckUI();
     }
 

@@ -1,7 +1,6 @@
 using DG.Tweening;
 using System;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -156,7 +155,7 @@ public class CardDisplay : MonoBehaviour
                 // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
                 if (targetSlot == currentSlot)
                 {
-                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f);
+                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => isTweening = false);
                     return;
                 }
 
@@ -175,7 +174,7 @@ public class CardDisplay : MonoBehaviour
                 targetSlot.PlaceCard(this);
 
                 // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
-                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f);
+                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => isTweening = false);
                 DOTweenManager.SlotCardPlaced(targetSlot.transform);
 
                 return;
@@ -185,6 +184,6 @@ public class CardDisplay : MonoBehaviour
         // 마우스 뗀 자리가 슬롯이 아닌 경우 (허공 또는 핸드 영역)
         // 슬롯에 꽂혀있던 카드라면 슬롯 연결을 끊고 핸드로 복귀 (ArrangeHand가 알아서 정렬)
         DetachFromCurrentSlot();
-        DOTweenManager.CardDragEnd(transform, originalScale, 0.1f);
+        DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => isTweening = false);
     }
 }

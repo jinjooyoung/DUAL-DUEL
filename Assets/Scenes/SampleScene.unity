@@ -256,6 +256,37 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 157148493}
   m_CullTransparentMesh: 1
+--- !u!1 &325933201
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 325933202}
+  m_Layer: 0
+  m_Name: DiscardDeckPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &325933202
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 325933201}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 12, y: -5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &330585543
 GameObject:
   m_ObjectHideFlags: 0
@@ -679,6 +710,37 @@ MonoBehaviour:
   m_ShadowLayerMask: 1
   m_RenderingLayers: 1
   m_ShadowRenderingLayers: 1
+--- !u!1 &516324520
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 516324521}
+  m_Layer: 0
+  m_Name: DrawDeckPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &516324521
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 516324520}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -12, y: -5, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &533102660
 GameObject:
   m_ObjectHideFlags: 0
@@ -864,8 +926,8 @@ MonoBehaviour:
     buffValue: 0
     debuffValue: 0
   monsterBaseAttack: 5
-  slotActionDelay: 1
-  nextTurnDelay: 2
+  slotActionDelay: 0.5
+  nextTurnDelay: 0.5
 --- !u!1 &685632118
 GameObject:
   m_ObjectHideFlags: 0
@@ -1277,10 +1339,12 @@ MonoBehaviour:
   - {fileID: 2055339529}
   - {fileID: 1031428244}
   handPosition: {fileID: 968608411}
+  drawDeckTransform: {fileID: 516324521}
+  discardDeckTransform: {fileID: 325933202}
   cardSpacing: 2
   arrangeSpeed: 10
-  drawInterval: 0.5
-  discardInterval: 0.5
+  drawInterval: 0.2
+  discardInterval: 0.2
 --- !u!1 &968608410
 GameObject:
   m_ObjectHideFlags: 0
@@ -3392,3 +3456,5 @@ SceneRoots:
   - {fileID: 1373977246}
   - {fileID: 335012545}
   - {fileID: 968608411}
+  - {fileID: 516324521}
+  - {fileID: 325933202}

@@ -1,3 +1,4 @@
+using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +38,7 @@ public class BattleManager : MonoBehaviour
     public int monsterBaseAttack = 5;
 
     [Header("카드 시전 딜레이")]
-    [SerializeField] private float slotActionDelay = 1.0f;
+    [SerializeField] private float slotActionDelay = 0.5f;
 
     [Header("턴 전환 대기 시간")]
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
@@ -119,7 +120,7 @@ public class BattleManager : MonoBehaviour
 
             if (slot != null && slot.isOccupied && slot.currentCard != null)
             {
-                ExecuteSlotAction(slot);
+                StartCoroutine(ExecuteSlotAction(slot));
                 yield return new WaitForSeconds(slotActionDelay);
             }
         }
@@ -188,10 +189,10 @@ public class BattleManager : MonoBehaviour
         BattleUIManager.Instance?.UpdateAllUI();
     }
 
-    private void ExecuteSlotAction(BattleSlot slot)
+    private IEnumerator ExecuteSlotAction(BattleSlot slot)
     {
         CardSO card = slot.currentCard.cardSO;
-        if (card == null) return;
+        if (card == null) yield break;
 
         bool isPlayerSlot = slot.slotOwnerType == OwnerType.Player;
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
@@ -230,6 +231,15 @@ public class BattleManager : MonoBehaviour
                 ModifyDebuff(target, finalValue);
                 break;
         }
+
+        // 사용 연출
+        Sequence sequence = DOTweenManager.CardExecute(
+            slot.currentCard.transform,
+            isPlayerSlot ? Vector3.right : Vector3.left
+        );
+
+        // 연출이 끝날 때까지 대기
+        yield return sequence.WaitForCompletion();
 
         // 5. 카드 회수 및 슬롯 정리, UI 갱신
         BattleCardManager.Instance?.DiscardCard(slot.currentCard);
