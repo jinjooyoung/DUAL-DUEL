@@ -491,9 +491,22 @@ public static class DOTweenManager
     /// <param name="slot">대상 슬롯 Transform</param>
     /// <param name="scaleMultiplier">하이라이트 스케일 배율</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Tween SlotHover(Transform slot, float scaleMultiplier = 1.05f, float duration = 0.1f)
+    public static Tween SlotHover(Transform slot, Vector3 originScale, float scaleMultiplier = 1.05f, float duration = 0.1f)
     {
-        return ScaleMultiplier(slot, scaleMultiplier, duration, Ease.OutQuad);
+        if (slot == null) return null;
+        return Scale(slot, originScale * scaleMultiplier, duration, Ease.OutQuad);
+    }
+
+    /// <summary>
+    /// 슬롯 호버 종료 시 원본 크기로 복귀
+    /// </summary>
+    /// <param name="slot">대상 슬롯 Transform</param>
+    /// <param name="scaleMultiplier">하이라이트 스케일 배율</param>
+    /// <param name="duration">진행 시간 (초)</param>
+    public static Tween SlotHoverExit(Transform slot, Vector3 originScale, float duration = 0.1f)
+    {
+        if (slot == null) return null;
+        return Scale(slot, originScale, duration, Ease.OutQuad);
     }
 
     /// <summary>
@@ -734,8 +747,11 @@ public static class DOTweenManager
     /// </summary>
     /// <param name="buttonTr">버튼 Transform</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Tween ButtonHoverExit(Transform buttonTr, float duration = 0.1f)
-        => Scale(buttonTr, Vector3.one, duration, Ease.OutQuad);
+    public static Tween ButtonHoverExit(Transform buttonTr, Vector3 originScale, float duration = 0.1f)
+    {
+        if (buttonTr == null) return null;
+        return Scale(buttonTr, originScale, duration, Ease.OutQuad);
+    }
 
     /// <summary>
     /// 버튼 클릭 시 살짝 눌렸다가 튕겨 나오는 피드백 연출입니다.
@@ -744,15 +760,15 @@ public static class DOTweenManager
     /// <param name="pressDownMult">눌렸을 때의 축소 배율</param>
     /// <param name="duration">진행 시간 (초)</param>
     /// <param name="onClickAction">클릭 순간(수축 직후) 실행될 콜백</param>
-    public static Sequence ButtonPress(Transform buttonTr, float pressDownMult = 0.94f, float duration = 0.12f, Action onClickAction = null)
+    public static Sequence ButtonPress(Transform buttonTr, Vector3 originScale, float pressDownMult = 0.94f, float duration = 0.12f, Action onClickAction = null)
     {
         if (buttonTr == null) return null;
         string tweenId = buttonTr.GetInstanceID() + ID_TRANSFORM;
         DOTween.Kill(tweenId);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
-        seq.Append(buttonTr.DOScale(Vector3.one * pressDownMult, duration * 0.4f).SetEase(Ease.OutQuad));
-        seq.Append(buttonTr.DOScale(Vector3.one, duration * 0.6f).SetEase(Ease.OutBack));
+        seq.Append(buttonTr.DOScale(originScale * pressDownMult, duration * 0.4f).SetEase(Ease.OutQuad));
+        seq.Append(buttonTr.DOScale(originScale, duration * 0.6f).SetEase(Ease.OutBack));
         seq.AppendCallback(() => onClickAction?.Invoke());
         return seq;
     }
@@ -883,14 +899,14 @@ public static class DOTweenManager
     /// <param name="otherCards">Dim(어둡게/흐리게) 처리할 나머지 카드 리스트</param>
     /// <param name="highlightScale">현재 카드의 확대 배율</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Sequence CurrentExecutionHighlight(Transform currentCard, List<Transform> otherCards, float highlightScale = 1.15f, float duration = 0.15f)
+    public static Sequence CurrentExecutionHighlight(Transform currentCard, Vector3 currentCardOriginScale, List<Transform> otherCards, Dictionary<Transform, Vector3> otherOriginScales = null, float highlightScale = 1.15f, float duration = 0.15f)
     {
         Sequence seq = DOTween.Sequence();
 
-        // 1. 현재 카드 부각
+        // 1. 현재 카드 부각 (원본 스케일 기반)
         if (currentCard != null)
         {
-            seq.Join(Scale(currentCard, currentCard.localScale * highlightScale, duration, Ease.OutBack));
+            seq.Join(Scale(currentCard, currentCardOriginScale * highlightScale, duration, Ease.OutBack));
             seq.Join(Flash(currentCard.gameObject, Color.yellow, duration, 1));
         }
 
@@ -900,8 +916,13 @@ public static class DOTweenManager
             foreach (var other in otherCards)
             {
                 if (other == null || other == currentCard) continue;
+
+                Vector3 targetDimScale = (otherOriginScales != null && otherOriginScales.TryGetValue(other, out var origin))
+                    ? origin * 0.95f
+                    : other.localScale * 0.95f;
+
                 seq.Join(Fade(other.gameObject, 0.45f, duration));
-                seq.Join(Scale(other, Vector3.one * 0.95f, duration));
+                seq.Join(Scale(other, targetDimScale, duration));
             }
         }
 
@@ -913,7 +934,7 @@ public static class DOTweenManager
     /// </summary>
     /// <param name="allCards">복원할 모든 카드 Transform 리스트</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Sequence ResetExecutionHighlight(List<Transform> allCards, float duration = 0.15f)
+    public static Sequence ResetExecutionHighlight(List<Transform> allCards, Dictionary<Transform, Vector3> originScales = null, float duration = 0.15f)
     {
         Sequence seq = DOTween.Sequence();
         if (allCards == null) return seq;
@@ -921,8 +942,13 @@ public static class DOTweenManager
         foreach (var card in allCards)
         {
             if (card == null) continue;
+
+            Vector3 targetScale = (originScales != null && originScales.TryGetValue(card, out var origin))
+                ? origin
+                : Vector3.one;
+
             seq.Join(Fade(card.gameObject, 1f, duration));
-            seq.Join(Scale(card, Vector3.one, duration));
+            seq.Join(Scale(card, targetScale, duration));
         }
         return seq;
     }
