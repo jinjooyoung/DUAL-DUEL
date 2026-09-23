@@ -1319,18 +1319,21 @@ MonoBehaviour:
   - {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
   - {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
   - {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
+  - {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+  - {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
+  - {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
+  - {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
+  - {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+  - {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
+  - {fileID: 11400000, guid: d3d749b12bbc1504081682ff665121ea, type: 2}
+  - {fileID: 11400000, guid: 801aa519ddc5bbc40ba42c9cd6f0c131, type: 2}
   - {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
   - {fileID: 11400000, guid: 9e7d56bcd31d9b24fa9a403f9c624438, type: 2}
-  - {fileID: 11400000, guid: 9bbb4700f0b7db641bbfa7166fa5e007, type: 2}
-  - {fileID: 11400000, guid: 94992f96505ac644e9adfee51eab888c, type: 2}
   - {fileID: 11400000, guid: 972bbe6dff6132b4d9b648fc75f884a8, type: 2}
-  - {fileID: 11400000, guid: a9386bf9b7584ff4a8fa7d570a6ecc1a, type: 2}
   - {fileID: 11400000, guid: a2de4cfd1e037d8419f889f84863f469, type: 2}
-  - {fileID: 11400000, guid: 8145cd6490b600344bdee6da2ca056c7, type: 2}
-  - {fileID: 11400000, guid: af269d0f74d3ab84695601529b822be7, type: 2}
-  - {fileID: 11400000, guid: 1f61148541a4e0b41b858f6a69bb51c9, type: 2}
   handCards: []
   discardDeck: []
+  cardPrefab: {fileID: 7328028137241284672, guid: e7e7891e845922141a882f9f9ac4ea29, type: 3}
   cardPool:
   - {fileID: 610270847}
   - {fileID: 1373318132}
@@ -1343,6 +1346,7 @@ MonoBehaviour:
   discardDeckTransform: {fileID: 325933202}
   cardSpacing: 2
   arrangeSpeed: 10
+  drawCount: 6
   drawInterval: 0.2
   discardInterval: 0.2
 --- !u!1 &968608410

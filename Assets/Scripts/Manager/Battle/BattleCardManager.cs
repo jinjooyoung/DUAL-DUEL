@@ -18,8 +18,10 @@ public class BattleCardManager : MonoBehaviour
     [Tooltip("사용되거나 버려진 카드 더미")]
     public List<CardSO> discardDeck = new List<CardSO>();
 
-    [Header("고정 카드 풀 (씬에 배치된 Display 컴포넌트 목록)")]
-    [Tooltip("최대 7개 할당 (기본 6개 사용, 확장 여유분 1개)")]
+    [Header("카드 풀 및 프리팹")]
+    [Tooltip("풀이 고갈되었을 때 새로 동적 인스턴스화할 카드 프리팹")]
+    [SerializeField] private GameObject cardPrefab;
+    [Tooltip("카드 오브젝트 풀 (초기 6개 배치 + 필요 시 동적 확장)")]
     public List<CardDisplay> cardPool = new List<CardDisplay>();
 
     [Header("손패 배치 기준점 및 덱/버림 위치")]
@@ -34,6 +36,7 @@ public class BattleCardManager : MonoBehaviour
     [SerializeField] private float arrangeSpeed = 10.0f;
 
     [Header("드로우 / 디스카드 연출 딜레이")]
+    public int drawCount = 6;                               // 드로우 할 카드 수
     [SerializeField] private float drawInterval = 0.5f;     // 드로우 간격 (0.5초)
     [SerializeField] private float discardInterval = 0.5f;  // 버리기 간격 (0.5초)
 
@@ -51,7 +54,7 @@ public class BattleCardManager : MonoBehaviour
         }
 
         ShuffleDeck();
-        StartCoroutine(Co_DrawCards(6));
+        StartCoroutine(Co_DrawCards(drawCount));
     }
 
     private void Update()
@@ -134,6 +137,7 @@ public class BattleCardManager : MonoBehaviour
             {
                 targetCard.ResetPlacement();
                 targetCard.isTweening = false;
+                targetCard.gameObject.SetActive(false); // 풀 반환을 위해 명시적으로 비활성화
             });
 
             if (discardTween != null)
@@ -145,19 +149,21 @@ public class BattleCardManager : MonoBehaviour
             yield return new WaitForSeconds(discardInterval);
         }
 
-        Debug.Log("[손패 정리 완료] 모든 잔여 손패 정리 완료");
+        Debug.Log($"[손패 정리 완료] 모든 잔여 손패 버림 덱으로 이동 및 풀 반환 완료 (현재 풀 총량: {cardPool.Count})");
     }
 
     private CardDisplay DrawCardInternal()
     {
-        CardDisplay availableDisplay = cardPool.Find(c => !c.gameObject.activeSelf);
-        if (availableDisplay == null || handCards.Count >= 6) return null;
-
+        // 덱 리사이클 확인
         if (drawDeck.Count == 0)
         {
             RecycleDiscardToDraw();
             if (drawDeck.Count == 0) return null;
         }
+
+        // 동적 풀에서 카드 확보 (부족 시 생성)
+        CardDisplay availableDisplay = GetOrCreateCardDisplay();
+        if (availableDisplay == null) return null;
 
         CardSO drawnData = drawDeck[0];
         drawDeck.RemoveAt(0);
@@ -168,6 +174,39 @@ public class BattleCardManager : MonoBehaviour
         availableDisplay.cardIndex = handCards.Count - 1;
 
         return availableDisplay;
+    }
+
+    /// <summary>
+    /// 풀에서 꺼져있는 카드를 가져오거나, 없으면 프리팹을 동적으로 새로 생성하여 풀에 추가 후 반환합니다.
+    /// </summary>
+    private CardDisplay GetOrCreateCardDisplay()
+    {
+        // 1. 기존 풀에서 비활성화된 오브젝트 탐색
+        CardDisplay availableDisplay = cardPool.Find(c => c != null && !c.gameObject.activeSelf);
+
+        if (availableDisplay != null)
+        {
+            return availableDisplay;
+        }
+
+        // 2. 여유분이 없으면 동적 확장 생성
+        if (cardPrefab != null)
+        {
+            Transform parentTransform = handPosition != null ? handPosition.parent : transform;
+            GameObject newCardObj = Instantiate(cardPrefab, parentTransform);
+            newCardObj.SetActive(false);
+
+            CardDisplay newDisplay = newCardObj.GetComponent<CardDisplay>();
+            if (newDisplay != null)
+            {
+                cardPool.Add(newDisplay);
+                Debug.Log($"[카드 풀 동적 확장] 여유 카드 부족으로 새 카드 생성. 현재 풀 크기: {cardPool.Count}");
+                return newDisplay;
+            }
+        }
+
+        Debug.LogError("[CardPool] cardPrefab이 연결되지 않아 카드를 동적으로 생성할 수 없습니다.");
+        return null;
     }
 
     private void ArrangeHand()

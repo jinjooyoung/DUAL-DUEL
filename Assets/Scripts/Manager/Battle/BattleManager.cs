@@ -183,7 +183,7 @@ public class BattleManager : MonoBehaviour
         // 2) 0.5초 간격으로 6장 다시 드로우 시작
         if (BattleCardManager.Instance != null)
         {
-            StartCoroutine(BattleCardManager.Instance.Co_DrawCards(6));
+            StartCoroutine(BattleCardManager.Instance.Co_DrawCards(BattleCardManager.Instance.drawCount));
         }
 
         BattleUIManager.Instance?.UpdateAllUI();
