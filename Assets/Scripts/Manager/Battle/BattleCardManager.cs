@@ -24,14 +24,20 @@ public class BattleCardManager : MonoBehaviour
     [Tooltip("카드 오브젝트 풀 (초기 6개 배치 + 필요 시 동적 확장)")]
     public List<CardDisplay> cardPool = new List<CardDisplay>();
 
-    [Header("손패 배치 기준점 및 덱/버림 위치")]
-    public Transform handPosition;
+    [Header("덱/버림 위치")]
     [Tooltip("드로우 덱 오브젝트 위치 (없으면 핸드 좌하단 기본값)")]
     public Transform drawDeckTransform;
     [Tooltip("버림 덱 오브젝트 위치 (없으면 핸드 우하단 기본값)")]
     public Transform discardDeckTransform;
 
-    [Header("핸드 정렬 옵션")]
+    [Header("손패 정렬 기준점")]
+    public Transform handPosition;
+    [Tooltip("손패가 위치할 수 있는 좌측 최대 경계")]
+    [SerializeField] private Transform leftBoundary;
+    [Tooltip("손패가 위치할 수 있는 우측 최대 경계")]
+    [SerializeField] private Transform rightBoundary;
+
+    [Tooltip("카드 간의 최대(기본) 간격")]
     [SerializeField] private float cardSpacing = 2.0f;
     [SerializeField] private float arrangeSpeed = 10.0f;
 
@@ -215,13 +221,51 @@ public class BattleCardManager : MonoBehaviour
         List<CardDisplay> activeHandDisplays = cardPool.FindAll(c => c != null && c.gameObject.activeSelf && !c.isPlaced && !c.isDragging && !c.isTweening);
         if (activeHandDisplays.Count == 0 || handPosition == null) return;
 
-        float totalWidth = (activeHandDisplays.Count - 1) * cardSpacing;
-        float startX = -totalWidth / 2f;
+        int cardCount = activeHandDisplays.Count;
 
-        for (int i = 0; i < activeHandDisplays.Count; i++)
+        // 카드가 1장이면 핸드 기준점 중앙에 바로 배치
+        if (cardCount == 1)
+        {
+            Vector3 centerPos = handPosition.position;
+            activeHandDisplays[0].transform.position = Vector3.Lerp(activeHandDisplays[0].transform.position, centerPos, Time.deltaTime * arrangeSpeed);
+            return;
+        }
+
+        // 1. 최대 허용 너비 계산 (경계 트랜스폼이 할당되어 있다면 그 거리, 없으면 기본값)
+        float maxAvailableWidth = (leftBoundary != null && rightBoundary != null)
+            ? Mathf.Abs(rightBoundary.position.x - leftBoundary.position.x)
+            : (cardCount - 1) * cardSpacing;
+
+        // 2. 동적 간격(Spacing) 계산: 기본 간격으로 배치했을 때 경계를 넘치면 비율에 맞게 줄임
+        float actualSpacing = cardSpacing;
+        float defaultTotalWidth = (cardCount - 1) * cardSpacing;
+
+        if (defaultTotalWidth > maxAvailableWidth)
+        {
+            // 경계 폭을 넘어가면 카드 수에 맞춰 간격을 좁힘
+            actualSpacing = maxAvailableWidth / (cardCount - 1);
+        }
+
+        // 3. 중앙 기준 시작 X좌표 계산
+        float finalTotalWidth = (cardCount - 1) * actualSpacing;
+        float startX = -finalTotalWidth / 2f;
+
+        // 경계의 중심 X좌표 기준 (경계가 없으면 handPosition 기준)
+        float centerX = (leftBoundary != null && rightBoundary != null)
+            ? (leftBoundary.position.x + rightBoundary.position.x) / 2f
+            : handPosition.position.x;
+
+        for (int i = 0; i < cardCount; i++)
         {
             CardDisplay display = activeHandDisplays[i];
-            Vector3 targetPosition = handPosition.position + new Vector3(startX + (i * cardSpacing), 0, 0);
+
+            // 카드가 겹칠 때 우측 카드가 좌측 카드 위에 자연스럽게 얹히도록 Z 오프셋 살짝 부여 (-0.01f씩 앞당김)
+            Vector3 targetPosition = new Vector3(
+                centerX + startX + (i * actualSpacing),
+                handPosition.position.y,
+                handPosition.position.z - (i * 0.01f)
+            );
+
             display.transform.position = Vector3.Lerp(display.transform.position, targetPosition, Time.deltaTime * arrangeSpeed);
         }
     }
