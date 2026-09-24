@@ -556,6 +556,7 @@ GameObject:
   - component: {fileID: 5464503843193004001}
   - component: {fileID: 8631466672114983559}
   - component: {fileID: 1707895618601584260}
+  - component: {fileID: 6527346215548770171}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -665,6 +666,7 @@ MonoBehaviour:
   descriptionText: {fileID: 6957019746556280763}
   isDragging: 0
   isPlaced: 0
+  isTweening: 0
   slotLayer:
     serializedVersion: 2
     m_Bits: 8
@@ -714,6 +716,19 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.6, y: 2.4}
   m_EdgeRadius: 0
+--- !u!210 &6527346215548770171
+SortingGroup:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7328028137241284672}
+  m_Enabled: 1
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 3
+  m_SortAtRoot: 0
+  m_Sort3DAs2D: 0
 --- !u!1 &7487023002979895624
 GameObject:
   m_ObjectHideFlags: 0
