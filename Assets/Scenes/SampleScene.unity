@@ -281,7 +281,7 @@ Transform:
   m_GameObject: {fileID: 294122024}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -6.2, y: -1.5, z: 0}
+  m_LocalPosition: {x: -5.5, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1379,7 +1379,7 @@ MonoBehaviour:
   rightBoundary: {fileID: 1897196283}
   cardSpacing: 2
   arrangeSpeed: 10
-  drawCount: 6
+  drawCount: 16
   drawInterval: 0.2
   discardInterval: 0.2
 --- !u!1 &968608410
@@ -1407,7 +1407,7 @@ Transform:
   m_GameObject: {fileID: 968608410}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0, y: -2.15, z: -0}
+  m_LocalPosition: {x: -0, y: -2, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3070,7 +3070,7 @@ Transform:
   m_GameObject: {fileID: 1897196282}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 6.2, y: -1.5, z: 0}
+  m_LocalPosition: {x: 5.5, y: -2, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3524,7 +3524,7 @@ SceneRoots:
   - {fileID: 1373977246}
   - {fileID: 335012545}
   - {fileID: 968608411}
-  - {fileID: 516324521}
-  - {fileID: 325933202}
   - {fileID: 294122025}
   - {fileID: 1897196283}
+  - {fileID: 516324521}
+  - {fileID: 325933202}

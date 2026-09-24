@@ -86,14 +86,13 @@ public class BattleCardManager : MonoBehaviour
             int totalCards = handCards.Count;
             float totalWidth = (totalCards - 1) * cardSpacing;
             float startX = -totalWidth / 2f;
-            Vector3 targetPos = handPosition.position + new Vector3(startX + ((totalCards - 1) * cardSpacing), 0, 0);
 
             // 드로우 연출 시작 (DOTweenManager 호출)
             drawnDisplay.isTweening = true;
             Tween drawTween = DOTweenManager.CardDraw(
                 drawnDisplay.transform,
                 startSpawnPos,
-                targetPos,
+                rightBoundary.position,
                 Vector3.one,
                 0.3f
             );
