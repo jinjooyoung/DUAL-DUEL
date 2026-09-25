@@ -1379,7 +1379,7 @@ MonoBehaviour:
   rightBoundary: {fileID: 1897196283}
   cardSpacing: 2
   arrangeSpeed: 10
-  drawCount: 16
+  drawCount: 6
   drawInterval: 0.2
   discardInterval: 0.2
 --- !u!1 &968608410

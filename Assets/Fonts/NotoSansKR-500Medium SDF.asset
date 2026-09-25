@@ -63,7 +63,7 @@ Material:
     - _GlowOffset: 0
     - _GlowOuter: 0.05
     - _GlowPower: 0.75
-    - _GradientScale: 7
+    - _GradientScale: 6
     - _LightAngle: 3.1416
     - _MaskSoftnessX: 0
     - _MaskSoftnessY: 0
@@ -126,24 +126,24 @@ MonoBehaviour:
     m_FaceIndex: 0
     m_FamilyName: Noto Sans KR
     m_StyleName: Medium
-    m_PointSize: 64
+    m_PointSize: 48
     m_Scale: 1
     m_UnitsPerEM: 1000
-    m_LineHeight: 92.672
-    m_AscentLine: 74.24
-    m_CapLine: 48
-    m_MeanLine: 36
+    m_LineHeight: 69.504
+    m_AscentLine: 55.679996
+    m_CapLine: 36
+    m_MeanLine: 27
     m_Baseline: 0
-    m_DescentLine: -18.432
-    m_SuperscriptOffset: 74.24
+    m_DescentLine: -13.823999
+    m_SuperscriptOffset: 55.679996
     m_SuperscriptSize: 0.5
-    m_SubscriptOffset: -18.432
+    m_SubscriptOffset: -13.823999
     m_SubscriptSize: 0.5
-    m_UnderlineOffset: -9.6
-    m_UnderlineThickness: 3.2
-    m_StrikethroughOffset: 14.4
-    m_StrikethroughThickness: 3.2
-    m_TabWidth: 14
+    m_UnderlineOffset: -7.2
+    m_UnderlineThickness: 2.3999999
+    m_StrikethroughOffset: 10.8
+    m_StrikethroughThickness: 2.3999999
+    m_TabWidth: 11
   m_Material: {fileID: -5714847790192654448}
   m_SourceFontFileGUID: 82022357ae162e04f8d417a4bbcdf0f4
   m_CreationSettings:
@@ -151,8 +151,8 @@ MonoBehaviour:
     sourceFontFileGUID: 82022357ae162e04f8d417a4bbcdf0f4
     faceIndex: 0
     pointSizeSamplingMode: 0
-    pointSize: 64
-    padding: 6
+    pointSize: 48
+    padding: 5
     paddingMode: 2
     packingMode: 0
     atlasWidth: 2048
@@ -179,7 +179,7 @@ MonoBehaviour:
   m_ClearDynamicDataOnBuild: 1
   m_AtlasWidth: 2048
   m_AtlasHeight: 2048
-  m_AtlasPadding: 6
+  m_AtlasPadding: 5
   m_AtlasRenderMode: 4165
   m_UsedGlyphRects: []
   m_FreeGlyphRects:
