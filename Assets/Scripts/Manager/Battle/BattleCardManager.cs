@@ -217,7 +217,15 @@ public class BattleCardManager : MonoBehaviour
     private void ArrangeHand()
     {
         // 배치되지 않았고, 드래그 중이 아니며, 드로우/디스카드 트윈 연출 중이 아닌 카드만 보간 정렬
-        List<CardDisplay> activeHandDisplays = cardPool.FindAll(c => c != null && c.gameObject.activeSelf && !c.isPlaced && !c.isDragging && !c.isTweening);
+        List<CardDisplay> activeHandDisplays = cardPool.FindAll(c =>
+            c != null &&
+            c.gameObject.activeSelf &&
+            !c.isPlaced &&
+            c.currentSlot == null &&
+            !c.isDragging &&
+            !c.isTweening
+        );
+
         if (activeHandDisplays.Count == 0 || handPosition == null) return;
 
         int cardCount = activeHandDisplays.Count;
@@ -277,6 +285,9 @@ public class BattleCardManager : MonoBehaviour
             ? discardDeckTransform.position
             : (handPosition != null ? handPosition.position + new Vector3(8f, -3f, 0f) : Vector3.zero);
 
+        // 연출 플래그 설정 (정렬 대상에서 즉시 제외)
+        targetDisplay.isTweening = true;
+
         if (targetDisplay.currentSlot != null)
         {
             targetDisplay.currentSlot.ClearSlot();
@@ -288,12 +299,15 @@ public class BattleCardManager : MonoBehaviour
             discardDeck.Add(targetDisplay.cardSO);
         }
 
+        // [수정] ResetPlacement()를 트윈 시작 전에 호출하지 않고, 
+        // 트윈이 끝난 후 비활성화 직전에 호출합니다.
         Tween discardTween = DOTweenManager.CardDiscard(targetDisplay.gameObject, discardTargetPos, 0.25f, () =>
         {
             targetDisplay.ResetPlacement();
             targetDisplay.isTweening = false;
+            targetDisplay.gameObject.SetActive(false); // 풀 반환 비활성화
         });
-        targetDisplay.ResetPlacement();
+
         BattleUIManager.Instance?.UpdateDeckUI();
     }
 

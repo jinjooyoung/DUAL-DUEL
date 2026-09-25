@@ -173,6 +173,14 @@ public class CardDisplay : MonoBehaviour
                 currentSlot = targetSlot;
                 targetSlot.PlaceCard(this);
 
+                // 슬롯에 카드가 성공적으로 놓였을 때 호출
+                if (BattleCardManager.Instance != null && this.cardSO != null)
+                {
+                    // 손패 데이터 리스트에서 즉시 제거 (실제 오브젝트는 슬롯에 존재)
+                    BattleCardManager.Instance.handCards.Remove(this.cardSO);
+                    BattleUIManager.Instance?.UpdateDeckUI();
+                }
+
                 // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
                 DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => isTweening = false);
                 DOTweenManager.SlotCardPlaced(targetSlot.transform);
