@@ -190,8 +190,14 @@ public class CardDisplay : MonoBehaviour
         }
 
         // 마우스 뗀 자리가 슬롯이 아닌 경우 (허공 또는 핸드 영역)
-        // 슬롯에 꽂혀있던 카드라면 슬롯 연결을 끊고 핸드로 복귀 (ArrangeHand가 알아서 정렬)
         DetachFromCurrentSlot();
+
+        // 카드를 놓은 Y 위치가 -1.5 이하인 경우 핸드 덱 리스트 인덱스 순서 변경
+        if (transform.position.y <= -1.5f)
+        {
+            BattleCardManager.Instance?.ReorderHandIndexOnly(this);
+        }
+
         DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => isTweening = false);
     }
 }

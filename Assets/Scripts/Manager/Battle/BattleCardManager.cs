@@ -277,6 +277,56 @@ public class BattleCardManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 놓은 카드의 X 좌표를 기준으로 handCards와 cardPool의 인덱스 순서를 변경합니다.
+    /// </summary>
+    public void ReorderHandIndexOnly(CardDisplay releasedCard)
+    {
+        if (releasedCard == null || releasedCard.cardSO == null) return;
+
+        // 1. 현재 핸드에 있는 카드들 수집 (슬롯에 꽂힌 카드 제외)
+        List<CardDisplay> activeCards = cardPool.FindAll(c =>
+            c != null &&
+            c.gameObject.activeSelf &&
+            !c.isPlaced &&
+            c.currentSlot == null
+        );
+
+        if (activeCards.Count <= 1) return;
+
+        // 2. 자신을 제외한 카드들을 현재 X 좌표(왼쪽 -> 오른쪽) 순으로 정렬
+        List<CardDisplay> otherCards = activeCards.FindAll(c => c != releasedCard);
+        otherCards.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
+
+        // 3. 놓은 카드의 X 좌표와 비교해 들어갈 인덱스 찾기
+        float releasedX = releasedCard.transform.position.x;
+        int targetIndex = otherCards.Count; // 기본값은 맨 뒤
+
+        for (int i = 0; i < otherCards.Count; i++)
+        {
+            if (releasedX < otherCards[i].transform.position.x)
+            {
+                targetIndex = i;
+                break;
+            }
+        }
+
+        // 4. handCards (데이터 리스트) 순서 변경
+        if (handCards.Contains(releasedCard.cardSO))
+        {
+            handCards.Remove(releasedCard.cardSO);
+            targetIndex = Mathf.Clamp(targetIndex, 0, handCards.Count);
+            handCards.Insert(targetIndex, releasedCard.cardSO);
+        }
+
+        // 5. cardPool (오브젝트 풀 리스트) 순서 동기화
+        if (cardPool.Contains(releasedCard))
+        {
+            cardPool.Remove(releasedCard);
+            cardPool.Insert(targetIndex, releasedCard);
+        }
+    }
+
     public void DiscardCard(CardDisplay targetDisplay)
     {
         if (targetDisplay == null || !targetDisplay.gameObject.activeSelf) return;
