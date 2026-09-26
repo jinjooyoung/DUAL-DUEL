@@ -8,7 +8,7 @@ using UnityEngine;
 public class CardDisplay : MonoBehaviour
 {
     [Header("카드 데이터(SO)")]
-    public CardSO cardSO;
+    public CardInstance cardInstance;
     public int cardIndex;
     public BattleSlot currentSlot;
 
@@ -45,9 +45,12 @@ public class CardDisplay : MonoBehaviour
     }
 
     // 카드 데이터 설정
-    public void SetupCard(CardSO data)
+    public void SetupCard(CardInstance instance)
     {
-        cardSO = data;
+        cardInstance = instance;
+        if (cardInstance == null || cardInstance.baseData == null) return;
+
+        CardSO data = cardInstance.baseData;
 
         // 3D 텍스트 업데이트
         if (nameText != null) nameText.text = LocalizationManager.Instance.GetText(data.nameKey);
@@ -56,20 +59,21 @@ public class CardDisplay : MonoBehaviour
         string desTemp = LocalizationManager.Instance != null ? LocalizationManager.Instance.GetText(data.descKey) : data.descKey;
         if (data.values != null && data.values.Count > 0)
         {
-            desTemp = desTemp.Replace("[Value]", data.values[0].ToString());
+            // values[0] 대신 강화 수치가 적용된 GetValue() 호출
+            desTemp = desTemp.Replace("[Value]", cardInstance.GetValue().ToString());
         }
 
         if (descriptionText != null) descriptionText.text = desTemp;
 
         // 카드 리소스
-        if (cardResource != null && cardSO.artwork != null)
-            cardResource.sprite = cardSO.artwork;
+        if (cardResource != null && data.artwork != null)
+            cardResource.sprite = data.artwork;
 
         if (background != null)
             background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
 
         if (typeIcon != null)
-            typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{cardSO.cardType}");
+            typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{data.cardType}");
 
         // 로컬라이징 후 설명 텍스트의 {value}를 cardSO.values로 Replace해주는 코드 여기 작성해야함
     }
@@ -188,10 +192,10 @@ public class CardDisplay : MonoBehaviour
                 targetSlot.PlaceCard(this);
 
                 // 슬롯에 카드가 성공적으로 놓였을 때 호출
-                if (BattleCardManager.Instance != null && this.cardSO != null)
+                if (BattleCardManager.Instance != null && this.cardInstance != null)
                 {
                     // 손패 데이터 리스트에서 즉시 제거 (실제 오브젝트는 슬롯에 존재)
-                    BattleCardManager.Instance.handCards.Remove(this.cardSO);
+                    BattleCardManager.Instance.handCards.Remove(this.cardInstance);
                     BattleUIManager.Instance?.UpdateDeckUI();
                 }
 

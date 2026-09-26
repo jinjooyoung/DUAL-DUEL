@@ -191,15 +191,17 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator ExecuteSlotAction(BattleSlot slot)
     {
-        CardSO card = slot.currentCard.cardSO;
-        if (card == null) yield break;
+        CardInstance instance = slot.currentCard.cardInstance;
+        if (instance == null || instance.baseData == null) yield break;
+
+        CardSO cardData = instance.baseData;
 
         bool isPlayerSlot = slot.slotOwnerType == OwnerType.Player;
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
 
-        // 1. 카드의 기본 밸류 확인
-        int baseCardValue = (card.values != null && card.values.Count > 0) ? card.values[0] : 0;
+        // 1. 카드의 밸류 확인(강화 단계가 적용된 GetValue() 호출)
+        int baseCardValue = instance.GetValue();
 
         // 2. 주체의 버프/디버프 확인 및 최종 밸류 계산 (음수면 0으로 보정)
         int finalValue = Mathf.Max(0, baseCardValue + user.buffValue - user.debuffValue);
@@ -209,7 +211,7 @@ public class BattleManager : MonoBehaviour
         user.debuffValue = 0;
 
         // 4. 최종 밸류를 바탕으로 카드 효과 실행 (0이면 실질적으로 효과 없음)
-        switch (card.cardType)
+        switch (cardData.cardType)
         {
             case CardType.Attack:
                 ApplyDamage(target, finalValue);

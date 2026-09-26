@@ -11,12 +11,17 @@ public class BattleCardManager : MonoBehaviour
     public static BattleCardManager Instance { get; private set; }
 
     [Header("덱 데이터")]
+    // 나중에 캐릭터 선택창에서 선택 > 초기덱 ID로 SO 찾아서 게임매니저 deck에 할당 후 게임 시작 흐름으로 진행할 예정
+    // 근데 그건 나중에 하고 일단은 테스트용으로 SO 찾았다 치고 흐름 확인용으로
+    [Tooltip("테스트용 초기 덱 (GameManager가 없을 때만 사용)")]
+    [SerializeField] private List<CardSO> testInitialDeckSO = new List<CardSO>();
+
     [Tooltip("뽑을 카드 더미")]
-    public List<CardSO> drawDeck = new List<CardSO>();
+    public List<CardInstance> drawDeck = new List<CardInstance>();
     [Tooltip("현재 핸드에 들고 있는 카드 데이터")]
-    public List<CardSO> handCards = new List<CardSO>();
+    public List<CardInstance> handCards = new List<CardInstance>();
     [Tooltip("사용되거나 버려진 카드 더미")]
-    public List<CardSO> discardDeck = new List<CardSO>();
+    public List<CardInstance> discardDeck = new List<CardInstance>();
 
     [Header("카드 풀 및 프리팹")]
     [Tooltip("풀이 고갈되었을 때 새로 동적 인스턴스화할 카드 프리팹")]
@@ -57,6 +62,30 @@ public class BattleCardManager : MonoBehaviour
         foreach (var card in cardPool)
         {
             if (card != null) card.gameObject.SetActive(false);
+        }
+
+        drawDeck.Clear();
+        handCards.Clear();
+        discardDeck.Clear();
+
+        // GameManager에 저장된 영구 보유 덱이 존재하면 가져와서 인스턴스 복제
+        if (GameManager.Instance != null && GameManager.Instance.deck.Count > 0)
+        {
+            foreach (var card in GameManager.Instance.deck)
+            {
+                drawDeck.Add(new CardInstance(card.baseData, card.upgradeLevel)
+                {
+                    instanceId = card.instanceId
+                });
+            }
+        }
+        else
+        {
+            // 배틀 씬 단독 테스트 시 인스펙터의 SO 목록으로 임시 인스턴스 생성
+            foreach (var so in testInitialDeckSO)
+            {
+                if (so != null) drawDeck.Add(new CardInstance(so, 0));
+            }
         }
 
         ShuffleDeck();
@@ -131,10 +160,10 @@ public class BattleCardManager : MonoBehaviour
             targetCard.isTweening = true;
 
             // 데이터 리스트 이동
-            if (targetCard.cardSO != null)
+            if (targetCard.cardInstance != null)
             {
-                handCards.Remove(targetCard.cardSO);
-                discardDeck.Add(targetCard.cardSO);
+                handCards.Remove(targetCard.cardInstance);
+                discardDeck.Add(targetCard.cardInstance);
             }
 
             // DOTweenManager.CardDiscard 실행 후 완료 대기
@@ -170,7 +199,7 @@ public class BattleCardManager : MonoBehaviour
         CardDisplay availableDisplay = GetOrCreateCardDisplay();
         if (availableDisplay == null) return null;
 
-        CardSO drawnData = drawDeck[0];
+        CardInstance drawnData = drawDeck[0];
         drawDeck.RemoveAt(0);
         handCards.Add(drawnData);
 
@@ -282,7 +311,7 @@ public class BattleCardManager : MonoBehaviour
     /// </summary>
     public void ReorderHandIndexOnly(CardDisplay releasedCard)
     {
-        if (releasedCard == null || releasedCard.cardSO == null) return;
+        if (releasedCard == null || releasedCard.cardInstance == null) return;
 
         // 1. 현재 핸드에 있는 카드들 수집 (슬롯에 꽂힌 카드 제외)
         List<CardDisplay> activeCards = cardPool.FindAll(c =>
@@ -312,11 +341,11 @@ public class BattleCardManager : MonoBehaviour
         }
 
         // 4. handCards (데이터 리스트) 순서 변경
-        if (handCards.Contains(releasedCard.cardSO))
+        if (handCards.Contains(releasedCard.cardInstance))
         {
-            handCards.Remove(releasedCard.cardSO);
+            handCards.Remove(releasedCard.cardInstance);
             targetIndex = Mathf.Clamp(targetIndex, 0, handCards.Count);
-            handCards.Insert(targetIndex, releasedCard.cardSO);
+            handCards.Insert(targetIndex, releasedCard.cardInstance);
         }
 
         // 5. cardPool (오브젝트 풀 리스트) 순서 동기화
@@ -343,10 +372,10 @@ public class BattleCardManager : MonoBehaviour
             targetDisplay.currentSlot.ClearSlot();
         }
 
-        if (targetDisplay.cardSO != null)
+        if (targetDisplay.cardInstance != null)
         {
-            handCards.Remove(targetDisplay.cardSO);
-            discardDeck.Add(targetDisplay.cardSO);
+            handCards.Remove(targetDisplay.cardInstance);
+            discardDeck.Add(targetDisplay.cardInstance);
         }
 
         // [수정] ResetPlacement()를 트윈 시작 전에 호출하지 않고, 
@@ -363,7 +392,7 @@ public class BattleCardManager : MonoBehaviour
 
     private void ShuffleDeck()
     {
-        List<CardSO> tempDeck = new List<CardSO>(drawDeck);
+        List<CardInstance> tempDeck = new List<CardInstance>(drawDeck);
         drawDeck.Clear();
         while (tempDeck.Count > 0)
         {
