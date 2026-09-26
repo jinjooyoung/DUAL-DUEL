@@ -5,10 +5,6 @@ public class BattleUIManager : MonoBehaviour
 {
     public static BattleUIManager Instance { get; private set; }
 
-    [Header("전투 매니저 참조")]
-    [SerializeField] private BattleManager battleManager;
-    [SerializeField] private BattleCardManager cardManager;
-
     [Header("텍스트 UI (TextMeshPro)")]
     [Tooltip("뽑을 카드 더미 카운트 텍스트")]
     [SerializeField] private TextMeshProUGUI drawDeckText;
@@ -29,15 +25,6 @@ public class BattleUIManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-
-        // 매니저 참조가 비어있다면 자동 탐색
-        if (battleManager == null) battleManager = FindAnyObjectByType<BattleManager>();
-        if (cardManager == null) cardManager = FindAnyObjectByType<BattleCardManager>();
-    }
-
-    private void Start()
-    {
-        UpdateAllUI();
     }
 
     /// <summary>
@@ -55,16 +42,16 @@ public class BattleUIManager : MonoBehaviour
     /// </summary>
     public void UpdateDeckUI()
     {
-        if (cardManager == null) return;
+        if (BattleCardManager.Instance == null) return;
 
         if (drawDeckText != null)
         {
-            drawDeckText.text = $"드로우덱\n{cardManager.drawDeck.Count}";
+            drawDeckText.text = $"드로우덱\n{BattleCardManager.Instance.drawDeck.Count}";
         }
 
         if (discardDeckText != null)
         {
-            discardDeckText.text = $"버림 덱\n{cardManager.discardDeck.Count}";
+            discardDeckText.text = $"버림 덱\n{BattleCardManager.Instance.discardDeck.Count}";
         }
     }
 
@@ -73,24 +60,24 @@ public class BattleUIManager : MonoBehaviour
     /// </summary>
     public void UpdateCombatStatsUI()
     {
-        if (battleManager == null) return;
+        if (BattleManager.Instance == null) return;
 
         // 플레이어 스탯 갱신
-        if (playerStatText != null && battleManager.playerStats != null)
+        if (playerStatText != null && BattleManager.Instance.playerStats != null)
         {
-            playerStatText.text = $"플레이어 체력 : {battleManager.playerStats.currentHp}\n플레이어 방어력 : {battleManager.playerStats.guard}";
+            playerStatText.text = $"플레이어 체력 : {BattleManager.Instance.playerStats.currentHp}\n플레이어 방어력 : {BattleManager.Instance.playerStats.guard}";
         }
 
         // 몬스터 스탯 갱신
-        if (monsterStatText != null && battleManager.monsterStats != null)
+        if (monsterStatText != null && BattleManager.Instance.monsterStats != null)
         {
-            monsterStatText.text = $"몬스터 체력 : {battleManager.monsterStats.currentHp}\n몬스터 방어력 : {battleManager.monsterStats.guard}";
+            monsterStatText.text = $"몬스터 체력 : {BattleManager.Instance.monsterStats.currentHp}\n몬스터 방어력 : {BattleManager.Instance.monsterStats.guard}";
         }
     }
 
     public void UpdateMonsterTurnDamage()
     {
         if (monsterTurnDamageText != null)
-            monsterTurnDamageText.text = $"이번 턴 적 공격 : {battleManager.monsterBaseAttack}";
+            monsterTurnDamageText.text = $"이번 턴 적 공격 : {BattleManager.Instance.monsterBaseAttack}";
     }
 }

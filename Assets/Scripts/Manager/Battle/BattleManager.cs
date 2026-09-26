@@ -26,6 +26,8 @@ public class CombatEntityStats
 // 배틀 시 핸드 덱을 배치 및 사용하는 배틀의 큰 흐름을 관리하는 매니저
 public class BattleManager : MonoBehaviour
 {
+    public static BattleManager Instance { get; private set; }
+
     [Header("전투 슬롯 필드")]
     public List<BattleSlot> fieldCardSlots = new List<BattleSlot>();
 
@@ -45,9 +47,17 @@ public class BattleManager : MonoBehaviour
 
     private Coroutine turnExecutionCoroutine;
 
+    private void Awake()
+    {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
+    }
+
+    // 순서 보장을 위해 초기화 로직 모음
     private void Start()
     {
         InitCombatStats();
+        BattleUIManager.Instance.UpdateAllUI();
     }
 
     /// <summary>
