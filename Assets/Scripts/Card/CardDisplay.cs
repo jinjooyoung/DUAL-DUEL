@@ -1,6 +1,7 @@
 using DG.Tweening;
 using System;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
 
@@ -24,7 +25,8 @@ public class CardDisplay : MonoBehaviour
     [Header("상태 플래그")]
     public bool isDragging = false;
     public bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
-    [HideInInspector] public bool isTweening = false; // 드로우/디스카드 등 트윈 제어 중일 때 true
+    public bool isSnapFixed = false;    // 핸드 카드 순서 변경. true일 시 Lerp X
+    public bool isTweening = false; // 드로우/디스카드 등 트윈 제어 중일 때 true
 
     private Vector3 originalPosition;
     private Vector3 originalScale = Vector3.one;
@@ -112,7 +114,7 @@ public class CardDisplay : MonoBehaviour
     {
         if (isDragging || isPlaced || isTweening) return;
         // 저장해 둔 손패 원래 위치(hoverOriginPos)와 원래 스케일, 회전값으로 깔끔하게 복귀
-        DOTweenManager.CardHoverExit(transform, originalPosition, originalScale, Vector3.zero, 0.12f);
+        DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
     }
 
     private void OnMouseDown()
@@ -121,6 +123,11 @@ public class CardDisplay : MonoBehaviour
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
         isDragging = true;
+
+        foreach (var card in BattleCardManager.Instance.cardPool)
+        {
+            ColliderOnOff(card, false);
+        }
 
         DOTweenManager.CardDragStart(transform, originalScale * 1.05f, 0.08f);
     }
@@ -142,6 +149,13 @@ public class CardDisplay : MonoBehaviour
         if (!isDragging) return;
         isDragging = false;
 
+        foreach (var card in BattleCardManager.Instance.cardPool)
+        {
+            if (card == this) continue;
+
+            ColliderOnOff(card, true);
+        }
+
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
@@ -155,7 +169,7 @@ public class CardDisplay : MonoBehaviour
                 // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
                 if (targetSlot == currentSlot)
                 {
-                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => isTweening = false);
+                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
                     return;
                 }
 
@@ -182,7 +196,7 @@ public class CardDisplay : MonoBehaviour
                 }
 
                 // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
-                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => isTweening = false);
+                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
                 DOTweenManager.SlotCardPlaced(targetSlot.transform);
 
                 return;
@@ -195,9 +209,16 @@ public class CardDisplay : MonoBehaviour
         // 카드를 놓은 Y 위치가 -1.5 이하인 경우 핸드 덱 리스트 인덱스 순서 변경
         if (transform.position.y <= -1.5f)
         {
+            isSnapFixed = true;
             BattleCardManager.Instance?.ReorderHandIndexOnly(this);
         }
 
-        DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => isTweening = false);
+        DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => ColliderOnOff(this, true));
+    }
+
+    private void ColliderOnOff(CardDisplay obj, bool on)
+    {
+        var collider = obj.GetComponent<BoxCollider2D>();
+        collider.enabled = on;
     }
 }

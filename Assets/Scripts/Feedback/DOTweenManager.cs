@@ -401,13 +401,16 @@ public static class DOTweenManager
     /// <param name="card">대상 카드 Transform</param>
     /// <param name="targetScale">복귀할 목표 스케일 Vector3</param>
     /// <param name="duration">진행 시간 (초)</param>
-    public static Tween CardDragEnd(Transform card, Vector3 targetScale, float duration = 0.1f, Action onComplete = null)
+    public static Sequence CardDragEnd(Transform card, Vector3 targetScale, float duration = 0.1f, Action onComplete = null)
     {
         if (card == null) return null;
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
         DOTween.Kill(tweenId);
 
-        return card.DOScale(targetScale, duration).SetEase(Ease.OutQuad).SetId(tweenId);
+        Sequence seq = DOTween.Sequence().SetId(tweenId);
+        seq.Append(card.DOScale(targetScale, duration).SetEase(Ease.OutQuad));
+        seq.OnComplete(() => onComplete?.Invoke());
+        return seq;
     }
 
     /// <summary>
