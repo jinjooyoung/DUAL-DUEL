@@ -12,7 +12,8 @@ public class DeckViewerPopup : MonoBehaviour
     [SerializeField] private Button closeButton;
     [SerializeField] private ScrollRect scrollRect;
 
-    private readonly List<GameObject> spawnedCards = new List<GameObject>();
+    // UI 오브젝트 풀 리스트
+    private readonly List<UIViewerCard> cardUIPool = new List<UIViewerCard>();
 
     private void Awake()
     {
@@ -49,34 +50,57 @@ public class DeckViewerPopup : MonoBehaviour
         if (titleText != null)
             titleText.text = $"{title} ({cards.Count})";
 
-        // 기존 생성된 카드 UI 정리
-        foreach (var cardObj in spawnedCards)
+        // 1. 필요한 수량만큼 풀에서 꺼내거나 새로 생성하여 세팅
+        for (int i = 0; i < cards.Count; i++)
         {
-            Destroy(cardObj);
-        }
-        spawnedCards.Clear();
-
-        // 새 카드 UI 인스턴스화 및 배치
-        if (viewerCardPrefab != null && contentRoot != null)
-        {
-            foreach (var card in cards)
+            UIViewerCard cardUI = GetOrCreateCardUI(i);
+            if (cardUI != null)
             {
-                if (card == null) continue;
-                GameObject newCard = Instantiate(viewerCardPrefab, contentRoot);
-                UIViewerCard cardUI = newCard.GetComponent<UIViewerCard>();
-                if (cardUI != null)
-                {
-                    cardUI.Setup(card);
-                }
-                spawnedCards.Add(newCard);
+                cardUI.gameObject.SetActive(true);
+                cardUI.Setup(cards[i]);
             }
         }
 
-        // 스크롤 위치를 맨 위로 초기화
+        // 2. 카드 수보다 풀에 남는 여유 오브젝트는 비활성화(SetActive(false))
+        for (int i = cards.Count; i < cardUIPool.Count; i++)
+        {
+            if (cardUIPool[i] != null)
+            {
+                cardUIPool[i].gameObject.SetActive(false);
+            }
+        }
+
+        // 3. 스크롤 위치를 맨 위로 초기화
         if (scrollRect != null)
         {
             scrollRect.verticalNormalizedPosition = 1f;
         }
+    }
+
+    /// <summary>
+    /// 풀에서 인덱스에 해당하는 UI를 가져오거나, 없으면 새로 인스턴스화
+    /// </summary>
+    private UIViewerCard GetOrCreateCardUI(int index)
+    {
+        // 이미 풀에 생성되어 있는 경우
+        if (index < cardUIPool.Count)
+        {
+            return cardUIPool[index];
+        }
+
+        // 부족할 경우 새로 생성하여 풀에 추가
+        if (viewerCardPrefab != null && contentRoot != null)
+        {
+            GameObject newObj = Instantiate(viewerCardPrefab, contentRoot);
+            UIViewerCard cardUI = newObj.GetComponent<UIViewerCard>();
+            if (cardUI != null)
+            {
+                cardUIPool.Add(cardUI);
+                return cardUI;
+            }
+        }
+
+        return null;
     }
 
     public void ClosePopup()

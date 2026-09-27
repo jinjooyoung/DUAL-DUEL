@@ -1,9 +1,7 @@
 using DG.Tweening;
-using System;
 using TMPro;
-using Unity.VisualScripting;
-using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CardDisplay : MonoBehaviour
 {
@@ -106,6 +104,9 @@ public class CardDisplay : MonoBehaviour
     // 마우스 호버 연출 (슬롯에 꽂히지 않고, 드래그 중이 아닐 때만)
     private void OnMouseEnter()
     {
+        // 마우스가 UI 팝업(DimmedBackground 등) 위에 있으면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (isDragging || isPlaced || isTweening) return;
 
         // 호버 시작 시 현재 손패 위치를 기준점으로 저장
@@ -116,6 +117,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseExit()
     {
+        // 마우스가 UI 팝업(DimmedBackground 등) 위에 있으면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (isDragging || isPlaced || isTweening) return;
         // 저장해 둔 손패 원래 위치(hoverOriginPos)와 원래 스케일, 회전값으로 깔끔하게 복귀
         DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
@@ -123,6 +127,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseDown()
     {
+        // 마우스가 UI 팝업(DimmedBackground 등) 위에 있으면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (isTweening) return;
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
@@ -138,6 +145,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        // 마우스가 UI 팝업(DimmedBackground 등) 위에 있으면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (isDragging)
         {
             // 마우스 위치로 카드 이동
@@ -150,6 +160,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseUp()
     {
+        // 마우스가 UI 팝업(DimmedBackground 등) 위에 있으면 무시
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject()) return;
+
         if (!isDragging) return;
         isDragging = false;
 
