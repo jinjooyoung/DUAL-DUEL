@@ -35,10 +35,6 @@ public class BattleManager : MonoBehaviour
     public CombatEntityStats playerStats;
     public CombatEntityStats monsterStats;
 
-    [Header("몬스터 기본 액션")]
-    [Tooltip("슬롯 외 몬스터의 턴 종료 확정 기본 공격력")]
-    public int monsterBaseAttack = 5;
-
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 0.5f;
 
@@ -92,12 +88,12 @@ public class BattleManager : MonoBehaviour
     {
         if (turnExecutionCoroutine != null) return;
 
-        // 5개 슬롯 완충 여부 검사
+        /*// 5개 슬롯 완충 여부 검사
         if (!IsAllSlotsOccupied())
         {
             Debug.LogWarning("[턴 종료 불가] 모든 슬롯에 카드를 배치해야 턴을 마칠 수 있습니다.");
             return;
-        }
+        }*/
 
         turnExecutionCoroutine = StartCoroutine(Co_ExecuteTurnSlots());
     }
@@ -127,18 +123,23 @@ public class BattleManager : MonoBehaviour
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
             BattleSlot slot = fieldCardSlots[i];
+            if (slot == null) continue;
 
-            if (slot != null && slot.isOccupied && slot.currentCard != null)
+            // [분기 1] 슬롯에 카드가 장착되어 있는 경우 -> 기존 카드 효과 발동
+            if (slot.isOccupied && slot.currentCard != null)
             {
-                StartCoroutine(ExecuteSlotAction(slot));
-                yield return new WaitForSeconds(slotActionDelay);
+                yield return StartCoroutine(ExecuteSlotAction(slot));
             }
-        }
+            // [분기 2] 슬롯이 비어있는 경우 (카드가 null) -> 슬롯 자체의 기본 공격력 실행
+            else
+            {
+                yield return StartCoroutine(Co_ExecuteSlotBaseAttack(slot));
+            }
 
-        // 1-1. 슬롯 5개 연산 후 몬스터가 살아있다면 확정 기본 공격 실행
-        if (monsterStats.currentHp > 0)
-        {
-            yield return StartCoroutine(Co_ExecuteMonsterBaseAttack());
+            yield return new WaitForSeconds(slotActionDelay);
+
+            // 적 사망 시 슬롯 루프 조기 종료
+            if (monsterStats.currentHp <= 0) break;
         }
 
         // 2. 슬롯 발동 완료 후, 손패에 남아있는 잉여 카드들 0.5초 간격으로 모두 버림
@@ -158,26 +159,34 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 슬롯 외 몬스터의 확정 기본 공격 연출 및 데미지 연산 코루틴
+    /// 카드가 비어 있는 슬롯에서 슬롯 고유의 기본 공격력을 시전하는 코루틴
     /// </summary>
-    private IEnumerator Co_ExecuteMonsterBaseAttack()
+    private IEnumerator Co_ExecuteSlotBaseAttack(BattleSlot slot)
     {
-        if (monsterBaseAttack <= 0) yield break;
+        bool isPlayerSlot = slot.slotOwnerType == OwnerType.Player;
+        CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
+        CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
 
-        Debug.Log($"[몬스터 기본 공격] 몬스터가 플레이어에게 기본 공격 {monsterBaseAttack} 시전!");
+        int rawAtk = slot.slotBaseAttack;
 
-        // 몬스터에게 남은 버프/디버프가 있다면 가산 적용
-        int finalDamage = Mathf.Max(0, monsterBaseAttack + monsterStats.buffValue - monsterStats.debuffValue);
-        monsterStats.buffValue = 0;
-        monsterStats.debuffValue = 0;
+        // 주체의 버프/디버프 가산 적용
+        int finalDamage = Mathf.Max(0, rawAtk + user.buffValue - user.debuffValue);
+        user.buffValue = 0;
+        user.debuffValue = 0;
 
-        // 플레이어에게 데미지 적용 (방어도 우선 차감 후 잔여 피해 체력 차감)
-        ApplyDamage(playerStats, finalDamage);
+        Debug.Log($"[빈 슬롯 기본 공격] {(isPlayerSlot ? "플레이어" : "적")} {slot.slotIndex}번 슬롯이 비어있어 기본 피해 {finalDamage}(원래: {rawAtk}) 시전!");
 
+        // 슬롯 펀치/돌진 연출
+        Sequence sequence = DOTweenManager.CardExecute(
+            slot.transform,
+            isPlayerSlot ? Vector3.right : Vector3.left
+        );
+
+        yield return sequence.WaitForCompletion();
+
+        // 피해 적용
+        ApplyDamage(target, finalDamage);
         BattleUIManager.Instance?.UpdateAllUI();
-
-        // 공격 액션 후 1초 연출 대기
-        yield return new WaitForSeconds(slotActionDelay);
     }
 
     /// <summary>
