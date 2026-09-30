@@ -136,6 +136,8 @@ public class BattleManager : MonoBehaviour
                 yield return StartCoroutine(Co_ExecuteSlotBaseAttack(slot));
             }
 
+            slot.ClearAtkText();
+
             yield return new WaitForSeconds(slotActionDelay);
 
             // 적 사망 시 슬롯 루프 조기 종료

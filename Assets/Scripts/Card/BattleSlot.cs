@@ -41,6 +41,18 @@ public class BattleSlot : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// 턴 실행 시 해당 슬롯 액션 격발 시점에 텍스트를 비움
+    /// </summary>
+    public void ClearAtkText()
+    {
+        if (baseAtkText != null)
+        {
+            baseAtkText.text = "";
+            // 또는 baseAtkText.gameObject.SetActive(false);
+        }
+    }
+
     public void SetSlotType(OwnerType newType, int baseAttack)
     {
         slotOwnerType = newType;
