@@ -7,6 +7,9 @@ public class BattleSlot : MonoBehaviour
     public bool isOccupied = false; // 카드가 이미 배치되어 있는지 여부
     public CardDisplay currentCard; // 배치된 카드 참조
 
+    [Header("슬롯 기본 공격력")]
+    public int slotBaseAttack;      // 카드가 없을 때 발동할 공격력
+
     // 카드 배치 처리
     public void PlaceCard(CardDisplay card)
     {
@@ -22,9 +25,10 @@ public class BattleSlot : MonoBehaviour
         currentCard = null;
     }
 
-    public void SetSlotType(OwnerType newType)
+    public void SetSlotType(OwnerType newType, int baseAttack)
     {
         slotOwnerType = newType;
+        slotBaseAttack = baseAttack;    // 슬롯 기본 공격력 할당
         isOccupied = false;
 
         // 슬롯 시각 피드백 (예: 플레이어는 파란색/보라색, 적은 붉은색 계열)

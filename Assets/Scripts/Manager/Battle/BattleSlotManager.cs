@@ -66,7 +66,14 @@ public class BattleSlotManager : MonoBehaviour
             if (slots[i] != null)
             {
                 slots[i].ClearSlot();               // 이전 턴 잔여 카드 참조 초기화
-                slots[i].SetSlotType(slotTypes[i]); // 슬롯 타입 및 외형 갱신
+
+                // 슬롯 타입에 따라 랜덤 기본 공격력 결정 (int Random.Range는 최댓값 미포함이므로 +1)
+                OwnerType type = slotTypes[i];
+                int randomAtk = (type == OwnerType.Player)
+                    ? Random.Range(1, 9)   // 플레이어: 1 ~ 8
+                    : Random.Range(5, 16); // 적: 5 ~ 15
+
+                slots[i].SetSlotType(slotTypes[i], randomAtk); // 슬롯 타입 및 외형 갱신
             }
         }
 
