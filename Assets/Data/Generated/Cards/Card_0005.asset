@@ -14,11 +14,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::CardSO
   cardId: 5
   cardType: 1
-  isSpecial: 0
-  rank: 2
-  artwork: {fileID: 21300000, guid: b500158f77bd024478302d72be775685, type: 3}
+  rank: 3
+  artwork: {fileID: 0}
   nameKey: CARDNAME_5
   descKey: CARDDESC_5
   values: 030000000400000005000000060000000700000009000000
-  playerSlotValue: 0
-  enemySlotValue: 0
+  isExhaust: 0
+  conditionCategory: 3
+  conditionParam: Enemy
+  rewardCategory: 5
+  rewardParam: 1

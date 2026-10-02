@@ -62,7 +62,6 @@ public class ExcelToScriptableConverter : EditorWindow
         switch (conversionType)
         {
             case ConversionType.Card:
-                // CardSO 생성 로직만 넘김
                 ConvertSheet<CardSO, CardDatabaseSO>("Card", "CardDatabase", (row) =>
                 {
                     if (row["cardId"] == DBNull.Value) return (null, null);
@@ -73,17 +72,35 @@ public class ExcelToScriptableConverter : EditorWindow
                     CardSO cardSO = CreateInstance<CardSO>();
                     cardSO.cardId = data.cardId;
 
+                    // 1. 카드 타입 및 등급 매핑
                     if (Enum.TryParse(data.cardType, true, out CardType type)) cardSO.cardType = type;
-                    cardSO.isSpecial = data.isSpecial == 1 ? true : false;
                     if (Enum.IsDefined(typeof(RankType), data.rank)) cardSO.rank = (RankType)data.rank;
 
+                    // 2. 로컬라이징 키 및 수치 리스트 매핑
                     cardSO.nameKey = data.nameKey;
                     cardSO.descKey = data.descKey;
                     cardSO.values = new List<int> { data.baseValue, data.upgrade_1, data.upgrade_2, data.upgrade_3, data.upgrade_4, data.upgrade_5 };
 
-                    cardSO.playerSlotValue = data.playerSlotValue;
-                    cardSO.enemySlotValue = data.enemySlotValue;
+                    // 3. 소멸 여부 매핑
+                    cardSO.isExhaust = data.isExhaust;
 
+                    // 4. 모듈형 기믹 조건(Condition) 매핑
+                    if (!string.IsNullOrEmpty(data.conditionCategory) && Enum.TryParse(data.conditionCategory, true, out ConditionCategory cond))
+                        cardSO.conditionCategory = cond;
+                    else
+                        cardSO.conditionCategory = ConditionCategory.None;
+
+                    cardSO.conditionParam = data.conditionParam ?? string.Empty;
+
+                    // 5. 모듈형 기믹 보상(Reward) 매핑
+                    if (!string.IsNullOrEmpty(data.rewardCategory) && Enum.TryParse(data.rewardCategory, true, out RewardCategory rew))
+                        cardSO.rewardCategory = rew;
+                    else
+                        cardSO.rewardCategory = RewardCategory.None;
+
+                    cardSO.rewardParam = data.rewardParam;
+
+                    // 6. 리소스 아트워크 및 파일명 설정
                     string artworkPath = $"Assets/Resources/Cards/Card_{data.cardId}.png";
                     cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
 
@@ -273,7 +290,14 @@ public class ExcelToScriptableConverter : EditorWindow
             upgrade_2 = Convert.ToInt32(row["upgrade_2"]),
             upgrade_3 = Convert.ToInt32(row["upgrade_3"]),
             upgrade_4 = Convert.ToInt32(row["upgrade_4"]),
-            upgrade_5 = Convert.ToInt32(row["upgrade_5"])
+            upgrade_5 = Convert.ToInt32(row["upgrade_5"]),
+
+            // [신규 기믹 필드] 빈 셀(DBNull) 대비 안전 처리 포함
+            isExhaust = row["isExhaust"] != DBNull.Value && Convert.ToBoolean(row["isExhaust"]),
+            conditionCategory = row["conditionCategory"] != DBNull.Value ? row["conditionCategory"].ToString() : "None",
+            conditionParam = row["conditionParam"] != DBNull.Value ? row["conditionParam"].ToString() : string.Empty,
+            rewardCategory = row["rewardCategory"] != DBNull.Value ? row["rewardCategory"].ToString() : "None",
+            rewardParam = row["rewardParam"] != DBNull.Value ? Convert.ToSingle(row["rewardParam"]) : 0f
         };
     }
 
