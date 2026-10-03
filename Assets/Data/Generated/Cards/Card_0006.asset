@@ -15,7 +15,7 @@ MonoBehaviour:
   cardId: 6
   cardType: 2
   rank: 3
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: b500158f77bd024478302d72be775685, type: 3}
   nameKey: CARDNAME_6
   descKey: CARDDESC_6
   values: 05000000060000000700000008000000090000000b000000
