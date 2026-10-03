@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: Localization_CARDDESC_8
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationSO
   key: CARDDESC_8
-  ko: "HP\uB97C [Value] \uD68C\uBCF5\uD55C\uB2E4."
+  ko: "\uB514\uBC84\uD504 [Value]. \uC190\uD328 \uACF5\uACA9 4\uC7A5 \uC774\uC0C1\uC774\uBA74..."
   en: Heal [Value] HP.
   jp: 

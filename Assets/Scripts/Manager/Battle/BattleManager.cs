@@ -326,7 +326,10 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator ExecuteSlotAction(BattleSlot slot)
     {
-        CardInstance instance = slot.currentCard.cardInstance;
+        CardDisplay cardDisplay = slot.currentCard;
+        if (cardDisplay == null) yield break;
+
+        CardInstance instance = cardDisplay.cardInstance;
         if (instance == null || instance.baseData == null) yield break;
 
         CardSO cardData = instance.baseData;
@@ -335,22 +338,139 @@ public class BattleManager : MonoBehaviour
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
 
-        // 0. 조건 만족 여부 검사
+        // 1. 조건 만족 여부 검사
         bool isConditionMet = CheckCardCondition(slot, cardData);
-        Debug.Log($"[{slot.slotIndex}번 슬롯] {cardData.nameKey} 조건({cardData.conditionCategory}): {(isConditionMet ? "달성!" : "미달성")}");
+        string conditionStatus = isConditionMet ? "<color=#00FF00>[조건 달성 - 보상 활성화]</color>" : "<color=#FF4444>[조건 미달 - 기본 시전]</color>";
+        Debug.Log($"[카드 효과 판별] 슬롯: {slot.slotIndex}번 | 카드 ID: {cardData.cardId} ({cardData.nameKey}) | 조건 타입: {cardData.conditionCategory} (파라미터: '{cardData.conditionParam}') -> {conditionStatus}");
 
-        // 1. 카드의 밸류 확인(강화 단계가 적용된 GetValue() 호출)
-        int baseCardValue = instance.GetValue();
+        // 2. 카드의 기본 밸류 확인 (강화 수치 적용)
+        int cardValue = instance.GetValue();
 
-        // 2. 주체의 버프/디버프 확인 및 최종 밸류 계산 (음수면 0으로 보정)
-        int finalValue = Mathf.Max(0, baseCardValue + user.buffValue - user.debuffValue);
+        // 3. 시전 및 보상 관련 파라미터 초기화
+        int repeatExtraCount = 0;
+        int triggerNeighborTarget = -999; // -1: 이전, 1: 다음
 
-        // 3. 이번 행동에 반영했으므로 주체의 버프/디버프 소진 (0으로 초기화)
-        user.buffValue = 0;
-        user.debuffValue = 0;
+        // 4. 조건 충족 시 보상 적용 (스위치문)
+        if (isConditionMet)
+        {
+            switch (cardData.rewardCategory)
+            {
+                case RewardCategory.None:
+                    break;
 
-        // 4. 최종 밸류를 바탕으로 카드 효과 실행 (0이면 실질적으로 효과 없음)
-        switch (cardData.cardType)
+                // 정수 밸류 가산
+                case RewardCategory.FlatBonus:
+                    cardValue += Mathf.RoundToInt(cardData.rewardParam);
+                    Debug.Log($"[보상: FlatBonus] {cardData.nameKey} 밸류 +{cardData.rewardParam} (최종: {cardValue})");
+                    break;
+
+                // 밸류 곱연산
+                case RewardCategory.Multiplier:
+                    cardValue = Mathf.RoundToInt(cardValue * cardData.rewardParam);
+                    Debug.Log($"[보상: Multiplier] {cardData.nameKey} 밸류 x{cardData.rewardParam} (최종: {cardValue})");
+                    break;
+
+                // 다중 시전: 기본 1회 + 추가 rewardParam회
+                case RewardCategory.RepeatCast:
+                    repeatExtraCount = Mathf.Max(0, Mathf.RoundToInt(cardData.rewardParam));
+                    Debug.Log($"[보상: RepeatCast] {cardData.nameKey} 추가 {repeatExtraCount}회 연타 시전 예약!");
+                    break;
+
+                // 인접 슬롯 카드 추가 시전 예약 (0: 이전 슬롯, 1: 다음 슬롯)
+                case RewardCategory.TriggerNeighborSlot:
+                    triggerNeighborTarget = Mathf.RoundToInt(cardData.rewardParam);
+                    Debug.Log($"[보상: TriggerNeighborSlot] {(triggerNeighborTarget == 0 ? "이전" : "다음")} 슬롯 연계 시전 예약!");
+                    break;
+
+                // 다음 턴 드로우 매수 추가 적립
+                case RewardCategory.ModifyNextDraw:
+                    if (BattleCardManager.Instance != null)
+                    {
+                        int extraDraw = Mathf.RoundToInt(cardData.rewardParam);
+                        BattleCardManager.Instance.bonusDrawCount += extraDraw;
+                        Debug.Log($"[보상: ModifyNextDraw] 다음 턴 드로우 +{extraDraw}장 예약 (누적 추가: {BattleCardManager.Instance.bonusDrawCount})");
+                    }
+                    break;
+
+                // 버프/디버프 부여 (구상 중)
+                case RewardCategory.ApplyBuffDebuff:
+                    Debug.Log($"[보상: ApplyBuffDebuff] 아직 기획 구상 중 (Param: {cardData.rewardParam})");
+                    break;
+            }
+        }
+
+        // 5. 기본 1회 시전 + RepeatCast 추가 횟수만큼 반복 실행
+        int totalCasts = 1 + repeatExtraCount;
+
+        for (int i = 0; i < totalCasts; i++)
+        {
+            // 주체 버프/디버프 연산 (음수 보정)
+            int finalValue = Mathf.Max(0, cardValue + user.buffValue - user.debuffValue);
+            user.buffValue = 0;
+            user.debuffValue = 0;
+
+            // 실제 효과 발동
+            ApplyCardEffect(cardData.cardType, user, target, finalValue);
+
+            // 사용 연출 (슬롯에 카드가 유지된 채로 찌르기)
+            Sequence sequence = DOTweenManager.CardExecute(
+                cardDisplay.transform,
+                isPlayerSlot ? Vector3.right : Vector3.left
+            );
+
+            yield return sequence.WaitForCompletion();
+            BattleUIManager.Instance?.UpdateAllUI();
+
+            // 연타 시전 사이 짧은 연출 대기
+            if (i < totalCasts - 1)
+            {
+                yield return new WaitForSeconds(0.15f);
+            }
+
+            // 시전 도중 적이 쓰러지면 즉시 연타 중단
+            if (monsterStats.currentHp <= 0) break;
+        }
+
+        // 6. 인접 슬롯 연계 시전 처리 (TriggerNeighborSlot)
+        if (triggerNeighborTarget != -999 && monsterStats.currentHp > 0)
+        {
+            int targetSlotIdx = (triggerNeighborTarget == 0) ? slot.slotIndex - 1 : slot.slotIndex + 1;
+
+            if (targetSlotIdx >= 0 && targetSlotIdx < fieldCardSlots.Count)
+            {
+                BattleSlot neighborSlot = fieldCardSlots[targetSlotIdx];
+
+                if (neighborSlot != null && neighborSlot.isOccupied && neighborSlot.currentCard != null)
+                {
+                    Debug.Log($"[연계 발동] {targetSlotIdx}번 슬롯의 {neighborSlot.currentCard.cardInstance.baseData.nameKey} 추가 시전 시작!");
+                    yield return StartCoroutine(ExecuteNeighborSlotAction(neighborSlot));
+                }
+            }
+        }
+
+        // 7. 모든 다중 시전/연계가 완전히 끝난 후 최종 카드 회수 및 정리
+        BattleCardManager.Instance?.DiscardCard(cardDisplay);
+        slot.ClearSlot();
+        BattleUIManager.Instance?.UpdateAllUI();
+    }
+
+    public void ModifyHealth(CombatEntityStats entity, int amount)
+    {
+        entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
+        Debug.Log($"HP 변경: {amount} (현재 HP: {entity.currentHp}/{entity.maxHp})");
+
+        if (entity.currentHp <= 0)
+        {
+            HandleDeath(entity);
+        }
+    }
+
+    /// <summary>
+    /// 카드 타입에 따른 실제 수치 효과 적용
+    /// </summary>
+    private void ApplyCardEffect(CardType cardType, CombatEntityStats user, CombatEntityStats target, int finalValue)
+    {
+        switch (cardType)
         {
             case CardType.Attack:
                 ApplyDamage(target, finalValue);
@@ -372,31 +492,36 @@ public class BattleManager : MonoBehaviour
                 ModifyDebuff(target, finalValue);
                 break;
         }
-
-        // 사용 연출
-        Sequence sequence = DOTweenManager.CardExecute(
-            slot.currentCard.transform,
-            isPlayerSlot ? Vector3.right : Vector3.left
-        );
-
-        // 연출이 끝날 때까지 대기
-        yield return sequence.WaitForCompletion();
-
-        // 5. 카드 회수 및 슬롯 정리, UI 갱신
-        BattleCardManager.Instance?.DiscardCard(slot.currentCard);
-        slot.ClearSlot();
-        BattleUIManager.Instance?.UpdateAllUI();
     }
 
-    public void ModifyHealth(CombatEntityStats entity, int amount)
+    /// <summary>
+    /// TriggerNeighborSlot 보상으로 인해 호출되는 인접 슬롯 1회 단독 시전 코루틴
+    /// (해당 카드의 디스카드 처리는 나중에 본인 차례에 하도록 슬롯에 그대로 둠)
+    /// </summary>
+    private IEnumerator ExecuteNeighborSlotAction(BattleSlot targetSlot)
     {
-        entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
-        Debug.Log($"HP 변경: {amount} (현재 HP: {entity.currentHp}/{entity.maxHp})");
+        CardDisplay cardDisplay = targetSlot.currentCard;
+        if (cardDisplay == null || cardDisplay.cardInstance == null) yield break;
 
-        if (entity.currentHp <= 0)
-        {
-            HandleDeath(entity);
-        }
+        CardSO cardData = cardDisplay.cardInstance.baseData;
+        bool isPlayer = targetSlot.slotOwnerType == OwnerType.Player;
+        CombatEntityStats user = isPlayer ? playerStats : monsterStats;
+        CombatEntityStats target = isPlayer ? monsterStats : playerStats;
+
+        int value = cardDisplay.cardInstance.GetValue();
+        int finalValue = Mathf.Max(0, value + user.buffValue - user.debuffValue);
+        user.buffValue = 0;
+        user.debuffValue = 0;
+
+        ApplyCardEffect(cardData.cardType, user, target, finalValue);
+
+        Sequence seq = DOTweenManager.CardExecute(
+            cardDisplay.transform,
+            isPlayer ? Vector3.right : Vector3.left
+        );
+
+        yield return seq.WaitForCompletion();
+        BattleUIManager.Instance?.UpdateAllUI();
     }
 
     /// <summary>

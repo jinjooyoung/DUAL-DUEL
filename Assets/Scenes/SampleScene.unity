@@ -1995,6 +1995,7 @@ MonoBehaviour:
   drawCount: 6
   drawInterval: 0.2
   discardInterval: 0.2
+  bonusDrawCount: 0
 --- !u!1 &968608410
 GameObject:
   m_ObjectHideFlags: 0

@@ -51,6 +51,9 @@ public class BattleCardManager : MonoBehaviour
     [SerializeField] private float drawInterval = 0.5f;     // 드로우 간격 (0.5초)
     [SerializeField] private float discardInterval = 0.5f;  // 버리기 간격 (0.5초)
 
+    [Header("임시 보너스 드로우")]
+    public int bonusDrawCount = 0; // 카드 효과로 다음 턴에 추가로 뽑을 장수
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
@@ -89,7 +92,9 @@ public class BattleCardManager : MonoBehaviour
         }
 
         ShuffleDeck();
-        StartCoroutine(Co_DrawCards(drawCount));
+        int finalDraw = drawCount + bonusDrawCount;
+        bonusDrawCount = 0; // 드로우 후 즉시 초기화
+        StartCoroutine(Co_DrawCards(finalDraw));
     }
 
     private void Update()
