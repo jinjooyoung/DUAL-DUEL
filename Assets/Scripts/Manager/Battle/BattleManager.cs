@@ -192,6 +192,120 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 카드의 조건(ConditionCategory) 충족 여부를 판별합니다.
+    /// </summary>
+    private bool CheckCardCondition(BattleSlot slot, CardSO cardData)
+    {
+        bool isConditionMet = false;
+        int currentIdx = slot.slotIndex;
+        string param = cardData.conditionParam;
+
+        switch (cardData.conditionCategory)
+        {
+            // 1. 조건 없음: 항상 참
+            case ConditionCategory.None:
+                isConditionMet = true;
+                break;
+
+            // 2. 슬롯 번호 제한 ("0,4" 또는 "1" 등)
+            case ConditionCategory.SlotIndexRestriction:
+                if (!string.IsNullOrEmpty(param))
+                {
+                    string[] targetIndices = param.Split(',');
+                    foreach (string idxStr in targetIndices)
+                    {
+                        if (int.TryParse(idxStr.Trim(), out int targetIdx))
+                        {
+                            if (currentIdx == targetIdx)
+                            {
+                                isConditionMet = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                break;
+
+            // 3. 인접 슬롯 카드 타입 검사 (0번/4번 제외, 1~3번 슬롯의 앞뒤에 카드가 모두 있고 둘 다 타입 일치)
+            case ConditionCategory.NeighborCardType:
+                if (currentIdx > 0 && currentIdx < fieldCardSlots.Count - 1)
+                {
+                    BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
+                    BattleSlot nextSlot = fieldCardSlots[currentIdx + 1];
+
+                    // 앞뒤 슬롯에 모두 카드가 배치되어 있는지 검사
+                    if (prevSlot != null && prevSlot.isOccupied && prevSlot.currentCard != null &&
+                        nextSlot != null && nextSlot.isOccupied && nextSlot.currentCard != null)
+                    {
+                        if (Enum.TryParse(param.Trim(), true, out CardType requiredType))
+                        {
+                            CardType prevType = prevSlot.currentCard.cardInstance.baseData.cardType;
+                            CardType nextType = nextSlot.currentCard.cardInstance.baseData.cardType;
+
+                            if (prevType == requiredType && nextType == requiredType)
+                            {
+                                isConditionMet = true;
+                            }
+                        }
+                    }
+                }
+                break;
+
+            // 4. 직전 슬롯 소유자 검사 (0번 슬롯 제외, 1~4번의 직전 슬롯 OwnerType 일치)
+            case ConditionCategory.PrevSlotOwner:
+                if (currentIdx > 0 && currentIdx < fieldCardSlots.Count)
+                {
+                    BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
+                    if (prevSlot != null)
+                    {
+                        if (Enum.TryParse(param.Trim(), true, out OwnerType targetOwner))
+                        {
+                            if (prevSlot.slotOwnerType == targetOwner)
+                            {
+                                isConditionMet = true;
+                            }
+                        }
+                    }
+                }
+                break;
+
+            // 5. 손패 카드 수량 검사 (예: "Count>=5", "Count<=2")
+            case ConditionCategory.HandCount:
+                if (BattleCardManager.Instance != null)
+                {
+                    int currentHandCount = BattleCardManager.Instance.handCards.Count;
+                    // "Count" 접두사 제거 후 부등호 연산 ("Count>=5" -> ">=5")
+                    string expression = param.Replace("Count", "").Trim();
+                    isConditionMet = EvaluateComparison(currentHandCount, expression);
+                }
+                break;
+
+            // 6. 손패 특정 타입 매수 검사 (예: "Attack>=4", "Defense>=2")
+            case ConditionCategory.HandType:
+                if (BattleCardManager.Instance != null)
+                {
+                    // 타입명과 부등호 수식 분리 (예: "Attack"과 ">=4")
+                    if (TryParseHandTypeExpression(param, out CardType targetType, out string expression))
+                    {
+                        int matchedTypeCount = 0;
+                        foreach (var handCard in BattleCardManager.Instance.handCards)
+                        {
+                            if (handCard != null && handCard.baseData != null && handCard.baseData.cardType == targetType)
+                            {
+                                matchedTypeCount++;
+                            }
+                        }
+
+                        isConditionMet = EvaluateComparison(matchedTypeCount, expression);
+                    }
+                }
+                break;
+        }
+
+        return isConditionMet;
+    }
+
+    /// <summary>
     /// 한 턴의 모든 연출과 버리기가 끝나고 새 턴이 시작될 때 호출
     /// </summary>
     private void OnAllSlotsFinished()
@@ -220,6 +334,10 @@ public class BattleManager : MonoBehaviour
         bool isPlayerSlot = slot.slotOwnerType == OwnerType.Player;
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
+
+        // 0. 조건 만족 여부 검사
+        bool isConditionMet = CheckCardCondition(slot, cardData);
+        Debug.Log($"[{slot.slotIndex}번 슬롯] {cardData.nameKey} 조건({cardData.conditionCategory}): {(isConditionMet ? "달성!" : "미달성")}");
 
         // 1. 카드의 밸류 확인(강화 단계가 적용된 GetValue() 호출)
         int baseCardValue = instance.GetValue();
@@ -339,6 +457,68 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
         }
+    }
+
+    /// <summary>
+    /// ">=5", "<=3", "==2" 등의 문자열 부등호 수식을 파싱하여 실제 값과 비교
+    /// </summary>
+    private bool EvaluateComparison(int actualValue, string expression)
+    {
+        expression = expression.Trim();
+
+        if (expression.StartsWith(">="))
+        {
+            if (int.TryParse(expression.Substring(2).Trim(), out int target))
+                return actualValue >= target;
+        }
+        else if (expression.StartsWith("<="))
+        {
+            if (int.TryParse(expression.Substring(2).Trim(), out int target))
+                return actualValue <= target;
+        }
+        else if (expression.StartsWith(">"))
+        {
+            if (int.TryParse(expression.Substring(1).Trim(), out int target))
+                return actualValue > target;
+        }
+        else if (expression.StartsWith("<"))
+        {
+            if (int.TryParse(expression.Substring(1).Trim(), out int target))
+                return actualValue < target;
+        }
+        else if (expression.StartsWith("=="))
+        {
+            if (int.TryParse(expression.Substring(2).Trim(), out int target))
+                return actualValue == target;
+        }
+        else
+        {
+            // 부등호 없이 숫자만 적힌 경우 기본 >= 로 판정
+            if (int.TryParse(expression, out int target))
+                return actualValue >= target;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// "Attack>=4" 형태의 문자열에서 ">=4" 수식을 분리
+    /// </summary>
+    private bool TryParseHandTypeExpression(string rawParam, out CardType type, out string expression)
+    {
+        type = CardType.Attack;
+        expression = string.Empty;
+
+        if (string.IsNullOrEmpty(rawParam)) return false;
+
+        // 부등호 기호 시작 위치 탐색
+        int opIndex = rawParam.IndexOfAny(new char[] { '>', '<', '=' });
+        if (opIndex <= 0) return false;
+
+        string typeString = rawParam.Substring(0, opIndex).Trim();
+        expression = rawParam.Substring(opIndex).Trim();
+
+        return Enum.TryParse(typeString, true, out type);
     }
 
     private void TurnResetGuardBuff()
