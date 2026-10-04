@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Localization_CARDDESC_4
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationSO
   key: CARDDESC_4
-  ko: "\uBC1B\uB294 \uD53C\uD574\uB97C [Value] \uAC10\uC18C\uC2DC\uD0A8\uB2E4."
+  ko: "\uBC1B\uB294 \uD53C\uD574\uB97C [Value] \uAC10\uC18C\uC2DC\uD0A8\uB2E4. \uC774\uC804
+    \uCE74\uB4DC\uB3C4 \uC2DC\uC804\uD55C\uB2E4."
   en: Take [Value] less damage.
   jp: 

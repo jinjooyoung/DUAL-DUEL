@@ -22,5 +22,5 @@ MonoBehaviour:
   isExhaust: 0
   conditionCategory: 1
   conditionParam: 1
-  rewardCategory: 6
-  rewardParam: 0
+  rewardCategory: 3
+  rewardParam: 2

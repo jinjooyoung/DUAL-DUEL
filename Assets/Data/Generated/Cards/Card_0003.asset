@@ -23,4 +23,4 @@ MonoBehaviour:
   conditionCategory: 3
   conditionParam: Player
   rewardCategory: 3
-  rewardParam: 3
+  rewardParam: 1

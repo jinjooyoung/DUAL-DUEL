@@ -21,6 +21,6 @@ MonoBehaviour:
   values: 0a0000000c0000000e000000100000001200000015000000
   isExhaust: 0
   conditionCategory: 4
-  conditionParam: Count>=5
-  rewardCategory: 0
-  rewardParam: 2
+  conditionParam: Count<=6
+  rewardCategory: 1
+  rewardParam: 6

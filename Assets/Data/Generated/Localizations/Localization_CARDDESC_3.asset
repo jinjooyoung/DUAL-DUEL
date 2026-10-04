@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::LocalizationSO
   key: CARDDESC_3
   ko: "\uC0C1\uB300\uC5D0\uAC8C [Value] \uD53C\uD574\uB97C \uC900\uB2E4. \uC774\uC804
-    \uC2AC\uB86F Player\uBA74 3\uD68C \uCD94\uAC00 \uC2DC\uC804"
+    \uC2AC\uB86F Player\uBA74 1\uD68C \uCD94\uAC00 \uC2DC\uC804"
   en: Deal [Value] damage to the opponent.
   jp: 
