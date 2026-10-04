@@ -329,15 +329,19 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void OnAllSlotsFinished()
     {
-        Debug.Log("[새 턴 시작] 다음 턴 슬롯 재배정 및 6장 드로우 시작");
+        Debug.Log("[새 턴 시작] 다음 턴 슬롯 재배정 및 드로우 시작");
 
         // 다음 턴 슬롯 5개 타입(아군/적) 새로 배정
         BattleSlotManager.Instance?.GenerateTurnSlotTypes();
 
-        // 2) 0.5초 간격으로 6장 다시 드로우 시작
+        // 기본 드로우 수 + 카드 효과로 적립된 보너스 드로우 합산 후 0으로 리셋
         if (BattleCardManager.Instance != null)
         {
-            StartCoroutine(BattleCardManager.Instance.Co_DrawCards(BattleCardManager.Instance.drawCount));
+            int finalDrawCount = BattleCardManager.Instance.drawCount + BattleCardManager.Instance.bonusDrawCount;
+            BattleCardManager.Instance.bonusDrawCount = 0; // 드로우 직후 즉시 리셋
+
+            Debug.Log($"[턴 시작 드로우] 기본 {BattleCardManager.Instance.drawCount}장 + 보너스 적용 -> 총 {finalDrawCount}장 드로우!");
+            StartCoroutine(BattleCardManager.Instance.Co_DrawCards(finalDrawCount));
         }
 
         BattleUIManager.Instance?.UpdateAllUI();
