@@ -144,6 +144,25 @@ public class BattleManager : MonoBehaviour
             if (monsterStats.currentHp <= 0) break;
         }
 
+        // [추가] 1-1. 0~4번 슬롯 및 모든 연계 시전이 완료된 후, 슬롯의 카드들을 0.2초 간격으로 순차 디스카드
+        for (int i = 0; i < fieldCardSlots.Count; i++)
+        {
+            BattleSlot slot = fieldCardSlots[i];
+            if (slot != null && slot.isOccupied && slot.currentCard != null)
+            {
+                CardDisplay cardToDiscard = slot.currentCard;
+
+                // 슬롯 비우기
+                slot.ClearSlot();
+
+                // 디스카드 실행 (BattleCardManager)
+                BattleCardManager.Instance?.DiscardCard(cardToDiscard);
+
+                // 0.2초 간격 대기
+                yield return new WaitForSeconds(0.2f);
+            }
+        }
+
         // 2. 슬롯 발동 완료 후, 손패에 남아있는 잉여 카드들 0.5초 간격으로 모두 버림
         if (BattleCardManager.Instance != null)
         {
@@ -449,8 +468,9 @@ public class BattleManager : MonoBehaviour
         }
 
         // 7. 모든 다중 시전/연계가 완전히 끝난 후 최종 카드 회수 및 정리
-        BattleCardManager.Instance?.DiscardCard(cardDisplay);
-        slot.ClearSlot();
+        //BattleCardManager.Instance?.DiscardCard(cardDisplay);
+        //slot.ClearSlot();
+
         BattleUIManager.Instance?.UpdateAllUI();
     }
 
