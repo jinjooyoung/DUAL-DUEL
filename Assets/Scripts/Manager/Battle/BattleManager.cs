@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.Rendering.DebugUI;
 
 [Serializable]
 public class CombatEntityStats
@@ -34,6 +35,29 @@ public class BattleManager : MonoBehaviour
     [Header("전투 주체 스탯")]
     public CombatEntityStats playerStats;
     public CombatEntityStats monsterStats;
+
+    [Header("전투 주체 위치 (플로팅 텍스트 기준점)")]
+    [SerializeField] private Transform playerTransform;
+    [SerializeField] private Transform monsterTransform;
+
+    /// <summary>
+    /// 대상 스탯(Entity)을 기반으로 플로팅 텍스트가 뜰 월드 위치를 가져옵니다.
+    /// </summary>
+    private Vector3 GetEntityWorldPosition(CombatEntityStats entity)
+    {
+        if (entity == playerStats)
+        {
+            return playerTransform != null
+                ? playerTransform.position + Vector3.up * 1.0f
+                : new Vector3(-5f, 0f, 0f); // Fallback 기본 좌표
+        }
+        else
+        {
+            return monsterTransform != null
+                ? monsterTransform.position + Vector3.up * 1.0f
+                : new Vector3(5f, 0f, 0f);  // Fallback 기본 좌표
+        }
+    }
 
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 0.5f;
@@ -483,6 +507,18 @@ public class BattleManager : MonoBehaviour
         entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
         Debug.Log($"HP 변경: {amount} (현재 HP: {entity.currentHp}/{entity.maxHp})");
 
+        // 대상의 위치 자동 판별
+        Vector3 spawnPos = GetEntityWorldPosition(entity);
+
+        if (amount > 0)
+        {
+            BattleUIManager.Instance?.ShowHealText(spawnPos, amount);
+        }
+        else
+        {
+            BattleUIManager.Instance?.ShowDamageText(spawnPos, -amount);
+        }
+
         if (entity.currentHp <= 0)
         {
             HandleDeath(entity);
@@ -582,18 +618,27 @@ public class BattleManager : MonoBehaviour
     {
         entity.guard = Mathf.Max(0, entity.guard + amount);
         Debug.Log($"방어도 변경: {amount} (현재 방어도: {entity.guard})");
+
+        Vector3 spawnPos = GetEntityWorldPosition(entity);
+        BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
     }
 
     public void ModifyBuff(CombatEntityStats entity, int amount)
     {
         entity.buffValue = Mathf.Max(0, entity.buffValue + amount);
         Debug.Log($"버프 변경: {amount} (현재 버프: {entity.buffValue})");
+
+        Vector3 spawnPos = GetEntityWorldPosition(entity);
+        BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
     }
 
     public void ModifyDebuff(CombatEntityStats entity, int amount)
     {
         entity.debuffValue = Mathf.Max(0, entity.debuffValue + amount);
         Debug.Log($"디버프 변경: {amount} (현재 디버프: {entity.debuffValue})");
+
+        Vector3 spawnPos = GetEntityWorldPosition(entity);
+        BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
     }
 
     private void HandleDeath(CombatEntityStats deadEntity)
@@ -679,5 +724,11 @@ public class BattleManager : MonoBehaviour
         monsterStats.buffValue = 0;
         monsterStats.debuffValue = 0;
         BattleUIManager.Instance?.UpdateAllUI();
+    }
+
+    public void SetSlotActionDelay(float newDelay)
+    {
+        slotActionDelay = Mathf.Clamp(newDelay, 0.2f, 3.0f);
+        Debug.Log($"[전투 매니저] 시전 딜레이 적용: {slotActionDelay:F2}초");
     }
 }
