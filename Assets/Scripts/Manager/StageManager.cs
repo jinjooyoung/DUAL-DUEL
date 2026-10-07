@@ -23,28 +23,95 @@ public class StageManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+            transform.SetParent(null); // 최상위 루트 보장
             DontDestroyOnLoad(gameObject);
+            SceneManager.sceneLoaded += OnSceneLoaded;
         }
         else
         {
             Destroy(gameObject);
+            return;
+        }
+
+        if (generator == null) generator = GetComponent<StageGenerator>();
+        if (generator == null) generator = gameObject.AddComponent<StageGenerator>();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this)
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
         }
     }
 
     private void Start()
     {
-        if (floors == null || floors.Count == 0)
+        // 첫 진입 씬이 StageSelectScene이면 무조건 생성 및 렌더링 강제 실행
+        if (SceneManager.GetActiveScene().name == "StageSelectScene")
         {
-            InitializeNewRun();
+            Debug.Log("<color=yellow>[StageManager] StageSelectScene 최초 실행 감지</color>");
+            InitializeStageSelectScene();
+        }
+    }
+
+    private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        Debug.Log($"<color=white>[StageManager] 씬 로드 완료: {scene.name}</color>");
+
+        if (scene.name == "StageSelectScene")
+        {
+            InitializeStageSelectScene();
+        }
+        else if (scene.name == "BattleScene" || scene.name == "EventScene")
+        {
+            InitializeGameplayScene();
         }
     }
 
     /// <summary>
-    /// 새로운 런 시작 시 호출되어 맵 데이터를 초기화하고 생성합니다.
+    /// 스테이지 선택 씬 중앙 초기화: 맵 생성 보장 후 StageMapUI 직접 호출
     /// </summary>
-    public void InitializeNewRun()
+    public void InitializeStageSelectScene()
     {
-        // 기획서 4-2 기준 가중치: Normal: 45, Elite: 30, Upgrade: 15, DeleteHeal: 10
+        // 데이터가 비어있거나 생성된 적이 없다면 즉시 생성
+        if (floors == null || floors.Count == 0)
+        {
+            CreateNewRunData();
+        }
+
+        // 씬 내의 StageMapUI를 찾아 데이터 주입 및 렌더링 명령
+        StageMapUI mapUI = FindFirstObjectByType<StageMapUI>();
+        if (mapUI != null)
+        {
+            Debug.Log("<color=cyan>[StageManager] StageMapUI를 찾아 렌더링을 명령합니다.</color>");
+            mapUI.RenderMap(floors);
+        }
+        else
+        {
+            Debug.LogError("<color=red>[StageManager] 씬에서 StageMapUI를 찾지 못했습니다! Content 오브젝트에 붙어있는지 확인하세요.</color>");
+        }
+    }
+
+    /// <summary>
+    /// 게임플레이(전투/이벤트) 씬 초기화
+    /// </summary>
+    private void InitializeGameplayScene()
+    {
+        StageInitializer initializer = FindFirstObjectByType<StageInitializer>();
+        if (initializer != null)
+        {
+            initializer.InitCurrentStage(currentNode);
+        }
+    }
+
+    /// <summary>
+    /// 신규 런 데이터 생성 실행
+    /// </summary>
+    public void CreateNewRunData()
+    {
+        Debug.Log("<color=yellow>[StageManager] 새 맵 생성을 시작합니다...</color>");
+
         Dictionary<StageType, float> weights = new Dictionary<StageType, float>
         {
             { StageType.Normal, 45f },
@@ -53,66 +120,47 @@ public class StageManager : MonoBehaviour
             { StageType.DeleteHeal, 10f }
         };
 
-        if (generator == null) generator = gameObject.AddComponent<StageGenerator>();
         floors = generator.GenerateMap(mapWidth, mapHeight, weights);
         currentNode = null;
+
+        int totalNodeCount = 0;
+        for (int i = 0; i < floors.Count; i++) totalNodeCount += floors[i].Count;
+
+        Debug.Log($"<color=green>[StageManager] 맵 생성 완료! 총 {floors.Count}개 층, {totalNodeCount}개 노드 생성됨.</color>");
     }
 
-    /// <summary>
-    /// UI에서 스테이지 노드 클릭 시 호출되어 이동 가능 여부를 판단하고 진입 루틴을 실행합니다.
-    /// </summary>
     public bool TryMoveToNode(StageNode targetNode)
     {
         if (!targetNode.canGo)
         {
-            Debug.Log("<color=red>이동 불가 스테이지입니다!</color>");
-            // TODO: SoundManager.PlayNegativeSfx();
+            Debug.Log("<color=red>[StageManager] 진입 불가능한 노드입니다.</color>");
             return false;
         }
 
-        // 이동 성공
-        // TODO: SoundManager.PlayPositiveSfx();
         StartCoroutine(EnterStageRoutine(targetNode));
         return true;
     }
 
-    /// <summary>
-    /// 스테이지 진입 프로세스: 선택 상태 확정 -> 페이드 아웃 -> 씬 로드 -> 완료 대기
-    /// </summary>
     private IEnumerator EnterStageRoutine(StageNode targetNode)
     {
         currentNode = targetNode;
         currentNode.isVisited = true;
 
-        // 같은 층의 모든 노드 진입 불가 처리
         foreach (var node in floors[targetNode.floor])
         {
             node.canGo = false;
         }
 
-        // 로드할 씬 이름 결정
         string targetSceneName = GetSceneNameForType(targetNode.stageType);
+        yield return new WaitForSeconds(0.2f);
 
-        // TODO: FadeManager.FadeOut(0.5f);
-        yield return new WaitForSeconds(0.5f);
-
-        AsyncOperation asyncLoad = SceneManager.LoadSceneAsync(targetSceneName);
-        while (!asyncLoad.isDone)
-        {
-            yield return null;
-        }
-
-        // 새 씬 로드 완료 후 BGM 및 페이드인 처리는 새 씬의 StageInitializer가 담당
+        SceneManager.LoadScene(targetSceneName);
     }
 
-    /// <summary>
-    /// 전투 승리 또는 이벤트 종료 후 호출되어 다음 노드를 활성화하고 맵 씬으로 복귀합니다.
-    /// </summary>
     public void CompleteCurrentStage()
     {
         if (currentNode != null)
         {
-            // 다음으로 연결된 상위 노드들만 canGo = true로 개방
             foreach (var next in currentNode.nextStages)
             {
                 next.canGo = true;
@@ -129,10 +177,7 @@ public class StageManager : MonoBehaviour
             case StageType.Normal:
             case StageType.Elite:
             case StageType.Boss:
-                return "BattleScene"; // 오늘 단계에서는 모든 전투 타입을 동일한 BattleScene으로 라우팅
-            case StageType.Upgrade:
-            case StageType.DeleteHeal:
-                return "EventScene";  // 비전투 씬 (또는 임시 BattleScene)
+                return "BattleScene";
             default:
                 return "BattleScene";
         }

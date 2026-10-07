@@ -77,7 +77,7 @@ public class StageGenerator : MonoBehaviour
     }
 
     /// <summary>
-    /// [2단계] 하위 층 노드에서 상위 층 노드로 1~3개 경로를 x좌표 거리 기준으로 연결합니다.
+    /// [2단계 수정본] 인접 레인(+-1) 우선 연결 및 선 교차(X자 꼬임) 방지 알고리즘 적용
     /// </summary>
     private void ConnectStagePaths(List<List<StageNode>> floors, int height)
     {
@@ -86,28 +86,80 @@ public class StageGenerator : MonoBehaviour
             List<StageNode> currentFloor = floors[f];
             List<StageNode> nextFloor = floors[f + 1];
 
-            foreach (var node in currentFloor)
+            // 0층(시작점): 1층의 모든 노드로 뻗어나감 (루트 분기)
+            if (f == 0)
             {
-                // 0층이거나 보스 직전 층(height - 2)은 윗층 전체 노드와 연결
-                if (f == 0 || f == height - 2)
+                foreach (var nextNode in nextFloor)
                 {
-                    foreach (var nextNode in nextFloor)
+                    LinkNodes(currentFloor[0], nextNode);
+                }
+                continue;
+            }
+
+            // 보스 직전 층: 모든 노드가 단 하나의 최상층 보스 노드로 모임
+            if (f == height - 2)
+            {
+                StageNode bossNode = nextFloor[0];
+                foreach (var node in currentFloor)
+                {
+                    LinkNodes(node, bossNode);
+                }
+                continue;
+            }
+
+            // 일반 중간 층: 교차 방지(No-Cross) 연결
+            // currentFloor는 이미 xIndex 오름차순으로 정렬되어 있음
+            int minNextIndexToConnect = 0;
+
+            for (int i = 0; i < currentFloor.Count; i++)
+            {
+                StageNode curr = currentFloor[i];
+
+                // 1. 현재 노드와 레인(xIndex) 거리가 1 이하인 후보군만 필터링 (|dx| <= 1)
+                //    동시에 교차를 막기 위해 이전 노드가 연결했던 최소 인덱스 이상만 탐색
+                var validCandidates = nextFloor
+                    .Where((next, idx) => idx >= minNextIndexToConnect && Mathf.Abs(next.xIndex - curr.xIndex) <= 1)
+                    .ToList();
+
+                // 만약 레인 1칸 이내 후보가 없다면, 가장 가까운 노드 1개만 예외 연결
+                if (validCandidates.Count == 0)
+                {
+                    var nearest = nextFloor
+                        .Where((next, idx) => idx >= minNextIndexToConnect)
+                        .OrderBy(next => Mathf.Abs(next.xIndex - curr.xIndex))
+                        .FirstOrDefault();
+
+                    if (nearest != null)
                     {
-                        LinkNodes(node, nextNode);
+                        validCandidates.Add(nearest);
                     }
-                    continue;
+                    else
+                    {
+                        // 더 이상 상위 인덱스가 없으면 마지막 노드에 합류
+                        validCandidates.Add(nextFloor.Last());
+                    }
                 }
 
-                // x좌표 거리 기준으로 윗층 노드 오름차순 정렬
-                var sortedNextNodes = nextFloor.OrderBy(next => Mathf.Abs(next.xIndex - node.xIndex)).ToList();
-
-                // 1~3개 랜덤 선택 (윗층 총 노드 개수 한도 내)
-                int connectCount = UnityEngine.Random.Range(1, 4);
-                connectCount = Mathf.Min(connectCount, sortedNextNodes.Count);
-
-                for (int i = 0; i < connectCount; i++)
+                // 2. 후보 중 1~2개만 연결 (3개 이상 연결하면 선이 난잡해짐)
+                int connectCount = Mathf.Min(UnityEngine.Random.Range(1, 3), validCandidates.Count);
+                for (int c = 0; c < connectCount; c++)
                 {
-                    LinkNodes(node, sortedNextNodes[i]);
+                    LinkNodes(curr, validCandidates[c]);
+                }
+
+                // 3. 교차 방지 갱신: 이번 노드가 연결한 마지막 노드의 인덱스를 기준점으로 설정
+                //    다음(아래쪽) 노드는 이 인덱스보다 아래(더 큰 인덱스)로만 연결해야 선이 겹치지 않음
+                int connectedMaxIdx = nextFloor.IndexOf(validCandidates[connectCount - 1]);
+                minNextIndexToConnect = connectedMaxIdx;
+            }
+
+            // [보정] 다음 층 노드 중 아무에게도 선택받지 못한 노드가 있다면 가장 가까운 아래층 노드와 강제 연결
+            foreach (var next in nextFloor)
+            {
+                if (next.prevStages.Count == 0)
+                {
+                    var nearestPrev = currentFloor.OrderBy(c => Mathf.Abs(c.xIndex - next.xIndex)).First();
+                    LinkNodes(nearestPrev, next);
                 }
             }
         }

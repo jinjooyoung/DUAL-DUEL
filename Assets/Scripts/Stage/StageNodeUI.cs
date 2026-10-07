@@ -1,43 +1,47 @@
 using UnityEngine;
-using UnityEngine.UI;
 
+/// <summary>
+/// 3D 월드 공간의 스테이지 노드 뷰어 컴포넌트
+/// </summary>
+[RequireComponent(typeof(Collider))] // 3D 콜라이더 필수 (2D 스프라이트면 Collider2D)
 public class StageNodeUI : MonoBehaviour
 {
     public StageNode nodeData;
 
-    [SerializeField] private Button button;
-    [SerializeField] private Image iconImage;
+    [Header("렌더러 및 이펙트")]
+    [SerializeField] private SpriteRenderer iconRenderer; // 또는 MeshRenderer
     [SerializeField] private GameObject highlightEffect;
 
-    /// <summary>
-    /// 전달받은 노드 데이터를 바인딩하고 비주얼 상태(진입 가능/방문 여부)를 갱신합니다.
-    /// </summary>
     public void Setup(StageNode node)
     {
         this.nodeData = node;
-
-        button.onClick.RemoveAllListeners();
-        button.onClick.AddListener(OnClickNode);
-
         RefreshVisual();
     }
 
     public void RefreshVisual()
     {
-        // 기획서 2-2-4: 갈 수 있든 없든 모든 버튼은 Interactable true 유지
-        button.interactable = true;
-
         if (highlightEffect != null)
         {
             highlightEffect.SetActive(nodeData.canGo && !nodeData.isVisited);
         }
 
-        // 방문 완료 노드는 어둡게 처리
-        iconImage.color = nodeData.isVisited ? Color.gray : (nodeData.canGo ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.5f));
+        if (iconRenderer != null)
+        {
+            // 방문 완료 노드는 어둡게, 진입 가능 노드는 밝게
+            iconRenderer.color = nodeData.isVisited
+                ? Color.gray
+                : (nodeData.canGo ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.5f));
+        }
     }
 
-    private void OnClickNode()
+    /// <summary>
+    /// 마우스로 3D 노드를 클릭했을 때 실행
+    /// </summary>
+    private void OnMouseDown()
     {
-        StageManager.Instance.TryMoveToNode(nodeData);
+        if (StageManager.Instance != null && nodeData != null)
+        {
+            StageManager.Instance.TryMoveToNode(nodeData);
+        }
     }
 }

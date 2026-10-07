@@ -2,27 +2,24 @@ using UnityEngine;
 
 public class StageInitializer : MonoBehaviour
 {
-    private void Start()
-    {
-        InitCurrentStage();
-    }
+    // Start()의 자체 실행은 주석 처리 또는 제거하여 StageManager의 호출 순서에 맞춥니다.
 
     /// <summary>
-    /// 로드된 씬에서 현재 진입한 스테이지 노드의 타입과 층수를 확인하고 전투 스펙을 보정합니다.
+    /// StageManager가 현재 진입한 노드 데이터를 넘겨주며 호출하는 초기화 함수
     /// </summary>
-    public void InitCurrentStage()
+    /// <param name="current">진입한 스테이지 노드 정보</param>
+    public void InitCurrentStage(StageNode current)
     {
-        if (StageManager.Instance == null || StageManager.Instance.currentNode == null)
+        if (current == null)
         {
-            Debug.LogWarning("테스트 실행: 기본 Normal 스테이지로 임시 시작합니다.");
+            Debug.LogWarning("[StageInitializer] 진입 노드 정보가 없습니다. 기본 Normal 0층으로 대체합니다.");
             return;
         }
 
-        StageNode current = StageManager.Instance.currentNode;
         int currentFloor = current.floor;
         StageType type = current.stageType;
 
-        // 기획서 4-3 난이도 계수: Normal (HP +10%, ATK +8%), Elite (HP +15%, ATK +12%)
+        // 기획서 4-3 난이도 계수: Normal (HP +10%, ATK +8%), Elite (HP +15%, ATK +12%), Boss (HP +25%, ATK +20%)
         float hpScale = 0.1f;
         float atkScale = 0.08f;
 
@@ -40,16 +37,29 @@ public class StageInitializer : MonoBehaviour
         float totalHpMultiplier = 1f + (hpScale * currentFloor);
         float totalAtkMultiplier = 1f + (atkScale * currentFloor);
 
-        Debug.Log($"<color=cyan>[스테이지 초기화]</color> 층수: {currentFloor}, 타입: {type} | HP 배율: {totalHpMultiplier:F2}, ATK 배율: {totalAtkMultiplier:F2}");
+        Debug.Log($"<color=cyan>[전투 스테이지 초기화]</color> {currentFloor}층 {type} | HP 배율: {totalHpMultiplier:F2}, ATK 배율: {totalAtkMultiplier:F2}");
 
-        // TODO: BattleManager.Instance.StartBattleWithModifiers(totalHpMultiplier, totalAtkMultiplier);
+        // TODO: BattleManager에 보정값 전달
+        // BattleManager.Instance?.StartBattleWithModifiers(totalHpMultiplier, totalAtkMultiplier);
     }
 
     /// <summary>
-    /// 전투 승리 버튼(테스트용) 또는 BattleManager의 승리 이벤트에서 호출
+    /// 단독 테스트 시 매개변수 없이 호출할 수 있도록 지원하는 오버로딩 함수
+    /// </summary>
+    public void InitCurrentStage()
+    {
+        StageNode node = (StageManager.Instance != null) ? StageManager.Instance.currentNode : null;
+        InitCurrentStage(node);
+    }
+
+    /// <summary>
+    /// 전투 승리 테스트 버튼 등에서 호출
     /// </summary>
     public void OnVictoryTestButton()
     {
-        StageManager.Instance.CompleteCurrentStage();
+        if (StageManager.Instance != null)
+        {
+            StageManager.Instance.CompleteCurrentStage();
+        }
     }
 }
