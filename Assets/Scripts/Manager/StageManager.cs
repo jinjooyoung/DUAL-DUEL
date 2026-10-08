@@ -13,7 +13,9 @@ public class StageManager : MonoBehaviour
 
     [Header("런타임 맵 데이터")]
     public List<List<StageNode>> floors = new List<List<StageNode>>();
-    public StageNode currentNode;
+    public StageNode currentNode; // 현재 선택/진입한 노드
+
+    private StageNodeUI selectedNodeUI;
 
     [Header("연결 컴포넌트")]
     [SerializeField] private StageGenerator generator;
@@ -23,7 +25,7 @@ public class StageManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            transform.SetParent(null); // 최상위 루트 보장
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded;
         }
@@ -47,55 +49,47 @@ public class StageManager : MonoBehaviour
 
     private void Start()
     {
-        // 첫 진입 씬이 StageSelectScene이면 무조건 생성 및 렌더링 강제 실행
         if (SceneManager.GetActiveScene().name == "StageSelectScene")
         {
-            Debug.Log("<color=yellow>[StageManager] StageSelectScene 최초 실행 감지</color>");
             InitializeStageSelectScene();
         }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        Debug.Log($"<color=white>[StageManager] 씬 로드 완료: {scene.name}</color>");
-
         if (scene.name == "StageSelectScene")
         {
             InitializeStageSelectScene();
         }
-        else if (scene.name == "BattleScene" || scene.name == "EventScene")
+        else if (scene.name == "BattleScene" || scene.name == "RestScene" || scene.name == "ShopScene")
         {
             InitializeGameplayScene();
         }
     }
 
-    /// <summary>
-    /// 스테이지 선택 씬 중앙 초기화: 맵 생성 보장 후 StageMapUI 직접 호출
-    /// </summary>
     public void InitializeStageSelectScene()
     {
-        // 데이터가 비어있거나 생성된 적이 없다면 즉시 생성
         if (floors == null || floors.Count == 0)
         {
             CreateNewRunData();
         }
 
-        // 씬 내의 StageMapUI를 찾아 데이터 주입 및 렌더링 명령
+        currentNode = null;
+        selectedNodeUI = null;
+
         StageMapUI mapUI = FindFirstObjectByType<StageMapUI>();
         if (mapUI != null)
         {
-            Debug.Log("<color=cyan>[StageManager] StageMapUI를 찾아 렌더링을 명령합니다.</color>");
             mapUI.RenderMap(floors);
         }
-        else
+
+        StageInfoPanel panel = FindFirstObjectByType<StageInfoPanel>();
+        if (panel != null)
         {
-            Debug.LogError("<color=red>[StageManager] 씬에서 StageMapUI를 찾지 못했습니다! Content 오브젝트에 붙어있는지 확인하세요.</color>");
+            panel.SetStartButtonInteractable(false);
         }
     }
 
-    /// <summary>
-    /// 게임플레이(전투/이벤트) 씬 초기화
-    /// </summary>
     private void InitializeGameplayScene()
     {
         StageInitializer initializer = FindFirstObjectByType<StageInitializer>();
@@ -105,56 +99,69 @@ public class StageManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 신규 런 데이터 생성 실행
-    /// </summary>
     public void CreateNewRunData()
     {
-        Debug.Log("<color=yellow>[StageManager] 새 맵 생성을 시작합니다...</color>");
-
+        // 6개 타입 비율 설정
         Dictionary<StageType, float> weights = new Dictionary<StageType, float>
         {
-            { StageType.Normal, 45f },
-            { StageType.Elite, 30f },
-            { StageType.Upgrade, 15f },
-            { StageType.DeleteHeal, 10f }
+            { StageType.Normal, 40f },
+            { StageType.Elite, 20f },
+            { StageType.Rest, 15f },
+            { StageType.Shop, 10f },
+            { StageType.Random, 15f }
         };
 
         floors = generator.GenerateMap(mapWidth, mapHeight, weights);
         currentNode = null;
-
-        int totalNodeCount = 0;
-        for (int i = 0; i < floors.Count; i++) totalNodeCount += floors[i].Count;
-
-        Debug.Log($"<color=green>[StageManager] 맵 생성 완료! 총 {floors.Count}개 층, {totalNodeCount}개 노드 생성됨.</color>");
     }
 
-    public bool TryMoveToNode(StageNode targetNode)
+    /// <summary>
+    /// 노드를 클릭했을 때 선택 상태 갱신 및 정보 패널 표시
+    /// </summary>
+    public void SelectNode(StageNodeUI nodeUI)
     {
-        if (!targetNode.canGo)
+        if (selectedNodeUI != null)
         {
-            Debug.Log("<color=red>[StageManager] 진입 불가능한 노드입니다.</color>");
-            return false;
+            selectedNodeUI.SetSelected(false);
         }
 
-        StartCoroutine(EnterStageRoutine(targetNode));
-        return true;
+        selectedNodeUI = nodeUI;
+        currentNode = nodeUI.nodeData;
+        selectedNodeUI.SetSelected(true);
+
+        StageInfoPanel infoPanel = FindFirstObjectByType<StageInfoPanel>();
+        if (infoPanel != null)
+        {
+            infoPanel.SetupPanel(currentNode);
+        }
     }
 
-    private IEnumerator EnterStageRoutine(StageNode targetNode)
+    /// <summary>
+    /// 정보 패널의 시작 버튼 클릭 시 실제 씬 진입
+    /// </summary>
+    public void StartCurrentSelectedStage()
     {
-        currentNode = targetNode;
+        if (currentNode == null || !currentNode.canGo) return;
+
         currentNode.isVisited = true;
 
-        foreach (var node in floors[targetNode.floor])
+        // 동일 층 노드 비활성화
+        foreach (var node in floors[currentNode.floor])
         {
             node.canGo = false;
         }
 
-        string targetSceneName = GetSceneNameForType(targetNode.stageType);
-        yield return new WaitForSeconds(0.2f);
+        // Random 노드 처리: Normal, Elite, Rest, Shop 중 하나를 무작위 결정
+        StageType executionType = currentNode.stageType;
+        if (executionType == StageType.Random)
+        {
+            StageType[] pool = { StageType.Normal, StageType.Elite, StageType.Rest, StageType.Shop };
+            executionType = pool[Random.Range(0, pool.Length)];
+            Debug.Log($"<color=magenta>[StageManager] 랜덤 노드 결정: {executionType}</color>");
+        }
 
-        SceneManager.LoadScene(targetSceneName);
+        string targetScene = GetSceneNameForType(executionType);
+        SceneManager.LoadScene(targetScene);
     }
 
     public void CompleteCurrentStage()
@@ -178,6 +185,10 @@ public class StageManager : MonoBehaviour
             case StageType.Elite:
             case StageType.Boss:
                 return "BattleScene";
+            case StageType.Rest:
+                return "RestScene";
+            case StageType.Shop:
+                return "ShopScene";
             default:
                 return "BattleScene";
         }

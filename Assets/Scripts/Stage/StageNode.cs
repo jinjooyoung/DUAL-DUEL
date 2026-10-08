@@ -1,33 +1,26 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 
-/// <summary>
-/// 스테이지 타입 정의 (기획서 4-1 데이터 테이블 기준)
-/// </summary>
 public enum StageType
 {
-    Normal,     // 기본 전투
-    Elite,      // 엘리트 전투
-    Upgrade,    // 카드 강화
-    DeleteHeal, // 카드 삭제 및 체력 회복
-    Boss        // 보스 전투
+    Normal, // 일반 전투
+    Elite,  // 엘리트 전투
+    Boss,   // 보스 전투
+    Rest,   // 정비 (회복, 강화, 삭제)
+    Shop,   // 상점
+    Random  // 랜덤 (노멀~상점 중 입장 시 결정)
 }
 
-/// <summary>
-/// 개별 스테이지 노드의 런타임 데이터 구조체
-/// </summary>
 [Serializable]
 public class StageNode
 {
     public int id;
-    public int floor;           // y좌표 (층)
-    public int xIndex;          // x좌표 (0 ~ width-1)
-    public StageType stageType; // 배정된 스테이지 타입
-    public bool canGo;          // 플레이어 진입 가능 여부
-    public bool isVisited;      // 이미 방문한 스테이지인지 여부
+    public int floor;           // y 좌표 (층)
+    public int xIndex;          // 레인 인덱스
+    public StageType stageType; // 노드 타입
+    public bool canGo;          // 진입 가능 여부
+    public bool isVisited;      // 방문 여부
 
-    // 노드 간 연결 참조 (순환 직렬화 방지를 위해 NonSerialized 처리)
     [NonSerialized] public List<StageNode> prevStages = new List<StageNode>();
     [NonSerialized] public List<StageNode> nextStages = new List<StageNode>();
 

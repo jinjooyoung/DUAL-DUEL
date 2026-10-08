@@ -1,47 +1,73 @@
 using UnityEngine;
 
-/// <summary>
-/// 3D 월드 공간의 스테이지 노드 뷰어 컴포넌트
-/// </summary>
-[RequireComponent(typeof(Collider))] // 3D 콜라이더 필수 (2D 스프라이트면 Collider2D)
+[RequireComponent(typeof(Collider))]
 public class StageNodeUI : MonoBehaviour
 {
     public StageNode nodeData;
 
-    [Header("렌더러 및 이펙트")]
-    [SerializeField] private SpriteRenderer iconRenderer; // 또는 MeshRenderer
-    [SerializeField] private GameObject highlightEffect;
+    [Header("스프라이트 렌더러 (자식 오브젝트들)")]
+    [SerializeField] private SpriteRenderer selectedRenderer; // Order in Layer 0
+    [SerializeField] private SpriteRenderer bgRenderer;       // Order in Layer 1
+    [SerializeField] private SpriteRenderer iconRenderer;     // Order in Layer 2
 
     public void Setup(StageNode node)
     {
         this.nodeData = node;
-        RefreshVisual();
-    }
 
-    public void RefreshVisual()
-    {
-        if (highlightEffect != null)
+        // 리소스 동적 로드 (Resources/Stage/ 폴더 기준)
+        if (bgRenderer != null)
         {
-            highlightEffect.SetActive(nodeData.canGo && !nodeData.isVisited);
+            bgRenderer.sprite = Resources.Load<Sprite>("Stage/StageBG");
+        }
+
+        if (selectedRenderer != null)
+        {
+            selectedRenderer.sprite = Resources.Load<Sprite>("Stage/Selected");
+            selectedRenderer.gameObject.SetActive(false);
         }
 
         if (iconRenderer != null)
         {
-            // 방문 완료 노드는 어둡게, 진입 가능 노드는 밝게
-            iconRenderer.color = nodeData.isVisited
-                ? Color.gray
-                : (nodeData.canGo ? Color.white : new Color(0.7f, 0.7f, 0.7f, 0.5f));
+            iconRenderer.sprite = Resources.Load<Sprite>($"Stage/{node.stageType}");
+        }
+
+        RefreshVisual();
+    }
+
+    /// <summary>
+    /// 갈 수 있는 노드는 흰색(본래 색), 갈 수 없는 노드는 검은색으로 표시
+    /// </summary>
+    public void RefreshVisual()
+    {
+        if (bgRenderer != null)
+        {
+            if (nodeData.canGo && !nodeData.isVisited)
+            {
+                bgRenderer.color = Color.white;
+            }
+            else
+            {
+                bgRenderer.color = Color.black;
+            }
         }
     }
 
     /// <summary>
-    /// 마우스로 3D 노드를 클릭했을 때 실행
+    /// 노드 선택 시 Selected 오브젝트 활성화/비활성화
     /// </summary>
+    public void SetSelected(bool isSelected)
+    {
+        if (selectedRenderer != null)
+        {
+            selectedRenderer.gameObject.SetActive(isSelected);
+        }
+    }
+
     private void OnMouseDown()
     {
         if (StageManager.Instance != null && nodeData != null)
         {
-            StageManager.Instance.TryMoveToNode(nodeData);
+            StageManager.Instance.SelectNode(this);
         }
     }
 }
