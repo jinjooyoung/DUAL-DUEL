@@ -744,6 +744,9 @@ MonoBehaviour:
   cardIndex: 0
   currentSlot: {fileID: 0}
   tableName: Card_Table
+  nameLocalizeEvent: {fileID: 3774976871235676448}
+  typeLocalizeEvent: {fileID: 3700500966841545367}
+  descriptionLocalizeEvent: {fileID: 5836189533207437111}
   background: {fileID: 5464503843193004001}
   cardResource: {fileID: 7859322494614027429}
   typeIcon: {fileID: 1592252172346136604}

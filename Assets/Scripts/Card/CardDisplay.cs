@@ -2,6 +2,9 @@ using DG.Tweening;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.Localization;
+using UnityEngine.Localization.Components;
+using UnityEngine.Localization.Settings;
 
 public class CardDisplay : MonoBehaviour
 {
@@ -9,6 +12,13 @@ public class CardDisplay : MonoBehaviour
     public CardInstance cardInstance;
     public int cardIndex;
     public BattleSlot currentSlot;
+
+    [Header("로컬라이제이션 테이블 정보")]
+    [SerializeField] private string tableName = "Card_Table";
+    [Header("로컬라이제이션 이벤트 컴포넌트")]
+    public LocalizeStringEvent nameLocalizeEvent;
+    public LocalizeStringEvent typeLocalizeEvent;
+    public LocalizeStringEvent descriptionLocalizeEvent;
 
     [Header("이미지")]
     public SpriteRenderer background;
@@ -50,18 +60,39 @@ public class CardDisplay : MonoBehaviour
 
         CardSO data = cardInstance.baseData;
 
-        // 3D 텍스트 업데이트
-        if (nameText != null) nameText.text = LocalizationManager.Instance.GetText(data.nameKey);
-        if (typeText != null) typeText.text = LocalizationManager.Instance.GetText($"{data.cardType.ToString().ToUpper()}_KEY");
-
-        string desTemp = LocalizationManager.Instance != null ? LocalizationManager.Instance.GetText(data.descKey) : data.descKey;
-        if (data.values != null && data.values.Count > 0)
+        // 1. 카드 이름 텍스트 세팅
+        if (nameText != null && nameLocalizeEvent != null)
         {
-            // values[0] 대신 강화 수치가 적용된 GetValue() 호출
-            desTemp = desTemp.Replace("[Value]", cardInstance.GetValue().ToString());
+            nameLocalizeEvent.StringReference.SetReference(tableName, data.nameKey);
+            nameLocalizeEvent.RefreshString();
+
+            Debug.Log("카드 이름 텍스트 세팅");
         }
 
-        if (descriptionText != null) descriptionText.text = desTemp;
+        // 2. 카드 타입 텍스트 세팅
+        if (typeText != null && typeLocalizeEvent != null)
+        {
+            string typeKey = $"{data.cardType.ToString().ToUpper()}_KEY";
+            typeLocalizeEvent.StringReference.SetReference(tableName, typeKey);
+            typeLocalizeEvent.RefreshString();
+
+            Debug.Log("카드 타입 텍스트 세팅");
+        }
+
+        // 3. 카드 설명 텍스트 세팅 및 수치 Replace
+        if (descriptionText != null && descriptionLocalizeEvent != null)
+        {
+            // 1) 수치 인자를 먼저 설정
+            descriptionLocalizeEvent.StringReference.Arguments = new object[] { new { value = cardInstance.GetValue() } };
+
+            // 2) 테이블과 키 설정
+            descriptionLocalizeEvent.StringReference.SetReference(tableName, data.descKey);
+
+            // 3) 문자열 갱신
+            descriptionLocalizeEvent.RefreshString();
+
+            Debug.Log("카드 설명 텍스트 세팅");
+        }
 
         // 카드 리소스
         if (cardResource != null && data.artwork != null)
@@ -72,8 +103,6 @@ public class CardDisplay : MonoBehaviour
 
         if (typeIcon != null)
             typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{data.cardType}");
-
-        // 로컬라이징 후 설명 텍스트의 {value}를 cardSO.values로 Replace해주는 코드 여기 작성해야함
     }
 
     /// <summary>

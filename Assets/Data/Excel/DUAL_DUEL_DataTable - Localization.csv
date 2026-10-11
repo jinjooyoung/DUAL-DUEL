@@ -1,0 +1,27 @@
+Key,Korean(ko),English(en)
+ATTACK_KEY,공격,Attack
+DEFENSE_KEY,방어,Defense
+HEAL_KEY,회복,Heal
+BUFF_KEY,강화,Buff
+DEBUFF_KEY,약화,Debuff
+SPECIAL_KEY,특수,Special
+,,
+CARDNAME_0,잽,Jap
+CARDNAME_1,스트라이크,Strike
+CARDNAME_2,브루트 포스,Brute Force
+CARDNAME_3,해비 스매시,Heavy Smash
+CARDNAME_4,흘리기,Evade
+CARDNAME_5,가드,Guard
+CARDNAME_6,카운터 가드,Counter Guard
+CARDNAME_7,아이언 월,Iron Wall
+CARDNAME_8,응급 처치,Regeneration
+,,
+CARDDESC_0,상대에게 [Value] 피해를 준다.,Deal [Value] damage to the opponent.
+CARDDESC_1,상대에게 [Value] 피해를 준다. 1또는5번째 배치시 +4,Deal [Value] damage to the opponent. +4 if placed in the 1st or 5th slot.
+CARDDESC_2,상대에게 [Value] 피해를 준다. 앞뒤 모두 Attack카드면 *2,Deal [Value] damage to the opponent. Doubled if both adjacent cards are Attack cards.
+CARDDESC_3,상대에게 [Value] 피해를 준다. 이전 슬롯 Player면 1회 추가 시전,Deal [Value] damage to the opponent. Cast an additional time if the previous slot is Player-owned.
+CARDDESC_4,받는 피해를 [Value] 감소시킨다. 이전 카드도 시전한다.,Reduce incoming damage by [Value]. Also cast the previous card.
+CARDDESC_5,받는 피해를 [Value] 감소시킨다. 이전 슬롯 Enemy면 다음 드로우수 +1,Reduce incoming damage by [Value]. Draw 1 additional card next turn if the previous slot is Enemy-owned.
+CARDDESC_6,HP를 [Value] 회복한다. 2번째 칸에 배치 시 2회 추가 시전,Restore [Value] HP. Cast 2 additional times if placed in the 2nd slot.
+CARDDESC_7,버프 [Value]. 현재 손패 6장 이하라면 +6,Gain [Value] buff. +6 if you have 6 or fewer cards in hand.
+CARDDESC_8,디버프 [Value].,Apply [Value] debuff.

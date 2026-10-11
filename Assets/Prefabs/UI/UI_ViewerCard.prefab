@@ -676,9 +676,9 @@ MonoBehaviour:
   typeText: {fileID: 2959866003841754555}
   descText: {fileID: 2434972313605274194}
   tableName: Card_Table
-  nameLocalizeEvent: {fileID: 0}
-  typeLocalizeEvent: {fileID: 0}
-  descLocalizeEvent: {fileID: 0}
+  nameLocalizeEvent: {fileID: 1859961346243236030}
+  typeLocalizeEvent: {fileID: 3239307011541513134}
+  descLocalizeEvent: {fileID: 1996138038070942672}
 --- !u!114 &8314894137438144019
 MonoBehaviour:
   m_ObjectHideFlags: 0

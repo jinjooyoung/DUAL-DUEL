@@ -10,12 +10,13 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5be51871efa6c3e4eae1703925c8f5ac, type: 3}
-  m_Name: New Table
+  m_Name: Card_Table
   m_EditorClassIdentifier: Unity.Localization.Editor::UnityEditor.Localization.StringTableCollection
-  m_SharedTableData: {fileID: 11400000, guid: c14f347cb07adb74a8ca9f9cd1269b50, type: 2}
+  m_SharedTableData: {fileID: 11400000, guid: 0f281b48dd6b04d46b25a002f6b9ac24, type: 2}
   m_Tables:
-  - {fileID: 11400000, guid: 429b98f187200fd4294be0a7d07434d3, type: 2}
-  - {fileID: 11400000, guid: 49ac29ef53e0028408dc5011715d2e3c, type: 2}
+  - {fileID: 11400000, guid: 75df3842122cc804bbd264734507fb97, type: 2}
+  - {fileID: 11400000, guid: 2cc23ab5732be7146bd99235a49d88cf, type: 2}
+  - {fileID: 11400000, guid: 793bdd16eb427d1478fffcbc0c7f18a8, type: 2}
   m_Extensions: []
   m_Group: String Table
   references:

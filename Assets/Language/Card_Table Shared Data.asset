@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5b11a58205ec3474ca216360e9fa74a8, type: 3}
+  m_Name: Card_Table Shared Data
+  m_EditorClassIdentifier: Unity.Localization::UnityEngine.Localization.Tables.SharedTableData
+  m_TableCollectionName: Card_Table
+  m_TableCollectionNameGuidString: 0f281b48dd6b04d46b25a002f6b9ac24
+  m_Entries:
+  - m_Id: 53273825280
+    m_Key: ATTACK_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602496
+    m_Key: DEFENSE_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602497
+    m_Key: HEAL_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602498
+    m_Key: BUFF_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602499
+    m_Key: DEBUFF_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602500
+    m_Key: SPECIAL_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602502
+    m_Key: CARDNAME_0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602503
+    m_Key: CARDNAME_1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602504
+    m_Key: CARDNAME_2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602505
+    m_Key: CARDNAME_3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602506
+    m_Key: CARDNAME_4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602507
+    m_Key: CARDNAME_5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602508
+    m_Key: CARDNAME_6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602509
+    m_Key: CARDNAME_7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602510
+    m_Key: CARDNAME_8
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602512
+    m_Key: CARDDESC_0
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602513
+    m_Key: CARDDESC_1
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602514
+    m_Key: CARDDESC_2
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602515
+    m_Key: CARDDESC_3
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602516
+    m_Key: CARDDESC_4
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602517
+    m_Key: CARDDESC_5
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602518
+    m_Key: CARDDESC_6
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602519
+    m_Key: CARDDESC_7
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602520
+    m_Key: CARDDESC_8
+    m_Metadata:
+      m_Items: []
+  m_Metadata:
+    m_Items: []
+  m_KeyGenerator:
+    rid: 1411976596847591542
+  references:
+    version: 2
+    RefIds:
+    - rid: 1411976596847591542
+      type: {class: DistributedUIDGenerator, ns: UnityEngine.Localization.Tables, asm: Unity.Localization}
+      data:
+        m_CustomEpoch: 1791724605532

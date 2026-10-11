@@ -15,8 +15,8 @@ MonoBehaviour:
   m_GroupName: Localization-Assets-Shared
   m_GUID: eaa64f3b38b486548a83d7ee66c60e32
   m_SerializeEntries:
-  - m_GUID: c14f347cb07adb74a8ca9f9cd1269b50
-    m_Address: Assets/Language/New Table Shared Data.asset
+  - m_GUID: 0f281b48dd6b04d46b25a002f6b9ac24
+    m_Address: Assets/Language/Card_Table Shared Data.asset
     m_ReadOnly: 1
     m_SerializedLabels: []
     FlaggedDuringContentUpdateRestriction: 0

@@ -6,7 +6,7 @@ using UnityEngine;
 /// </summary>
 public class LocalizationManager : MonoBehaviour
 {
-    public static LocalizationManager Instance { get; private set; }
+    /*public static LocalizationManager Instance { get; private set; }
 
     private void Awake()
     {
@@ -52,5 +52,5 @@ public class LocalizationManager : MonoBehaviour
             LanguageType.JP => !string.IsNullOrEmpty(locData.jp) ? locData.jp : locData.ko,
             _ => locData.ko
         };
-    }
+    }*/
 }
