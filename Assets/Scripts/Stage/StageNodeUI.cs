@@ -34,7 +34,7 @@ public class StageNodeUI : MonoBehaviour
 
         if (checkRenderer != null)
         {
-            checkRenderer.sprite = Resources.Load<Sprite>("Stage/Check");
+            checkRenderer.sprite = Resources.Load<Sprite>("Stage/StageCheck");
         }
 
         RefreshVisual();

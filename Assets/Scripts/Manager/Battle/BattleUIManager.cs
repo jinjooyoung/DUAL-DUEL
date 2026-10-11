@@ -19,6 +19,11 @@ public class BattleUIManager : MonoBehaviour
     [Tooltip("몬스터 스탯 텍스트")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
 
+    [Header("배틀 종료 패널")]
+    public GameObject endOfBattlePanel;
+    [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI reviewText;
+
     [Header("플로팅 텍스트 오브젝트")]
     [Tooltip("3D TextMeshPro가 붙은 플로팅 텍스트 프리팹")]
     [SerializeField] private GameObject floatingTextPrefab;
@@ -34,6 +39,7 @@ public class BattleUIManager : MonoBehaviour
         else Destroy(gameObject);
 
         InitFloatingTextPool();
+        endOfBattlePanel.SetActive(false);
     }
 
     /// <summary>
@@ -165,5 +171,26 @@ public class BattleUIManager : MonoBehaviour
         {
             monsterStatText.text = $"몬스터 체력 : {BattleManager.Instance.monsterStats.currentHp}\n몬스터 방어력 : {BattleManager.Instance.monsterStats.guard}";
         }
+    }
+
+    public void VictoryUI()
+    {
+        titleText.text = "승리!";
+        reviewText.text = "";
+
+        OnEndOfBattlePanel();
+    }
+
+    public void DefeatUI()
+    {
+        titleText.text = "패배!";
+        reviewText.text = "";
+
+        OnEndOfBattlePanel();
+    }
+
+    public void OnEndOfBattlePanel()
+    {
+        if (endOfBattlePanel != null) endOfBattlePanel.SetActive(true);
     }
 }

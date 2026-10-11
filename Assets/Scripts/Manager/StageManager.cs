@@ -201,19 +201,6 @@ public class StageManager : MonoBehaviour
         SceneManager.LoadScene("StageSelectScene");
     }
 
-    public void CompleteCurrentStage()
-    {
-        if (currentNode != null)
-        {
-            foreach (var next in currentNode.nextStages)
-            {
-                next.canGo = true;
-            }
-        }
-
-        SceneManager.LoadScene("StageSelectScene");
-    }
-
     private string GetSceneNameForType(StageType type)
     {
         switch (type)

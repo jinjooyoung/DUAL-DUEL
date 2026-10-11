@@ -1339,8 +1339,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageMapCameraController
   targetCamera: {fileID: 873977042}
-  dragSpeed: 1
-  scrollSpeed: 5
+  dragSpeed: 3
+  scrollSpeed: 10
   smoothTime: 0.1
   minX: 10
   fixedY: -1

@@ -33,6 +33,7 @@ public class StageInitializer : MonoBehaviour
             hpScale = 0.25f;
             atkScale = 0.20f;
         }
+        // 아마 몬스터 데이터 중 하나 뽑아오는 식으로 변경해서 난이도 계수 곱셈 계산 안 쓸듯? 일단 냅둠
 
         float totalHpMultiplier = 1f + (hpScale * currentFloor);
         float totalAtkMultiplier = 1f + (atkScale * currentFloor);
@@ -53,13 +54,13 @@ public class StageInitializer : MonoBehaviour
     }
 
     /// <summary>
-    /// 전투 승리 테스트 버튼 등에서 호출
+    /// 선택 씬으로 되돌아감
     /// </summary>
-    public void OnVictoryTestButton()
+    public void OnClickReturnButton()
     {
         if (StageManager.Instance != null)
         {
-            StageManager.Instance.CompleteCurrentStage();
+            StageManager.Instance.ReturnToStageSelect();
         }
     }
 }
