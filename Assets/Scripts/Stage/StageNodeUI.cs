@@ -9,6 +9,7 @@ public class StageNodeUI : MonoBehaviour
     [SerializeField] private SpriteRenderer selectedRenderer; // Order in Layer 0
     [SerializeField] private SpriteRenderer bgRenderer;       // Order in Layer 1
     [SerializeField] private SpriteRenderer iconRenderer;     // Order in Layer 2
+    [SerializeField] private SpriteRenderer checkRenderer;    // Order in Layer 3 (방문 완료 표시)
 
     public void Setup(StageNode node)
     {
@@ -31,6 +32,11 @@ public class StageNodeUI : MonoBehaviour
             iconRenderer.sprite = Resources.Load<Sprite>($"Stage/{node.stageType}");
         }
 
+        if (checkRenderer != null)
+        {
+            checkRenderer.sprite = Resources.Load<Sprite>("Stage/Check");
+        }
+
         RefreshVisual();
     }
 
@@ -49,6 +55,12 @@ public class StageNodeUI : MonoBehaviour
             {
                 bgRenderer.color = Color.black;
             }
+        }
+
+        // 방문 완료 여부에 따라 체크 이미지 활성화 / 비활성화
+        if (checkRenderer != null)
+        {
+            checkRenderer.gameObject.SetActive(nodeData.isVisited);
         }
     }
 

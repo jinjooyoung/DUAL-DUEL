@@ -164,6 +164,43 @@ public class StageManager : MonoBehaviour
         SceneManager.LoadScene(targetScene);
     }
 
+    /// <summary>
+    /// 스테이지 클리어/종료 후 호출:
+    /// 현재 노드를 완료 처리하고, 다음 연결 노드들을 개방(canGo = true)한 뒤 스테이지 선택 씬으로 복귀합니다.
+    /// UI 버튼의 OnClick() 이벤트에 직접 연결
+    /// </summary>
+    public void ReturnToStageSelect()
+    {
+        if (currentNode != null)
+        {
+            // 1. 현재 노드 완료 마킹
+            currentNode.isVisited = true;
+            currentNode.canGo = false;
+
+            // 2. 현재 노드에서 뻗어나간 다음 노드(nextStages)들만 진입 가능(canGo = true)으로 활성화
+            if (currentNode.nextStages != null && currentNode.nextStages.Count > 0)
+            {
+                foreach (var nextNode in currentNode.nextStages)
+                {
+                    nextNode.canGo = true;
+                }
+            }
+            else
+            {
+                Debug.Log("<color=gold>[StageManager] 마지막 노드(보스) 클리어! 런 승리!</color>");
+                // TODO: 엔딩 씬 이동 또는 런 클리어 팝업 연출
+            }
+        }
+        else
+        {
+            Debug.LogWarning("[StageManager] currentNode가 null인 상태에서 복귀를 시도했습니다.");
+        }
+
+        // 3. 스테이지 선택 씬으로 이동
+        // (StageManager가 DontDestroyOnLoad이므로 OnSceneLoaded를 통해 자동으로 맵 UI가 갱신됩니다)
+        SceneManager.LoadScene("StageSelectScene");
+    }
+
     public void CompleteCurrentStage()
     {
         if (currentNode != null)
