@@ -1203,7 +1203,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StageManager
   mapWidth: 5
-  mapHeight: 10
+  mapHeight: 18
   currentNode:
     id: 0
     floor: 0
