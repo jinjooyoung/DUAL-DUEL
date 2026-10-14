@@ -5,5 +5,5 @@ public class CharacterDatabaseSO : BaseDatabaseSO<int, CharacterSO>
 {
     protected override int GetKey(CharacterSO item) => item.characterID;
 
-    public CharacterSO GetWordById(int id) => GetByKey(id);
+    public CharacterSO GetCharacterById(int id) => GetByKey(id);
 }
