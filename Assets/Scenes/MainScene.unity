@@ -269,6 +269,52 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &562550381
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 562550383}
+  - component: {fileID: 562550382}
+  m_Layer: 0
+  m_Name: RewardManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &562550382
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562550381}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4672fa935da0b8949848a0bd3f9ed2fd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::RewardManager
+  currentRewardCards: []
+  remainRerollCount: 5
+--- !u!4 &562550383
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 562550381}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 848.97217, y: 494.9925, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1009837493
 GameObject:
   m_ObjectHideFlags: 0
@@ -299,7 +345,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DataManager
   cardDatabase: {fileID: 11400000, guid: 5f1906aeb9c159543a06db1b1d88ad93, type: 2}
-  localizationDatabase: {fileID: 11400000, guid: 94a75e98e9ba3ab4985db43559a26793, type: 2}
   characterDatabaseSO: {fileID: 11400000, guid: be93511c5e513cd44b7434ab3bf75229, type: 2}
   monsterDatabase: {fileID: 11400000, guid: 78e9f8a6bb3d8b4429485e4d028a98b2, type: 2}
 --- !u!4 &1009837495
@@ -1248,6 +1293,7 @@ SceneRoots:
   - {fileID: 2076466732}
   - {fileID: 419783045}
   - {fileID: 1009837495}
+  - {fileID: 562550383}
   - {fileID: 1089911356}
   - {fileID: 1325033696}
   - {fileID: 199687456}

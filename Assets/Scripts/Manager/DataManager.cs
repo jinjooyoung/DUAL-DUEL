@@ -10,7 +10,6 @@ public class DataManager : MonoBehaviour
 
     [Header("데이터베이스 SO")]
     [SerializeField] private CardDatabaseSO cardDatabase;
-    [SerializeField] private LocalizationDatabaseSO localizationDatabase;
     [SerializeField] private CharacterDatabaseSO characterDatabaseSO;
     [SerializeField] private MonsterDatabaseSO monsterDatabase;
     // 추후에 엑셀에 데이터 더 생기면 추가
@@ -33,8 +32,7 @@ public class DataManager : MonoBehaviour
     {
         IInitializableDatabase[] allDatabases = new IInitializableDatabase[]
         {
-            cardDatabase,
-            localizationDatabase
+            cardDatabase
             // 새 DB 변수 이름만 여기에 쉼표로 추가
         };
 
@@ -52,16 +50,6 @@ public class DataManager : MonoBehaviour
     public CardSO GetCard(int cardId)
     {
         return cardDatabase != null ? cardDatabase.GetCardById(cardId) : null;
-    }
-
-    /// <summary>
-    /// 번역 문자열 받아오기
-    /// </summary>
-    /// <param name="key">번역 string 키</param>
-    /// <returns>찾은 번역SO</returns>
-    public LocalizationSO GetWord(string key)
-    {
-        return localizationDatabase != null ? localizationDatabase.GetWordById(key) : null;
     }
 
     /// <summary>

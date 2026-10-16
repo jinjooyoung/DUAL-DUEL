@@ -13,8 +13,7 @@ public enum ConversionType
     Card,
     Character,
     Monster,
-    Reward,
-    Localization
+    Reward
 }
 
 public class ExcelToScriptableConverter : EditorWindow
@@ -106,26 +105,6 @@ public class ExcelToScriptableConverter : EditorWindow
 
                     string assetName = $"Card_{data.cardId:D4}";
                     return (cardSO, assetName);
-                });
-                break;
-
-            case ConversionType.Localization:
-                // LocalizationSO 생성 로직만 넘김
-                ConvertSheet<LocalizationSO, LocalizationDatabaseSO>("Localization", "LocalizationDatabase", (row) =>
-                {
-                    if (row["nameKey"] == DBNull.Value) return (null, null);
-
-                    LocalizationData data = ReadLocalizationData(row);
-                    if (string.IsNullOrEmpty(data.key)) return (null, null);
-
-                    LocalizationSO locSO = CreateInstance<LocalizationSO>();
-                    locSO.key = data.key;
-                    locSO.ko = data.ko;
-                    locSO.en = data.en;
-                    locSO.jp = data.jp;
-
-                    string assetName = $"Localization_{data.key}";
-                    return (locSO, assetName);
                 });
                 break;
 
@@ -298,17 +277,6 @@ public class ExcelToScriptableConverter : EditorWindow
             conditionParam = row["conditionParam"] != DBNull.Value ? row["conditionParam"].ToString() : string.Empty,
             rewardCategory = row["rewardCategory"] != DBNull.Value ? row["rewardCategory"].ToString() : "None",
             rewardParam = row["rewardParam"] != DBNull.Value ? Convert.ToSingle(row["rewardParam"]) : 0f
-        };
-    }
-
-    private LocalizationData ReadLocalizationData(DataRow row)
-    {
-        return new LocalizationData
-        {
-            key = row["nameKey"].ToString(),
-            ko = GetCellString(row, "KO"),
-            en = GetCellString(row, "EN"),
-            jp = GetCellString(row, "JP")
         };
     }
 
