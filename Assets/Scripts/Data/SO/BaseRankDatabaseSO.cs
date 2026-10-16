@@ -38,13 +38,13 @@ public abstract class BaseRankDatabaseSO<TKey, TRank, TItem> : BaseDatabaseSO<TK
     /// <summary>
     /// 등급에 해당하는 아이템 리스트 반환 (미등록 등급일 경우 빈 컬렉션 반환)
     /// </summary>
-    public IReadOnlyList<TItem> GetListByRank(TRank rank)
+    public List<TItem> GetListByRank(TRank rank)
     {
         if (listByRank == null) Initialize();
 
         if (listByRank.TryGetValue(rank, out var list))
             return list;
 
-        return Array.Empty<TItem>();
+        return default(List<TItem>);
     }
 }

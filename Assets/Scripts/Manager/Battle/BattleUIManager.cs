@@ -189,6 +189,16 @@ public class BattleUIManager : MonoBehaviour
         OnEndOfBattlePanel();
     }
 
+    public void rewardPanel()
+    {
+        RewardCardUI rewardUI = FindFirstObjectByType<RewardCardUI>(FindObjectsInactive.Include);
+        if (rewardUI != null)
+        {
+            OnEndOfBattlePanel();
+            rewardUI.OpenRewardPanel();
+        }
+    }
+
     public void OnEndOfBattlePanel()
     {
         if (endOfBattlePanel != null) endOfBattlePanel.SetActive(true);

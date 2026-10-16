@@ -12,6 +12,7 @@ public class StageManager : MonoBehaviour
     public int mapHeight = 10;
 
     [Header("런타임 맵 데이터")]
+    public int currentChapter = 1;
     public List<List<StageNode>> floors = new List<List<StageNode>>();
     public StageNode currentNode; // 현재 선택/진입한 노드
 
@@ -72,6 +73,7 @@ public class StageManager : MonoBehaviour
         if (floors == null || floors.Count == 0)
         {
             CreateNewRunData();
+            RewardManager.Instance.SetChapter(currentChapter);
         }
 
         currentNode = null;

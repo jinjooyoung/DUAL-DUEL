@@ -9,7 +9,7 @@ public interface IInitializableDatabase
 // 등급별 리스트를 가져옴
 public interface IRankDatabase<TRank, TItem>
 {
-    IReadOnlyList<TItem> GetListByRank(TRank rank);
+    List<TItem> GetListByRank(TRank rank);
 }
 
 public abstract class BaseDatabaseSO<TKey, TItem> : ScriptableObject, IInitializableDatabase

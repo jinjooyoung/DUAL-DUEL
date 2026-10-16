@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -61,5 +62,21 @@ public class DataManager : MonoBehaviour
     public LocalizationSO GetWord(string key)
     {
         return localizationDatabase != null ? localizationDatabase.GetWordById(key) : null;
+    }
+
+    /// <summary>
+    /// 카드 등급(RankType)에 해당하는 카드 SO 리스트를 카드 데이터베이스에서 조회하여 반환합니다.
+    /// </summary>
+    /// <param name="rank">조회할 카드 등급</param>
+    /// <returns>해당 등급의 CardSO 리스트 (없거나 실패 시 null)</returns>
+    public List<CardSO> GetCardsByRank(RankType rank)
+    {
+        if (cardDatabase == null)
+        {
+            Debug.LogError("<color=red>[DataManager] cardDatabase가 null입니다! 인스펙터 할당을 확인하세요.</color>");
+            return null;
+        }
+
+        return cardDatabase.GetListByRank(rank);
     }
 }

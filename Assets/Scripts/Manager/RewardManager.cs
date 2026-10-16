@@ -2,14 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// 전투 승리 후 카드 보상 생성 및 덱 추가를 총괄하는 싱글톤 매니저
+/// 전투 승리 후 카드 보상 데이터 및 새로고침 수량을 총괄하는 전역 싱글톤 매니저
 /// </summary>
 public class RewardManager : MonoBehaviour
 {
     public static RewardManager Instance { get; private set; }
 
-    // 1. 챕터별 카드 보상 등급 가중치 테이블
-    // 1챕터: 25, 45, 30, 18, 2, 0
+    [Header("챕터별 등급 가중치")]
     private readonly Dictionary<RankType, float> chapter1Weights = new()
     {
         { RankType.Common, 25f },
@@ -20,7 +19,6 @@ public class RewardManager : MonoBehaviour
         { RankType.Mythic, 0f }
     };
 
-    // 2챕터: 15, 35, 44, 22.8, 3, 0.2
     private readonly Dictionary<RankType, float> chapter2Weights = new()
     {
         { RankType.Common, 15f },
@@ -31,7 +29,6 @@ public class RewardManager : MonoBehaviour
         { RankType.Mythic, 0.2f }
     };
 
-    // 3챕터: 10, 25, 43, 42.6, 8.5, 0.9
     private readonly Dictionary<RankType, float> chapter3Weights = new()
     {
         { RankType.Common, 10f },
@@ -42,17 +39,21 @@ public class RewardManager : MonoBehaviour
         { RankType.Mythic, 0.9f }
     };
 
-    // 2. 소프트 보정 추첨기 (선언만 진행, 생성은 Initialize에서 단 1회)
     private SoftPityProbabilityCorrector<RankType> rankCorrector;
-
     private bool isInitialized = false;
+
+    [Header("현재 보상 추첨 데이터")]
+    public List<CardSO> currentRewardCards = new List<CardSO>();
+
+    [Header("전역 새로고침 제한")]
+    public int remainRerollCount = 5; // 게임 전체 동안 총 5회 제한
 
     private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
-            transform.SetParent(null); // 최상위 루트 보장
+            transform.SetParent(null);
             DontDestroyOnLoad(gameObject);
         }
         else
@@ -61,41 +62,122 @@ public class RewardManager : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 게임 중 최초 1회 호출되어 추첨기를 1챕터 가중치 기반으로 생성합니다.
-    /// (보정 시작 등급은 Rare(3등급) 기준으로 설정)
-    /// </summary>
     public void Initialize()
     {
         if (isInitialized) return;
 
-        // 1챕터 기준 가중치 및 Rare(3) 이상 미등장 시 소프트 보정 적용
         rankCorrector = new SoftPityProbabilityCorrector<RankType>(chapter1Weights, (int)RankType.Rare);
         isInitialized = true;
-
-        Debug.Log("<color=green>[RewardManager] 카드 보상 등급 보정 추첨기 초기화 완료 (1챕터 가중치 적용)</color>");
+        Debug.Log("<color=green>[RewardManager] 보상 추첨기 초기화 완료</color>");
     }
 
-    /// <summary>
-    /// 챕터 전환 시 호출하여 가중치 테이블을 교체할 때 사용
-    /// </summary>
     public void SetChapter(int chapter)
     {
         if (rankCorrector == null) Initialize();
 
         switch (chapter)
         {
-            case 1:
-                rankCorrector.SetWeightTable(chapter1Weights);
-                break;
-            case 2:
-                rankCorrector.SetWeightTable(chapter2Weights);
-                break;
-            case 3:
-                rankCorrector.SetWeightTable(chapter3Weights);
-                break;
+            case 1: rankCorrector.SetWeightTable(chapter1Weights); break;
+            case 2: rankCorrector.SetWeightTable(chapter2Weights); break;
+            case 3: rankCorrector.SetWeightTable(chapter3Weights); break;
+        }
+    }
+
+    public RankType EvaluateRank()
+    {
+        if (rankCorrector == null) Initialize();
+        return rankCorrector.EvaluateNext();
+    }
+
+    public CardSO GetRandomCardByRank(RankType rank)
+    {
+        if (DataManager.Instance == null)
+        {
+            Debug.LogError("<color=red>[RewardManager] DataManager.Instance가 null입니다!</color>");
+            return null;
         }
 
-        Debug.Log($"<color=cyan>[RewardManager] {chapter}챕터 가중치 테이블 교체 완료</color>");
+        List<CardSO> cardList = DataManager.Instance.GetCardsByRank(rank);
+        if (cardList == null || cardList.Count == 0)
+        {
+            Debug.LogWarning($"<color=yellow>[RewardManager] '{rank}' 등급 카드가 비어있습니다.</color>");
+            return null;
+        }
+
+        int randomIndex = Random.Range(0, cardList.Count);
+        return cardList[randomIndex];
+    }
+
+    /// <summary>
+    /// 카드 3장을 일괄 추첨하여 임시 보상 리스트를 구성합니다.
+    /// </summary>
+    public void GenerateRewardCards()
+    {
+        currentRewardCards.Clear();
+
+        for (int i = 0; i < 3; i++)
+        {
+            RankType rolledRank = EvaluateRank();
+            CardSO card = GetRandomCardByRank(rolledRank);
+
+            // 안전장치: 혹시라도 null이 나오면 한 번 더 Common으로 Fallback
+            if (card == null)
+            {
+                card = GetRandomCardByRank(RankType.Common);
+            }
+
+            currentRewardCards.Add(card);
+            Debug.Log($"<color=cyan>[RewardManager] {i}번 슬롯 카드 세팅: {card?.nameKey} (등급: {rolledRank})</color>");
+        }
+    }
+
+    /// <summary>
+    /// 특정 인덱스의 카드 슬롯만 새로 추첨하여 덮어씌웁니다.
+    /// </summary>
+    public bool RerollCardSlot(int index)
+    {
+        if (remainRerollCount <= 0)
+        {
+            Debug.LogWarning("[RewardManager] 남은 새로고침 횟수가 없습니다!");
+            return false;
+        }
+
+        if (index < 0 || index >= currentRewardCards.Count)
+        {
+            Debug.LogError($"[RewardManager] 잘못된 리롤 인덱스입니다: {index}");
+            return false;
+        }
+
+        // 새로고침 차감 및 새 카드 추출
+        remainRerollCount--;
+        RankType rolledRank = EvaluateRank();
+        CardSO newCard = GetRandomCardByRank(rolledRank) ?? GetRandomCardByRank(RankType.Common);
+
+        currentRewardCards[index] = newCard;
+        Debug.Log($"<color=yellow>[RewardManager] {index}번 슬롯 새로고침 성공! -> {newCard.nameKey} (남은 횟수: {remainRerollCount})</color>");
+
+        return true;
+    }
+
+    /// <summary>
+    /// 플레이어가 카드를 선택했을 때 GameManager의 덱에 CardInstance 형태로 추가
+    /// </summary>
+    public void SelectCard(int index)
+    {
+        if (index < 0 || index >= currentRewardCards.Count) return;
+
+        CardSO chosenSO = currentRewardCards[index];
+        if (chosenSO != null)
+        {
+            CardInstance newInstance = new CardInstance(chosenSO, 0);
+
+            if (GameManager.Instance != null)
+            {
+                GameManager.Instance.deck.Add(newInstance);
+                Debug.Log($"<color=green>[RewardManager] 덱 추가 완료! {chosenSO.nameKey} (현재 총 덱 수량: {GameManager.Instance.deck.Count})</color>");
+            }
+        }
+
+        currentRewardCards.Clear();
     }
 }

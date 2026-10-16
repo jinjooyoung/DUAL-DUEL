@@ -646,12 +646,12 @@ public class BattleManager : MonoBehaviour
         if (deadEntity == playerStats)
         {
             Debug.Log("[전투 종료] 플레이어 사망 - 패배");
-            BattleUIManager.Instance.DefeatUI();
+            BattleUIManager.Instance?.DefeatUI();
         }
         else
         {
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
-            BattleUIManager.Instance.VictoryUI();
+            BattleUIManager.Instance?.VictoryUI();
         }
     }
 
