@@ -639,6 +639,7 @@ GameObject:
   - component: {fileID: 8631466672114983559}
   - component: {fileID: 1707895618601584260}
   - component: {fileID: 6527346215548770171}
+  - component: {fileID: 2794881952506452298}
   m_Layer: 0
   m_Name: Card
   m_TagString: Untagged
@@ -819,6 +820,19 @@ SortingGroup:
   m_SortingOrder: 3
   m_SortAtRoot: 0
   m_Sort3DAs2D: 0
+--- !u!114 &2794881952506452298
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7328028137241284672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c8e40470aaff9e408bb83277a1a80b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TooltipTrigger
+  tooltipText: "\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4"
 --- !u!1 &7487023002979895624
 GameObject:
   m_ObjectHideFlags: 0
