@@ -360,6 +360,7 @@ GameObject:
   - component: {fileID: 873977042}
   - component: {fileID: 873977041}
   - component: {fileID: 873977044}
+  - component: {fileID: 873977045}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -485,6 +486,21 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &873977045
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 873977040}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2313f9802cda034a9d9f8da8ca0dd00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BGMPlayer
+  bgmType: 2
+  fadeDuration: 0.8
+  restartIfSame: 0
 --- !u!1 &942033601
 GameObject:
   m_ObjectHideFlags: 0
@@ -1204,6 +1220,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StageManager
   mapWidth: 5
   mapHeight: 18
+  currentChapter: 1
   currentNode:
     id: 0
     floor: 0

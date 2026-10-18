@@ -1,0 +1,56 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 87779606d09c4d145ab73f260457f39a, type: 3}
+  m_Name: SoundDatabase
+  m_EditorClassIdentifier: Assembly-CSharp::SoundDatabaseSO
+  bgmList:
+  - soundType: 1
+    clip: {fileID: 8300000, guid: 510c33ca580a3c24ab2f050263ad4011, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 2
+    clip: {fileID: 8300000, guid: 3667e07cc61d04147b318134599a34a7, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 3
+    clip: {fileID: 8300000, guid: bf8ad15327c244f4e853c393f11de03a, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 4
+    clip: {fileID: 8300000, guid: 01a46e9fcad6fa24d96f919a50d9d170, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 5
+    clip: {fileID: 8300000, guid: e7aa6c9b7e5a84fbbbb6dee504359793, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 6
+    clip: {fileID: 8300000, guid: 28a0d52495ed0404f93bf90c7f272486, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 7
+    clip: {fileID: 8300000, guid: 5ac6fc4003415436bb278aafd51b6878, type: 3}
+    volume: 0.8
+    pitch: 1
+  - soundType: 8
+    clip: {fileID: 8300000, guid: 03fc1782d3b8b41edb7206193da9ac38, type: 3}
+    volume: 0.8
+    pitch: 1
+  sfxList:
+  - soundType: 5
+    clip: {fileID: 8300000, guid: 88d30c9c845d25f499caa621c4205056, type: 3}
+    volume: 0
+    pitch: 0
+  - soundType: 7
+    clip: {fileID: 8300000, guid: de91148ffd1bef144b71fd1a77fb2be5, type: 3}
+    volume: 0
+    pitch: 0

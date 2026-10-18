@@ -624,6 +624,54 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1190579505}
   m_CullTransparentMesh: 1
+--- !u!1 &1227402763
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1227402765}
+  - component: {fileID: 1227402764}
+  m_Layer: 0
+  m_Name: SoundManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1227402764
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227402763}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5c8a55ef968aa0f42be795e33f5345d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
+  soundDatabase: {fileID: 11400000, guid: ca83ef5602fd1ae41b95fd1d30ed72ff, type: 2}
+  bgmGroup: {fileID: -5883212223419160105, guid: 46d9a8efab258fd488440e744cb289b7, type: 2}
+  sfxGroup: {fileID: -3889647523173931412, guid: 46d9a8efab258fd488440e744cb289b7, type: 2}
+  sfxPoolSize: 10
+--- !u!4 &1227402765
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1227402763}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1325033693
 GameObject:
   m_ObjectHideFlags: 0
@@ -989,6 +1037,7 @@ GameObject:
   - component: {fileID: 1756247879}
   - component: {fileID: 1756247878}
   - component: {fileID: 1756247881}
+  - component: {fileID: 1756247882}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1114,6 +1163,21 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
+--- !u!114 &1756247882
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1756247877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2313f9802cda034a9d9f8da8ca0dd00, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BGMPlayer
+  bgmType: 1
+  fadeDuration: 0.8
+  restartIfSame: 0
 --- !u!1 &1790113100
 GameObject:
   m_ObjectHideFlags: 0
@@ -1390,6 +1454,7 @@ SceneRoots:
   - {fileID: 2076466732}
   - {fileID: 419783045}
   - {fileID: 1009837495}
+  - {fileID: 1227402765}
   - {fileID: 562550383}
   - {fileID: 1089911356}
   - {fileID: 1325033696}
