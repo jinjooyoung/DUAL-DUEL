@@ -18,15 +18,15 @@ public enum BGMType
 public enum SFXType
 {
     ButtonClick = 0,
-    CardHover,
     CardDraw,
+    CardPlace,
     CardPlay,
-    CardDiscard,
     Attack_Slash,
+    Shield_Taking,
     Shield_Block,
     Hit_Damage,
     Heal,
-    Reward_Reroll
+    Buff
 }
 
 [Serializable]

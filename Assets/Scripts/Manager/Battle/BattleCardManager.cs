@@ -131,6 +131,8 @@ public class BattleCardManager : MonoBehaviour
                 0.3f
             );
 
+            SoundManager.Instance.PlaySFX(SFXType.CardDraw);
+
             BattleUIManager.Instance?.UpdateDeckUI();
 
             // 트윈 완료 시 정렬 참여 허용
@@ -170,7 +172,7 @@ public class BattleCardManager : MonoBehaviour
                 handCards.Remove(targetCard.cardInstance);
                 discardDeck.Add(targetCard.cardInstance);
             }
-
+            SoundManager.Instance.PlaySFX(SFXType.CardDraw);
             // DOTweenManager.CardDiscard 실행 후 완료 대기
             Tween discardTween = DOTweenManager.CardDiscard(targetCard.gameObject, discardTargetPos, 0.25f, () =>
             {

@@ -513,10 +513,22 @@ public class BattleManager : MonoBehaviour
         if (amount > 0)
         {
             BattleUIManager.Instance?.ShowHealText(spawnPos, amount);
+            SoundManager.Instance.PlaySFX(SFXType.Heal);
+            return;
         }
         else
         {
             BattleUIManager.Instance?.ShowDamageText(spawnPos, -amount);
+        }
+
+        // 플레이어라면
+        if (entity == playerStats)
+        {
+            SoundManager.Instance.PlaySFX(SFXType.Hit_Damage);
+        }
+        else
+        {
+            SoundManager.Instance.PlaySFX(SFXType.Attack_Slash);
         }
 
         if (entity.currentHp <= 0)
@@ -605,6 +617,7 @@ public class BattleManager : MonoBehaviour
             else
             {
                 target.guard -= damage;
+                SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
             }
         }
         // 2. 방어도가 0인 경우 (데미지 전량 체력 차감)
@@ -621,6 +634,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
+        SoundManager.Instance.PlaySFX(SFXType.Shield_Taking);
     }
 
     public void ModifyBuff(CombatEntityStats entity, int amount)
@@ -630,6 +644,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
+        SoundManager.Instance.PlaySFX(SFXType.Buff);
     }
 
     public void ModifyDebuff(CombatEntityStats entity, int amount)
@@ -639,6 +654,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
+        SoundManager.Instance.PlaySFX(SFXType.Buff);
     }
 
     private void HandleDeath(CombatEntityStats deadEntity)
@@ -647,11 +663,13 @@ public class BattleManager : MonoBehaviour
         {
             Debug.Log("[전투 종료] 플레이어 사망 - 패배");
             BattleUIManager.Instance?.DefeatUI();
+            SoundManager.Instance.PlayBGM(BGMType.Defeat);
         }
         else
         {
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
             BattleUIManager.Instance?.VictoryUI();
+            SoundManager.Instance.PlayBGM(BGMType.Victory);
         }
     }
 

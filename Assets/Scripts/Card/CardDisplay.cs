@@ -179,6 +179,7 @@ public class CardDisplay : MonoBehaviour
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
         isDragging = true;
+        SoundManager.Instance.PlaySFX(SFXType.CardPlay);
 
         foreach (var card in BattleCardManager.Instance.cardPool)
         {
@@ -258,6 +259,8 @@ public class CardDisplay : MonoBehaviour
                 return;
             }
         }
+
+        SoundManager.Instance.PlaySFX(SFXType.CardPlace);
 
         // 마우스 뗀 자리가 슬롯이 아닌 경우 (허공 또는 핸드 영역)
         DetachFromCurrentSlot();

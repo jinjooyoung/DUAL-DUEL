@@ -109,6 +109,14 @@ public class SoundManager : MonoBehaviour
 
     #region SFX 제어
 
+    public void PlaySFXByIndex(int index)
+    {
+        if (index < 0 || index >= System.Enum.GetValues(typeof(SFXType)).Length)
+            return;
+
+        PlaySFX((SFXType)index);
+    }
+
     /// <summary>
     /// 효과음을 1회 재생합니다.
     /// </summary>
