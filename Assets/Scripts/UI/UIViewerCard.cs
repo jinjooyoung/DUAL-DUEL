@@ -7,6 +7,7 @@ public class UIViewerCard : MonoBehaviour
 {
     [Header("카드 이미지")]
     [SerializeField] private Image artworkImage;
+    [SerializeField] private Image background;
 
     [Header("텍스트")]
     [SerializeField] private TextMeshProUGUI nameText;
@@ -26,6 +27,31 @@ public class UIViewerCard : MonoBehaviour
 
         // 카드 이미지
         if (artworkImage != null) artworkImage.sprite = data.artwork;
+
+        if (background != null)
+        {
+            switch (data.rank)
+            {
+                case RankType.Common:
+                    background.color = Hex("#FFFFFF");
+                    break;
+                case RankType.Uncommon:
+                    background.color = Hex("#9EE647");
+                    break;
+                case RankType.Rare:
+                    background.color = Hex("#58A3E6");
+                    break;
+                case RankType.Epic:
+                    background.color = Hex("#E6606E");
+                    break;
+                case RankType.Legendary:
+                    background.color = Hex("#9071E6");
+                    break;
+                case RankType.Mythic:
+                    background.color = Hex("#FCE66F");
+                    break;
+            }
+        }
 
         // 카드 이름
         if (nameText != null && nameLocalizeEvent != null)
@@ -60,5 +86,11 @@ public class UIViewerCard : MonoBehaviour
             // 3. 텍스트 즉시 갱신
             descLocalizeEvent.RefreshString();
         }
+    }
+
+    private Color Hex(string hex)
+    {
+        ColorUtility.TryParseHtmlString(hex, out Color color);
+        return color;
     }
 }

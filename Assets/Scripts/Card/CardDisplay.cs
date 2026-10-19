@@ -1,5 +1,6 @@
 using DG.Tweening;
 using TMPro;
+using Unity.Burst.Intrinsics;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Localization;
@@ -99,7 +100,31 @@ public class CardDisplay : MonoBehaviour
             cardResource.sprite = data.artwork;
 
         if (background != null)
+        {
             background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
+
+            switch (data.rank)
+            {
+                case RankType.Common:
+                    background.color = Hex("#FFFFFF");
+                    break;
+                case RankType.Uncommon:
+                    background.color = Hex("#9EE647");
+                    break;
+                case RankType.Rare:
+                    background.color = Hex("#58A3E6");
+                    break;
+                case RankType.Epic:
+                    background.color = Hex("#E6606E");
+                    break;
+                case RankType.Legendary:
+                    background.color = Hex("#9071E6");
+                    break;
+                case RankType.Mythic:
+                    background.color = Hex("#FCE66F");
+                    break;
+            }
+        }
 
         if (typeIcon != null)
             typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{data.cardType}");
@@ -245,6 +270,12 @@ public class CardDisplay : MonoBehaviour
         }
 
         DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => ColliderOnOff(this, true));
+    }
+
+    private Color Hex(string hex)
+    {
+        ColorUtility.TryParseHtmlString(hex, out Color color);
+        return color;
     }
 
     private void ColliderOnOff(CardDisplay obj, bool on)

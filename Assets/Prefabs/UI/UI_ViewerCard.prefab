@@ -672,6 +672,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIViewerCard
   artworkImage: {fileID: 8064571199500888762}
+  background: {fileID: 8314894137438144019}
   nameText: {fileID: 5380296915214653336}
   typeText: {fileID: 2959866003841754555}
   descText: {fileID: 2434972313605274194}
