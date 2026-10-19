@@ -48,13 +48,16 @@ public class UIViewerCard : MonoBehaviour
         // 카드 설명 및 수치 인자
         if (descText != null && descLocalizeEvent != null)
         {
+            // 1. {value} 인자 먼저 등록
+            descLocalizeEvent.StringReference.Arguments = new object[]
+            {
+                new { value = card.GetValue() }
+            };
+
+            // 2. 그 다음 테이블/키 설정
             descLocalizeEvent.StringReference.SetReference(tableName, data.descKey);
 
-            descLocalizeEvent.StringReference.Arguments = new object[]
-                {
-                    new { value = card.GetValue() }
-                };
-
+            // 3. 텍스트 즉시 갱신
             descLocalizeEvent.RefreshString();
         }
     }
