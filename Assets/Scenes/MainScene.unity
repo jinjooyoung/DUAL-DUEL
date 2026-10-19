@@ -251,7 +251,37 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ba2a4e9d4bbba7740bf4f95864eb34af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  deck: []
+  deck:
+  - instanceId: 1
+    baseData: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+    upgradeLevel: 0
+  - instanceId: 2
+    baseData: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+    upgradeLevel: 0
+  - instanceId: 3
+    baseData: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+    upgradeLevel: 0
+  - instanceId: 4
+    baseData: {fileID: 11400000, guid: d063c640ae18ff84588c7bc10b2b0d90, type: 2}
+    upgradeLevel: 0
+  - instanceId: 5
+    baseData: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+    upgradeLevel: 0
+  - instanceId: 6
+    baseData: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+    upgradeLevel: 0
+  - instanceId: 7
+    baseData: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+    upgradeLevel: 0
+  - instanceId: 8
+    baseData: {fileID: 11400000, guid: 374ed88b94d963b418e3d8a221a04973, type: 2}
+    upgradeLevel: 0
+  - instanceId: 9
+    baseData: {fileID: 11400000, guid: ea2b60a6b9215714eb4e063fc8dcf002, type: 2}
+    upgradeLevel: 0
+  - instanceId: 10
+    baseData: {fileID: 11400000, guid: 972bbe6dff6132b4d9b648fc75f884a8, type: 2}
+    upgradeLevel: 0
   character: {fileID: 11400000, guid: 3824bad56fec45d41a49f774bbc954dc, type: 2}
   monster: {fileID: 11400000, guid: 373cb5ebd5bab9040b7a451ea61f3a72, type: 2}
 --- !u!4 &419783045
