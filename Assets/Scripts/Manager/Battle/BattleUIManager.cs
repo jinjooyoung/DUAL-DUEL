@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -19,10 +20,16 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private Slider playerHpSlider;
     [SerializeField] private Slider playerShieldSlider;
 
+    [Header("플레이어 표정")]
+    [SerializeField] private CharacterExpression playerExpression;
+
     [Header("몬스터 스탯 UI")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
     [SerializeField] private Slider monsterHpSlider;
     [SerializeField] private Slider monsterShieldSlider;
+
+    [Header("몬스터 표정")]
+    [SerializeField] private CharacterExpression monsterExpression;
 
     [Header("배틀 종료 패널")]
     public GameObject endOfBattlePanel;
@@ -231,6 +238,11 @@ public class BattleUIManager : MonoBehaviour
                 monsterShieldSlider.value = stats.guard;
         }
     }
+
+    public void PlayPlayerHit() => playerExpression.PlayHit();
+    public void PlayPlayerAttack() => playerExpression.PlayAttack();
+    public void PlayMonsterHit() => monsterExpression.PlayHit();
+    public void PlayMonsterAttack() => monsterExpression.PlayAttack();
 
     public void VictoryUI()
     {

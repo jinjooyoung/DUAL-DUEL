@@ -661,6 +661,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8074369805498629912}
+  - component: {fileID: 4642420183813526884}
   m_Layer: 5
   m_Name: MonsterUITemplate
   m_TagString: Untagged
@@ -690,6 +691,23 @@ RectTransform:
   m_AnchoredPosition: {x: -30, y: -50}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 1, y: 1}
+--- !u!114 &4642420183813526884
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6911913426010689499}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f8ca1d0cd774a44b861a1230977a583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterExpression
+  targetImage: {fileID: 6512969539553520615}
+  defaultSprite: {fileID: -4289653751065813697, guid: 5402f6abb6ba92b4da98c4f0e53c8281, type: 3}
+  hitSprite: {fileID: 298707924, guid: 5402f6abb6ba92b4da98c4f0e53c8281, type: 3}
+  attackSprite: {fileID: -1251579315, guid: 5402f6abb6ba92b4da98c4f0e53c8281, type: 3}
+  duration: 0.5
 --- !u!1 &7003190157328005707
 GameObject:
   m_ObjectHideFlags: 0

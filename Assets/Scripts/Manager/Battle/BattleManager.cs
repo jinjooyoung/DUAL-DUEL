@@ -526,10 +526,14 @@ public class BattleManager : MonoBehaviour
         if (entity == playerStats)
         {
             SoundManager.Instance.PlaySFX(SFXType.Hit_Damage);
+            BattleUIManager.Instance.PlayMonsterAttack();
+            BattleUIManager.Instance.PlayPlayerHit();
         }
         else
         {
             SoundManager.Instance.PlaySFX(SFXType.Attack_Slash);
+            BattleUIManager.Instance.PlayPlayerAttack();
+            BattleUIManager.Instance.PlayMonsterHit();
         }
 
         if (entity.currentHp <= 0)
@@ -636,6 +640,15 @@ public class BattleManager : MonoBehaviour
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
         SoundManager.Instance.PlaySFX(SFXType.Shield_Taking);
+
+        if (entity == playerStats)
+        {
+            BattleUIManager.Instance.PlayPlayerAttack();
+        }
+        else
+        {
+            BattleUIManager.Instance.PlayMonsterAttack();
+        }
     }
 
     public void ModifyBuff(CombatEntityStats entity, int amount)
@@ -646,6 +659,15 @@ public class BattleManager : MonoBehaviour
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
         SoundManager.Instance.PlaySFX(SFXType.Buff);
+
+        if (entity == playerStats)
+        {
+            BattleUIManager.Instance.PlayPlayerAttack();
+        }
+        else
+        {
+            BattleUIManager.Instance.PlayMonsterAttack();
+        }
     }
 
     public void ModifyDebuff(CombatEntityStats entity, int amount)
@@ -656,6 +678,15 @@ public class BattleManager : MonoBehaviour
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
         SoundManager.Instance.PlaySFX(SFXType.Buff);
+
+        if (entity == playerStats)
+        {
+            BattleUIManager.Instance.PlayPlayerAttack();
+        }
+        else
+        {
+            BattleUIManager.Instance.PlayMonsterAttack();
+        }
     }
 
     private void HandleDeath(CombatEntityStats deadEntity)

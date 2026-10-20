@@ -336,6 +336,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4936356389738685825}
+  - component: {fileID: 8969449175541071607}
   m_Layer: 5
   m_Name: CharacterUITemplate
   m_TagString: Untagged
@@ -365,6 +366,23 @@ RectTransform:
   m_AnchoredPosition: {x: 30, y: -30}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0, y: 1}
+--- !u!114 &8969449175541071607
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9077986452027385656}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f8ca1d0cd774a44b861a1230977a583, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CharacterExpression
+  targetImage: {fileID: 816185329959473617}
+  defaultSprite: {fileID: 855951602050502238, guid: cd9ec61be9000554fa1b1dc1c9711184, type: 3}
+  hitSprite: {fileID: -619227376, guid: cd9ec61be9000554fa1b1dc1c9711184, type: 3}
+  attackSprite: {fileID: 120482465, guid: cd9ec61be9000554fa1b1dc1c9711184, type: 3}
+  duration: 0.5
 --- !u!1001 &7778524367288772749
 PrefabInstance:
   m_ObjectHideFlags: 0
