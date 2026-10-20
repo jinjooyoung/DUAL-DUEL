@@ -674,6 +674,51 @@ public static class DOTweenManager
         return seq;
     }
 
+    /// <summary>
+    /// 받은 피해량에 따라 카메라와 UI를 함께 흔듭니다.
+    /// </summary>
+    public static void ShakeByDamage(int damage, RectTransform uiRoot, Transform camTransform = null)
+    {
+        float duration, camStrength, uiStrength;
+        int vibrato;
+
+        if (damage >= 20)       // 정말 크게
+        {
+            duration = 0.3f; camStrength = 0.3f; uiStrength = 40f; vibrato = 18;
+        }
+        else if (damage >= 10)  // 크게
+        {
+            duration = 0.2f; camStrength = 0.15f; uiStrength = 22f; vibrato = 15;
+        }
+        else                    // 작게
+        {
+            duration = 0.12f; camStrength = 0.05f; uiStrength = 8f; vibrato = 12;
+        }
+
+        if (camTransform == null && Camera.main != null)
+            camTransform = Camera.main.transform;
+
+        CameraShake(camTransform, duration, camStrength, vibrato);
+        UIShake(uiRoot, duration, uiStrength, vibrato);
+    }
+
+    /// <summary>
+    /// UI 루트(RectTransform)를 흔드는 효과입니다. 단위는 픽셀입니다.
+    /// </summary>
+    public static Tween UIShake(RectTransform uiRoot, float duration = 0.15f, float strength = 15f, int vibrato = 12)
+    {
+        if (uiRoot == null) return null;
+        string tweenId = uiRoot.GetInstanceID() + ID_TRANSFORM;
+
+        // 진행 중인 쉐이크를 죽이고 원위치로 복구
+        DOTween.Kill(tweenId);
+        uiRoot.anchoredPosition = Vector2.zero;
+
+        return uiRoot.DOShakeAnchorPos(duration, strength, vibrato, 90f, false, true)
+                     .SetId(tweenId)
+                     .OnKill(() => { if (uiRoot != null) uiRoot.anchoredPosition = Vector2.zero; });
+    }
+
     #endregion
 
     #region 6. HP / Slider / Value 연출

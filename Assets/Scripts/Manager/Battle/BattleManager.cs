@@ -59,6 +59,10 @@ public class BattleManager : MonoBehaviour
         }
     }
 
+    [Header("카메라 쉐이크")]
+    [SerializeField] private RectTransform uiShakeRoot;
+    [SerializeField] private Transform cameraTransform;
+
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 0.5f;
 
@@ -73,6 +77,7 @@ public class BattleManager : MonoBehaviour
         else Destroy(gameObject);
 
         InitCombatStats();
+        cameraTransform = Camera.main.transform;
     }
 
     // 순서 보장을 위해 초기화 로직 모음
@@ -520,6 +525,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             BattleUIManager.Instance?.ShowDamageText(spawnPos, -amount);
+            DOTweenManager.ShakeByDamage(-amount, uiShakeRoot, cameraTransform);
         }
 
         // 플레이어라면
