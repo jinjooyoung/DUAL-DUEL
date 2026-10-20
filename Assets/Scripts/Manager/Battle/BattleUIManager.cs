@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class BattleUIManager : MonoBehaviour
 {
@@ -13,11 +14,15 @@ public class BattleUIManager : MonoBehaviour
     [Tooltip("버려진 카드 더미 카운트 텍스트")]
     [SerializeField] private TextMeshProUGUI discardDeckText;
 
-    [Tooltip("플레이어 스탯 텍스트")]
+    [Header("플레이어 스탯 UI")]
     [SerializeField] private TextMeshProUGUI playerStatText;
+    [SerializeField] private Slider playerHpSlider;
+    [SerializeField] private Slider playerShieldSlider;
 
-    [Tooltip("몬스터 스탯 텍스트")]
+    [Header("몬스터 스탯 UI")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
+    [SerializeField] private Slider monsterHpSlider;
+    [SerializeField] private Slider monsterShieldSlider;
 
     [Header("배틀 종료 패널")]
     public GameObject endOfBattlePanel;
@@ -36,10 +41,21 @@ public class BattleUIManager : MonoBehaviour
     private void Awake()
     {
         if (Instance == null) Instance = this;
-        else Destroy(gameObject);
+        else
+        {
+            Destroy(gameObject);
+            return;
+        }
 
         InitFloatingTextPool();
-        endOfBattlePanel.SetActive(false);
+
+        if (endOfBattlePanel != null)
+            endOfBattlePanel.SetActive(false);
+    }
+
+    private void Start()
+    {
+        InitializeCombatStatsUI();
     }
 
     /// <summary>
@@ -53,6 +69,25 @@ public class BattleUIManager : MonoBehaviour
         {
             CreateNewFloatingText();
         }
+    }
+
+    private void InitializeCombatStatsUI()
+    {
+        if (BattleManager.Instance == null) return;
+
+        if (BattleManager.Instance.playerStats != null)
+        {
+            if (playerHpSlider != null) playerHpSlider.maxValue = BattleManager.Instance.playerStats.currentHp;
+            if (playerShieldSlider != null) playerShieldSlider.maxValue = BattleManager.Instance.playerStats.currentHp;
+        }
+
+        if (BattleManager.Instance.monsterStats != null)
+        {
+            if (monsterHpSlider != null) monsterHpSlider.maxValue = BattleManager.Instance.monsterStats.currentHp;
+            if (monsterShieldSlider != null) monsterShieldSlider.maxValue = BattleManager.Instance.monsterStats.currentHp;
+        }
+
+        UpdateCombatStatsUI();
     }
 
     /// <summary>
@@ -160,16 +195,40 @@ public class BattleUIManager : MonoBehaviour
     {
         if (BattleManager.Instance == null) return;
 
-        // 플레이어 스탯 갱신
-        if (playerStatText != null && BattleManager.Instance.playerStats != null)
+        // 플레이어 스탯
+        if (BattleManager.Instance.playerStats != null)
         {
-            playerStatText.text = $"플레이어 체력 : {BattleManager.Instance.playerStats.currentHp}\n플레이어 방어력 : {BattleManager.Instance.playerStats.guard}";
+            var stats = BattleManager.Instance.playerStats;
+
+            if (playerStatText != null)
+            {
+                playerStatText.text =
+                    $"Player\n<size=36>{stats.currentHp}/{playerHpSlider.maxValue}    +{stats.guard}</size>";
+            }
+
+            if (playerHpSlider != null)
+                playerHpSlider.value = stats.currentHp;
+
+            if (playerShieldSlider != null)
+                playerShieldSlider.value = stats.guard;
         }
 
-        // 몬스터 스탯 갱신
-        if (monsterStatText != null && BattleManager.Instance.monsterStats != null)
+        // 몬스터 스탯
+        if (BattleManager.Instance.monsterStats != null)
         {
-            monsterStatText.text = $"몬스터 체력 : {BattleManager.Instance.monsterStats.currentHp}\n몬스터 방어력 : {BattleManager.Instance.monsterStats.guard}";
+            var stats = BattleManager.Instance.monsterStats;
+
+            if (monsterStatText != null)
+            {
+                monsterStatText.text =
+                    $"Monster\n<size=36>{stats.currentHp}/{monsterHpSlider.maxValue}    +{stats.guard}</size>";
+            }
+
+            if (monsterHpSlider != null)
+                monsterHpSlider.value = stats.currentHp;
+
+            if (monsterShieldSlider != null)
+                monsterShieldSlider.value = stats.guard;
         }
     }
 

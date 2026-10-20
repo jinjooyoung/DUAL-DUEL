@@ -71,12 +71,13 @@ public class BattleManager : MonoBehaviour
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
+
+        InitCombatStats();
     }
 
     // 순서 보장을 위해 초기화 로직 모음
     private void Start()
     {
-        InitCombatStats();
         BattleUIManager.Instance.UpdateAllUI();
     }
 
