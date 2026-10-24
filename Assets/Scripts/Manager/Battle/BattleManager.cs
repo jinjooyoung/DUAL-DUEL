@@ -48,15 +48,20 @@ public class BattleManager : MonoBehaviour
         if (entity == playerStats)
         {
             return playerTransform != null
-                ? playerTransform.position + Vector3.up * 1.0f
+                ? playerTransform.position + Vector3.down * 2.0f
                 : new Vector3(-5f, 0f, 0f); // Fallback 기본 좌표
         }
         else
         {
             return monsterTransform != null
-                ? monsterTransform.position + Vector3.up * 1.0f
+                ? monsterTransform.position + Vector3.down * 2.0f
                 : new Vector3(5f, 0f, 0f);  // Fallback 기본 좌표
         }
+    }
+
+    private Transform GetEntityTransform(CombatEntityStats entity)
+    {
+        return entity == playerStats ? playerTransform : monsterTransform;
     }
 
     [Header("카메라 쉐이크")]
@@ -525,6 +530,7 @@ public class BattleManager : MonoBehaviour
         else
         {
             BattleUIManager.Instance?.ShowDamageText(spawnPos, -amount);
+            BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Hit);
             DOTweenManager.ShakeByDamage(-amount, uiShakeRoot, cameraTransform);
         }
 
@@ -629,6 +635,7 @@ public class BattleManager : MonoBehaviour
             {
                 target.guard -= damage;
                 SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defense);
             }
         }
         // 2. 방어도가 0인 경우 (데미지 전량 체력 차감)
@@ -645,6 +652,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
+        BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Defense);
         SoundManager.Instance.PlaySFX(SFXType.Shield_Taking);
 
         if (entity == playerStats)
@@ -664,6 +672,7 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
+        BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Buff);
         SoundManager.Instance.PlaySFX(SFXType.Buff);
 
         if (entity == playerStats)
