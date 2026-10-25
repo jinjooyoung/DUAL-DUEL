@@ -71,6 +71,9 @@ public class SoundManager : MonoBehaviour
     /// <summary>
     /// BGM을 페이드인/아웃하며 루프 재생합니다.
     /// </summary>
+    /// <summary>
+    /// BGM을 페이드인/아웃하며 루프 재생합니다.
+    /// </summary>
     public void PlayBGM(BGMType type, float fadeDuration = 0.5f)
     {
         if (CurrentBGM == type && type != BGMType.None) return;
@@ -85,22 +88,60 @@ public class SoundManager : MonoBehaviour
 
         CurrentBGM = type;
 
-        AudioSource currentSource = isUsingSourceA ? bgmSourceA : bgmSourceB;
+        // 현재 채널과 새 채널 스위칭
+        AudioSource oldSource = isUsingSourceA ? bgmSourceA : bgmSourceB;
         AudioSource newSource = isUsingSourceA ? bgmSourceB : bgmSourceA;
         isUsingSourceA = !isUsingSourceA;
 
+        // 1. 새 오디오 소스의 기존 트윈 제거 및 초기화
+        newSource.DOKill();
         newSource.clip = data.clip;
         newSource.pitch = data.pitch;
-        newSource.volume = 0f;
+        newSource.volume = 0f; // ★ 필수: 시작 볼륨을 반드시 0으로 설정
         newSource.Play();
 
-        currentSource.DOFade(0f, fadeDuration).OnComplete(() => currentSource.Stop());
+        // 2. 페이드 시간 0초 예외 처리
+        if (fadeDuration <= 0f)
+        {
+            oldSource.DOKill();
+            oldSource.Stop();
+            oldSource.volume = 0f;
+            newSource.volume = data.volume;
+            return;
+        }
+
+        // 3. 새 BGM 서서히 페이드인 (0 -> Target Volume)
         newSource.DOFade(data.volume, fadeDuration);
+
+        // 4. 이전 BGM 서서히 페이드아웃 (Current Volume -> 0)
+        oldSource.DOKill();
+        oldSource.DOFade(0f, fadeDuration).OnComplete(() =>
+        {
+            // 페이드아웃이 끝난 시점에도 여전히 메인이 아닌 경우에만 안전하게 Stop
+            AudioSource currentActive = isUsingSourceA ? bgmSourceB : bgmSourceA;
+            if (oldSource != currentActive)
+            {
+                oldSource.Stop();
+            }
+        });
     }
 
     public void StopBGM(float fadeDuration = 0.5f)
     {
         CurrentBGM = BGMType.None;
+
+        bgmSourceA.DOKill();
+        bgmSourceB.DOKill();
+
+        if (fadeDuration <= 0f)
+        {
+            bgmSourceA.Stop();
+            bgmSourceB.Stop();
+            bgmSourceA.volume = 0f;
+            bgmSourceB.volume = 0f;
+            return;
+        }
+
         bgmSourceA.DOFade(0f, fadeDuration).OnComplete(() => bgmSourceA.Stop());
         bgmSourceB.DOFade(0f, fadeDuration).OnComplete(() => bgmSourceB.Stop());
     }
