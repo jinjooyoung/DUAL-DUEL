@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 [RequireComponent(typeof(Collider))]
 public class StageNodeUI : MonoBehaviour
@@ -77,6 +78,11 @@ public class StageNodeUI : MonoBehaviour
 
     private void OnMouseDown()
     {
+        if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
+        {
+            return;
+        }
+
         if (StageManager.Instance != null && nodeData != null)
         {
             StageManager.Instance.SelectNode(this);
