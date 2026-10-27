@@ -186,12 +186,12 @@ public class BattleUIManager : MonoBehaviour
 
         if (drawDeckText != null)
         {
-            drawDeckText.text = $"µå·Î¿ìµ¦\n{BattleCardManager.Instance.drawDeck.Count}";
+            drawDeckText.text = $"{BattleCardManager.Instance.drawDeck.Count}";
         }
 
         if (discardDeckText != null)
         {
-            discardDeckText.text = $"¹ö¸² µ¦\n{BattleCardManager.Instance.discardDeck.Count}";
+            discardDeckText.text = $"{BattleCardManager.Instance.discardDeck.Count}";
         }
     }
 
