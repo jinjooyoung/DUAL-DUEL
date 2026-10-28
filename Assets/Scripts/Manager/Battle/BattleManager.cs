@@ -74,7 +74,7 @@ public class BattleManager : MonoBehaviour
     [Header("턴 전환 대기 시간")]
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
 
-    private bool isGameOver = false;
+    public bool isGameOver = false;
 
     private Coroutine turnExecutionCoroutine;
 
