@@ -15,6 +15,9 @@ public class GameManager : MonoBehaviour
     [Header("현재 몬스터")]
     public MonsterSO monster;
 
+    [Header("런타임 데이터")]
+    public int currentHP;
+
     private void Awake()
     {
         if (Instance == null)
@@ -26,5 +29,7 @@ public class GameManager : MonoBehaviour
         {
             Destroy(gameObject);
         }
+
+        currentHP = character.maxHp;
     }
 }

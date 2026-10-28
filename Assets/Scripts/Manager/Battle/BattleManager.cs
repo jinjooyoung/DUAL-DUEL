@@ -74,6 +74,8 @@ public class BattleManager : MonoBehaviour
     [Header("턴 전환 대기 시간")]
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
 
+    private bool isGameOver = false;
+
     private Coroutine turnExecutionCoroutine;
 
     private void Awake()
@@ -99,7 +101,7 @@ public class BattleManager : MonoBehaviour
         if (GameManager.Instance != null)
         {
             // 플레이어 SO 데이터 연결 (없을 경우 50 기본값 안전장치)
-            int pMaxHp = GameManager.Instance.character != null ? GameManager.Instance.character.maxHp : 50;
+            int pMaxHp = GameManager.Instance.character != null ? GameManager.Instance.currentHP : 50;
             playerStats = new CombatEntityStats(pMaxHp);
 
             // 몬스터 SO 데이터 연결 (없을 경우 35 기본값 안전장치)
@@ -122,6 +124,8 @@ public class BattleManager : MonoBehaviour
     public void TurnEnd()
     {
         if (turnExecutionCoroutine != null) return;
+
+        if (isGameOver) return;
 
         /*// 5개 슬롯 완충 여부 검사
         if (!IsAllSlotsOccupied())
@@ -157,6 +161,8 @@ public class BattleManager : MonoBehaviour
         // 1. 슬롯 5개 순차 발동 (1초 간격)
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
+            if (isGameOver) yield break;
+
             BattleSlot slot = fieldCardSlots[i];
             if (slot == null) continue;
 
@@ -178,6 +184,8 @@ public class BattleManager : MonoBehaviour
             // 적 사망 시 슬롯 루프 조기 종료
             if (monsterStats.currentHp <= 0) break;
         }
+
+        if (isGameOver) yield break;
 
         // [추가] 1-1. 0~4번 슬롯 및 모든 연계 시전이 완료된 후, 슬롯의 카드들을 0.2초 간격으로 순차 디스카드
         for (int i = 0; i < fieldCardSlots.Count; i++)
@@ -219,6 +227,8 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private IEnumerator Co_ExecuteSlotBaseAttack(BattleSlot slot)
     {
+        if (isGameOver) yield break;
+
         bool isPlayerSlot = slot.slotOwnerType == OwnerType.Player;
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
@@ -384,6 +394,8 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator ExecuteSlotAction(BattleSlot slot)
     {
+        if (isGameOver) yield break;
+
         CardDisplay cardDisplay = slot.currentCard;
         if (cardDisplay == null) yield break;
 
@@ -706,6 +718,8 @@ public class BattleManager : MonoBehaviour
 
     private void HandleDeath(CombatEntityStats deadEntity)
     {
+        isGameOver = true;
+
         if (deadEntity == playerStats)
         {
             Debug.Log("[전투 종료] 플레이어 사망 - 패배");
@@ -717,6 +731,7 @@ public class BattleManager : MonoBehaviour
             Debug.Log("[전투 종료] 몬스터 처치 - 승리");
             BattleUIManager.Instance?.VictoryUI();
             SoundManager.Instance.PlayBGM(BGMType.Victory);
+            GameManager.Instance.currentHP = playerStats.currentHp;
         }
     }
 

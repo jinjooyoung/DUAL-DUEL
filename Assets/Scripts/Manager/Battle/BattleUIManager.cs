@@ -84,8 +84,8 @@ public class BattleUIManager : MonoBehaviour
 
         if (BattleManager.Instance.playerStats != null)
         {
-            if (playerHpSlider != null) playerHpSlider.maxValue = BattleManager.Instance.playerStats.currentHp;
-            if (playerShieldSlider != null) playerShieldSlider.maxValue = BattleManager.Instance.playerStats.currentHp;
+            if (playerHpSlider != null) playerHpSlider.maxValue = GameManager.Instance.character.maxHp;
+            if (playerShieldSlider != null) playerShieldSlider.maxValue = GameManager.Instance.character.maxHp;
         }
 
         if (BattleManager.Instance.monsterStats != null)
