@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MonsterSO
   monsterID: 2000
   monsterName: MONSTERNAME_2000
-  maxHp: 80
+  maxHp: 30
   slotCreateType: 0
   monsterDeckID: ffffffff
   rewardCardRank: 1
