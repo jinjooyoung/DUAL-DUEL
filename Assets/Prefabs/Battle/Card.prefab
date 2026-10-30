@@ -399,7 +399,7 @@ Transform:
   m_GameObject: {fileID: 3197019554259964109}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.65, y: 1.05, z: 0}
+  m_LocalPosition: {x: -0.168, y: -0.43, z: 0}
   m_LocalScale: {x: 1.5, y: 1.5, z: 1.5}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -454,7 +454,7 @@ SpriteRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 4
   m_MaskInteraction: 0
-  m_Sprite: {fileID: 0}
+  m_Sprite: {fileID: 21300000, guid: 191ec8f1f7a317345b4fe18039e59291, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -462,7 +462,7 @@ SpriteRenderer:
   m_Size: {x: 0.2, y: 0.2}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 0
+  m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
 --- !u!1 &7083574515970785664
 GameObject:
@@ -807,13 +807,12 @@ MonoBehaviour:
   tableName: Card_Table
   nameLocalizeEvent: {fileID: 3774976871235676448}
   typeLocalizeEvent: {fileID: 3700500966841545367}
-  descriptionLocalizeEvent: {fileID: 5836189533207437111}
   background: {fileID: 5464503843193004001}
   cardResource: {fileID: 7859322494614027429}
   typeIcon: {fileID: 1592252172346136604}
   nameText: {fileID: 7065318448404453018}
   typeText: {fileID: 8386421444745756568}
-  descriptionText: {fileID: 6957019746556280763}
+  valueText: {fileID: 6957019746556280763}
   isDragging: 0
   isPlaced: 0
   isSnapFixed: 0
@@ -906,7 +905,7 @@ GameObject:
   - component: {fileID: 6957019746556280763}
   - component: {fileID: 5836189533207437111}
   m_Layer: 0
-  m_Name: Des
+  m_Name: ValueText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -928,8 +927,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: -0.22}
-  m_SizeDelta: {x: 29.05, y: 5}
+  m_AnchoredPosition: {x: 0.45, y: -0.4}
+  m_SizeDelta: {x: 15, y: 5}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &4415599811392111499
 MeshRenderer:
@@ -1000,7 +999,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: "\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85\uCE74\uB4DC\uC124\uBA85"
+  m_text: 99
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: c2092a44201c75c468b3b8ba08ccbf75, type: 2}
   m_sharedMaterial: {fileID: 8870530502105284316, guid: c2092a44201c75c468b3b8ba08ccbf75, type: 2}
@@ -1027,14 +1026,14 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 36
-  m_fontSizeBase: 36
+  m_fontSize: 40
+  m_fontSizeBase: 40
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18
   m_fontSizeMax: 72
   m_fontStyle: 0
-  m_HorizontalAlignment: 2
+  m_HorizontalAlignment: 1
   m_VerticalAlignment: 256
   m_textAlignment: 65535
   m_characterSpacing: 0

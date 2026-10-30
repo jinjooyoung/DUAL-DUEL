@@ -1,4 +1,5 @@
 using DG.Tweening;
+using System.Collections.Generic;
 using TMPro;
 using Unity.Burst.Intrinsics;
 using UnityEngine;
@@ -19,7 +20,6 @@ public class CardDisplay : MonoBehaviour
     [Header("로컬라이제이션 이벤트 컴포넌트")]
     public LocalizeStringEvent nameLocalizeEvent;
     public LocalizeStringEvent typeLocalizeEvent;
-    public LocalizeStringEvent descriptionLocalizeEvent;
 
     [Header("이미지")]
     public SpriteRenderer background;
@@ -29,7 +29,7 @@ public class CardDisplay : MonoBehaviour
     [Header("텍스트")]
     public TextMeshPro nameText;
     public TextMeshPro typeText;
-    public TextMeshPro descriptionText;
+    public TextMeshPro valueText;
 
     [Header("상태 플래그")]
     public bool isDragging = false;
@@ -80,19 +80,10 @@ public class CardDisplay : MonoBehaviour
             Debug.Log("카드 타입 텍스트 세팅");
         }
 
-        // 3. 카드 설명 텍스트 세팅 및 수치 Replace
-        if (descriptionText != null && descriptionLocalizeEvent != null)
+        // 3. 카드 수치 (설명은 툴팁으로 이동)
+        if (valueText != null)
         {
-            // 1) 수치 인자를 먼저 설정
-            descriptionLocalizeEvent.StringReference.Arguments = new object[] { new { value = cardInstance.GetValue() } };
-
-            // 2) 테이블과 키 설정
-            descriptionLocalizeEvent.StringReference.SetReference(tableName, data.descKey);
-
-            // 3) 문자열 갱신
-            descriptionLocalizeEvent.RefreshString();
-
-            Debug.Log("카드 설명 텍스트 세팅");
+            valueText.text = cardInstance.GetValue().ToString();
         }
 
         // 카드 리소스

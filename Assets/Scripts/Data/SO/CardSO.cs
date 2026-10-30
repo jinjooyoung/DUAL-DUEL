@@ -82,7 +82,7 @@ public class CardSO : ScriptableObject
 
     [Header("로컬라이징 키")]
     public string nameKey;
-    public string descKey;
+    public string descKey;          // 툴팁으로 띄울 내용
 
     [Header("성장 수치 (Index 0: 기본, 1~5: 강화 단계)")]
     public List<int> values = new List<int>();
