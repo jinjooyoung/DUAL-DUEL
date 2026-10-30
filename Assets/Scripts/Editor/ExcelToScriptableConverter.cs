@@ -103,6 +103,12 @@ public class ExcelToScriptableConverter : EditorWindow
                     string artworkPath = $"Assets/Resources/Cards/Card_{data.cardId}.png";
                     cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
 
+                    cardSO.bgSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Cards/Public/Card_BG");
+                    cardSO.typeIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/{cardSO.cardType}");
+                    cardSO.gimmikIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/GimmikIcon_Test");
+                    cardSO.FilledStarSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/FilledStar");
+                    cardSO.EmptyStartSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/EmptyStar");
+
                     string assetName = $"Card_{data.cardId:D4}";
                     return (cardSO, assetName);
                 });

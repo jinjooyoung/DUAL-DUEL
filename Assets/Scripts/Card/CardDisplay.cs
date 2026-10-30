@@ -1,12 +1,8 @@
 using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
-using Unity.Burst.Intrinsics;
 using UnityEngine;
-using UnityEngine.EventSystems;
-using UnityEngine.Localization;
 using UnityEngine.Localization.Components;
-using UnityEngine.Localization.Settings;
 
 public class CardDisplay : MonoBehaviour
 {
@@ -25,11 +21,16 @@ public class CardDisplay : MonoBehaviour
     public SpriteRenderer background;
     public SpriteRenderer cardResource;
     public SpriteRenderer typeIcon;
+    public SpriteRenderer gimmickIcon;
+
+    [Header("랭크 별 아이콘")]
+    public List<SpriteRenderer> rankStarIcons;
 
     [Header("텍스트")]
     public TextMeshPro nameText;
     public TextMeshPro typeText;
     public TextMeshPro valueText;
+    public TextMeshPro gimmikValueText;
 
     [Header("상태 플래그")]
     public bool isDragging = false;
@@ -86,39 +87,31 @@ public class CardDisplay : MonoBehaviour
             valueText.text = cardInstance.GetValue().ToString();
         }
 
+        if (gimmikValueText != null)
+        {
+            gimmikValueText.text = data.rewardParam.ToString();
+        }
+
         // 카드 리소스
         if (cardResource != null && data.artwork != null)
             cardResource.sprite = data.artwork;
 
         if (background != null)
         {
-            background.sprite = Resources.Load<Sprite>("Cards/Public/Card_BG");
+            background.sprite = data.bgSprite;
 
-            switch (data.rank)
+            int activeStarCount = (int)data.rank;
+
+            for (int i = 0; i < rankStarIcons.Count; i++)
             {
-                case RankType.Common:
-                    background.color = Hex("#FFFFFF");
-                    break;
-                case RankType.Uncommon:
-                    background.color = Hex("#9EE647");
-                    break;
-                case RankType.Rare:
-                    background.color = Hex("#58A3E6");
-                    break;
-                case RankType.Epic:
-                    background.color = Hex("#E6606E");
-                    break;
-                case RankType.Legendary:
-                    background.color = Hex("#9071E6");
-                    break;
-                case RankType.Mythic:
-                    background.color = Hex("#FCE66F");
-                    break;
+                if (rankStarIcons[i] == null) continue;
+
+                rankStarIcons[i].sprite = i < activeStarCount ? data.FilledStarSprite : data.EmptyStartSprite;
             }
         }
 
-        if (typeIcon != null)
-            typeIcon.sprite = Resources.Load<Sprite>($"Cards/Public/{data.cardType}");
+        if (typeIcon != null) typeIcon.sprite = data.typeIconSprite;
+        if (gimmickIcon != null) gimmickIcon.sprite = data.gimmikIconSprite;
     }
 
     /// <summary>

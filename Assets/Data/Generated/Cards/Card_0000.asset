@@ -16,6 +16,11 @@ MonoBehaviour:
   cardType: 0
   rank: 1
   artwork: {fileID: 21300000, guid: 4d7635c366a76274c85747592d98d2f5, type: 3}
+  bgSprite: {fileID: 21300000, guid: bf0515b8257f0724bb80830a1cf7f1fe, type: 3}
+  typeIconSprite: {fileID: 21300000, guid: 191ec8f1f7a317345b4fe18039e59291, type: 3}
+  gimmikIconSprite: {fileID: 21300000, guid: 11179d7c6da5d23459377785ddeb9c00, type: 3}
+  FilledStarSprite: {fileID: 21300000, guid: d61195ed859fc2e429209c9fb840f6bf, type: 3}
+  EmptyStartSprite: {fileID: 21300000, guid: 6db9619954b81cc4e84835c24ce09ca0, type: 3}
   nameKey: CARDNAME_0
   descKey: CARDDESC_0
   values: 020000000300000004000000050000000600000007000000

@@ -80,6 +80,12 @@ public class CardSO : ScriptableObject
     public RankType rank;           // 데이터테이블은 숫자로 작성하고 SO에는 타입으로 불러옴
     public Sprite artwork;          // 스프라이트는 SO 생성 에디터에서 리소스폴더에 있는 Card_XXXX 아이디로 찾아와서 할당하도록 할 예정
 
+    public Sprite bgSprite;         // 카드 배경
+    public Sprite typeIconSprite;   // 타입 아이콘
+    public Sprite gimmikIconSprite; // 기믹 아이콘
+    public Sprite FilledStarSprite;
+    public Sprite EmptyStartSprite;
+
     [Header("로컬라이징 키")]
     public string nameKey;
     public string descKey;          // 툴팁으로 띄울 내용
