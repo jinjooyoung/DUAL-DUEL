@@ -1785,6 +1785,8 @@ MonoBehaviour:
   typeText: {fileID: 8386421444745756568}
   valueText: {fileID: 6957019746556280763}
   gimmikValueText: {fileID: 2291843798079013465}
+  typeGroup: {fileID: 448307387905962249}
+  GimmikGroup: {fileID: 5891646481189557864}
   isDragging: 0
   isPlaced: 0
   isSnapFixed: 0

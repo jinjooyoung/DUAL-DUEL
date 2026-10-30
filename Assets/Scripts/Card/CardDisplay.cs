@@ -32,6 +32,10 @@ public class CardDisplay : MonoBehaviour
     public TextMeshPro valueText;
     public TextMeshPro gimmikValueText;
 
+    [Header("타입, 기믹 오브젝트")]
+    public GameObject typeGroup;
+    public GameObject GimmikGroup;
+
     [Header("상태 플래그")]
     public bool isDragging = false;
     public bool isPlaced = false;      // 슬롯에 고정된 상태인지 여부
@@ -40,6 +44,7 @@ public class CardDisplay : MonoBehaviour
 
     private Vector3 originalPosition;
     private Vector3 originalScale = Vector3.one;
+    private Vector3 originalTypeGroupPos;
 
     [Header("레이어 마스크")]
     public LayerMask slotLayer;
@@ -47,6 +52,7 @@ public class CardDisplay : MonoBehaviour
     private void Awake()
     {
         originalScale = transform.localScale;
+        originalTypeGroupPos = typeGroup.transform.localPosition;
     }
 
     void Start()
@@ -87,11 +93,6 @@ public class CardDisplay : MonoBehaviour
             valueText.text = cardInstance.GetValue().ToString();
         }
 
-        if (gimmikValueText != null)
-        {
-            gimmikValueText.text = data.rewardParam.ToString();
-        }
-
         // 카드 리소스
         if (cardResource != null && data.artwork != null)
             cardResource.sprite = data.artwork;
@@ -111,6 +112,60 @@ public class CardDisplay : MonoBehaviour
         }
 
         if (typeIcon != null) typeIcon.sprite = data.typeIconSprite;
+
+        RewardCategory rewardCategory = data.rewardCategory;
+
+        if (rewardCategory == RewardCategory.None)
+        {
+            GimmikGroup.SetActive(false);
+            typeGroup.transform.localPosition = new Vector3(0, typeGroup.transform.localPosition.y, typeGroup.transform.localPosition.z);
+            return;
+        }
+        else
+        {
+            GimmikGroup.SetActive(true);
+            typeGroup.transform.localPosition = originalTypeGroupPos;
+        }
+
+        string temp;
+
+        switch (rewardCategory)
+        {
+            case RewardCategory.FlatBonus:
+                temp = $"+{data.rewardParam}"; // 예: +4
+                break;
+
+            case RewardCategory.Multiplier:
+                temp = $"x{data.rewardParam}"; // 예: x2
+                break;
+
+            case RewardCategory.RepeatCast:
+                temp = $"+{data.rewardParam}"; // 예: 2
+                break;
+
+            case RewardCategory.TriggerNeighborSlot:
+                temp = "+1"; // "1회 추가 시전" 의미
+                break;
+
+            case RewardCategory.ModifyNextDraw:
+                temp = $"+{data.rewardParam}"; // 예: +1 (드로우 증가)
+                break;
+
+            case RewardCategory.ApplyBuffDebuff:
+                temp = $"{data.rewardParam}"; // 부여할 중첩 수치
+                break;
+
+            default:
+                temp = data.rewardParam > 0 ? ((int)data.rewardParam).ToString() : string.Empty;
+                break;
+        }
+
+        // 3-1. 카드 기믹 밸류
+        if (gimmikValueText != null)
+        {
+            gimmikValueText.text = temp;
+        }
+
         if (gimmickIcon != null) gimmickIcon.sprite = data.gimmikIconSprite;
     }
 
