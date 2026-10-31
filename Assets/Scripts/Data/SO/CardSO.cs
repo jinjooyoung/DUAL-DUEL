@@ -41,7 +41,6 @@ public enum RewardCategory
     RepeatCast = 3,             // 해당 카드 N회 다중 시전 (연타)
     TriggerNeighborSlot = 4,    // 인접 슬롯 카드 추가 발동 (0: 양쪽, -1: 앞, 1: 뒤)
     ModifyNextDraw = 5,         // 다음 턴 드로우 매수 조정 (+N장)
-    ApplyBuffDebuff = 6         // 버프/디버프 부여
 }
 
 [Serializable]

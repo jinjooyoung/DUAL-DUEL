@@ -151,10 +151,6 @@ public class CardDisplay : MonoBehaviour
                 temp = $"+{data.rewardParam}"; // 예: +1 (드로우 증가)
                 break;
 
-            case RewardCategory.ApplyBuffDebuff:
-                temp = $"{data.rewardParam}"; // 부여할 중첩 수치
-                break;
-
             default:
                 temp = data.rewardParam > 0 ? ((int)data.rewardParam).ToString() : string.Empty;
                 break;

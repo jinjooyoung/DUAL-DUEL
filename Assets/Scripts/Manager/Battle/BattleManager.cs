@@ -461,11 +461,6 @@ public class BattleManager : MonoBehaviour
                         Debug.Log($"[보상: ModifyNextDraw] 다음 턴 드로우 +{extraDraw}장 예약 (누적 추가: {BattleCardManager.Instance.bonusDrawCount})");
                     }
                     break;
-
-                // 버프/디버프 부여 (구상 중)
-                case RewardCategory.ApplyBuffDebuff:
-                    Debug.Log($"[보상: ApplyBuffDebuff] 아직 기획 구상 중 (Param: {cardData.rewardParam})");
-                    break;
             }
         }
 
