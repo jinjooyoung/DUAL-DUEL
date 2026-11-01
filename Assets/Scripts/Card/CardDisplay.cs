@@ -136,47 +136,16 @@ public class CardDisplay : MonoBehaviour
     {
         if (cardInstance == null || cardInstance.baseData == null) return;
 
-        CardSO data = cardInstance.baseData;
-
         // 카드 기본 밸류
         if (valueText != null)
         {
             valueText.text = cardInstance.GetValue().ToString();
         }
 
-        if (gimmikValueText == null) return;
-
-        float rewardParam = cardInstance.GetRewardParam();
-
-        switch (data.rewardCategory)
+        // 기믹 보상 수치 (포맷은 CardInstance에서 공용 처리)
+        if (gimmikValueText != null)
         {
-            case RewardCategory.None:
-                gimmikValueText.text = string.Empty;
-                break;
-
-            case RewardCategory.FlatBonus:
-                gimmikValueText.text = $"+{rewardParam}";  // 예: +4
-                break;
-
-            case RewardCategory.Multiplier:
-                gimmikValueText.text = $"x{rewardParam}";  // 예: x2
-                break;
-
-            case RewardCategory.RepeatCast:
-                gimmikValueText.text = $"+{rewardParam}";  // 예: +2 (추가 시전 횟수)
-                break;
-
-            case RewardCategory.TriggerNeighborSlot:
-                gimmikValueText.text = "+1";                // 인접 카드 1회 추가 시전 (파람은 방향값이라 표시 안 함)
-                break;
-
-            case RewardCategory.ModifyNextDraw:
-                gimmikValueText.text = $"+{rewardParam}";  // 예: +1 (드로우 증가)
-                break;
-
-            default:
-                gimmikValueText.text = rewardParam > 0 ? ((int)rewardParam).ToString() : string.Empty;
-                break;
+            gimmikValueText.text = cardInstance.GetRewardDisplayText();
         }
     }
 

@@ -36,6 +36,27 @@ public class CardInstance   // SO는 정적 데이터. 이건 런타임용
     }
 
     /// <summary>
+    /// 기믹 아이콘 옆에 표시할 보상 텍스트 (3D 카드 / UI 카드 공용)
+    /// </summary>
+    public string GetRewardDisplayText()
+    {
+        if (baseData == null) return string.Empty;
+
+        float rewardParam = GetRewardParam();
+
+        switch (baseData.rewardCategory)
+        {
+            case RewardCategory.None:                return string.Empty;
+            case RewardCategory.FlatBonus:           return $"+{rewardParam}";   // 예: +4
+            case RewardCategory.Multiplier:          return $"x{rewardParam}";   // 예: x2
+            case RewardCategory.RepeatCast:          return $"+{rewardParam}";   // 예: +2 (추가 시전 횟수)
+            case RewardCategory.TriggerNeighborSlot: return "+1";                // 인접 카드 1회 추가 시전 (파람은 방향값)
+            case RewardCategory.ModifyNextDraw:      return $"+{rewardParam}";   // 예: +1 (드로우 증가)
+            default:                                 return rewardParam > 0 ? ((int)rewardParam).ToString() : string.Empty;
+        }
+    }
+
+    /// <summary>
     /// 더 강화할 수 있는지 (강화 로직 구현 시 사용)
     /// </summary>
     public bool CanUpgrade => baseData != null && baseData.CanUpgrade(upgradeLevel);
