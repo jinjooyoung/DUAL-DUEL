@@ -1,18 +1,17 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 [Serializable]
 public class CombatEntityStats
 {
-    [Tooltip("ÇöÀç Ã¼·Â")] public int currentHp;
-    [Tooltip("ÃÖ´ë Ã¼·Â")] public int maxHp;
-    [Tooltip("ÇöÀç ¹æ¾îµµ")] public int guard;
-    [Tooltip("¹öÇÁ ¹ë·ù (°ø°İ·Â/À§·Â °¡»ê µî)")] public int buffValue;
-    [Tooltip("µğ¹öÇÁ ¹ë·ù (¾àÈ­ µî)")] public int debuffValue;
+    [Tooltip("í˜„ì¬ ì²´ë ¥")] public int currentHp;
+    [Tooltip("ìµœëŒ€ ì²´ë ¥")] public int maxHp;
+    [Tooltip("í˜„ì¬ ë°©ì–´ë„")] public int guard;
+    [Tooltip("ë²„í”„ ë°¸ë¥˜ (ê³µê²©ë ¥/ìœ„ë ¥ ê°€ì‚° ë“±)")] public int buffValue;
+    [Tooltip("ë””ë²„í”„ ë°¸ë¥˜ (ì•½í™” ë“±)")] public int debuffValue;
 
     public CombatEntityStats(int maxHp)
     {
@@ -24,24 +23,24 @@ public class CombatEntityStats
     }
 }
 
-// ¹èÆ² ½Ã ÇÚµå µ¦À» ¹èÄ¡ ¹× »ç¿ëÇÏ´Â ¹èÆ²ÀÇ Å« Èå¸§À» °ü¸®ÇÏ´Â ¸Å´ÏÀú
+// ë°°í‹€ ì‹œ í•¸ë“œ ë±ì„ ë°°ì¹˜ ë° ì‚¬ìš©í•˜ëŠ” ë°°í‹€ì˜ í° íë¦„ì„ ê´€ë¦¬í•˜ëŠ” ë§¤ë‹ˆì €
 public class BattleManager : MonoBehaviour
 {
     public static BattleManager Instance { get; private set; }
 
-    [Header("ÀüÅõ ½½·Ô ÇÊµå")]
+    [Header("ì „íˆ¬ ìŠ¬ë¡¯ í•„ë“œ")]
     public List<BattleSlot> fieldCardSlots = new List<BattleSlot>();
 
-    [Header("ÀüÅõ ÁÖÃ¼ ½ºÅÈ")]
+    [Header("ì „íˆ¬ ì£¼ì²´ ìŠ¤íƒ¯")]
     public CombatEntityStats playerStats;
     public CombatEntityStats monsterStats;
 
-    [Header("ÀüÅõ ÁÖÃ¼ À§Ä¡ (ÇÃ·ÎÆÃ ÅØ½ºÆ® ±âÁØÁ¡)")]
+    [Header("ì „íˆ¬ ì£¼ì²´ ìœ„ì¹˜ (í”Œë¡œíŒ… í…ìŠ¤íŠ¸ ê¸°ì¤€ì )")]
     [SerializeField] private Transform playerTransform;
     [SerializeField] private Transform monsterTransform;
 
     /// <summary>
-    /// ´ë»ó ½ºÅÈ(Entity)À» ±â¹İÀ¸·Î ÇÃ·ÎÆÃ ÅØ½ºÆ®°¡ ¶ã ¿ùµå À§Ä¡¸¦ °¡Á®¿É´Ï´Ù.
+    /// ëŒ€ìƒ ìŠ¤íƒ¯(Entity)ì„ ê¸°ë°˜ìœ¼ë¡œ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ê°€ ëœ° ì›”ë“œ ìœ„ì¹˜ë¥¼ ê°€ì ¸ì˜µë‹ˆë‹¤.
     /// </summary>
     private Vector3 GetEntityWorldPosition(CombatEntityStats entity)
     {
@@ -49,13 +48,13 @@ public class BattleManager : MonoBehaviour
         {
             return playerTransform != null
                 ? playerTransform.position + Vector3.down * 2.0f
-                : new Vector3(-5f, 0f, 0f); // Fallback ±âº» ÁÂÇ¥
+                : new Vector3(-5f, 0f, 0f); // Fallback ê¸°ë³¸ ì¢Œí‘œ
         }
         else
         {
             return monsterTransform != null
                 ? monsterTransform.position + Vector3.down * 2.0f
-                : new Vector3(5f, 0f, 0f);  // Fallback ±âº» ÁÂÇ¥
+                : new Vector3(5f, 0f, 0f);  // Fallback ê¸°ë³¸ ì¢Œí‘œ
         }
     }
 
@@ -64,15 +63,15 @@ public class BattleManager : MonoBehaviour
         return entity == playerStats ? playerTransform : monsterTransform;
     }
 
-    [Header("Ä«¸Ş¶ó ½¦ÀÌÅ©")]
+    [Header("ì¹´ë©”ë¼ ì‰ì´í¬")]
     [SerializeField] private RectTransform uiShakeRoot;
     [SerializeField] private Transform cameraTransform;
 
-    [Header("Ä«µå ½ÃÀü µô·¹ÀÌ")]
+    [Header("ì¹´ë“œ ì‹œì „ ë”œë ˆì´")]
     [SerializeField] private float slotActionDelay = 0.5f;
 
-    [Header("ÅÏ ÀüÈ¯ ´ë±â ½Ã°£")]
-    [SerializeField] private float nextTurnDelay = 2.0f; // ÅÏ Á¾·á ÈÄ ´ÙÀ½ µå·Î¿ì±îÁö ´ë±â ½Ã°£ (2ÃÊ)
+    [Header("í„´ ì „í™˜ ëŒ€ê¸° ì‹œê°„")]
+    [SerializeField] private float nextTurnDelay = 2.0f; // í„´ ì¢…ë£Œ í›„ ë‹¤ìŒ ë“œë¡œìš°ê¹Œì§€ ëŒ€ê¸° ì‹œê°„ (2ì´ˆ)
 
     public bool isGameOver = false;
 
@@ -87,39 +86,39 @@ public class BattleManager : MonoBehaviour
         cameraTransform = Camera.main.transform;
     }
 
-    // ¼ø¼­ º¸ÀåÀ» À§ÇØ ÃÊ±âÈ­ ·ÎÁ÷ ¸ğÀ½
+    // ìˆœì„œ ë³´ì¥ì„ ìœ„í•´ ì´ˆê¸°í™” ë¡œì§ ëª¨ìŒ
     private void Start()
     {
         BattleUIManager.Instance.UpdateAllUI();
     }
 
     /// <summary>
-    /// GameManager¿¡ ÁöÁ¤µÈ CharacterSO¿Í MonsterSOÀÇ maxHp µ¥ÀÌÅÍ¸¦ ÀĞ¾î ÀüÅõ ½ºÅÈ ÃÊ±âÈ­
+    /// GameManagerì— ì§€ì •ëœ CharacterSOì™€ MonsterSOì˜ maxHp ë°ì´í„°ë¥¼ ì½ì–´ ì „íˆ¬ ìŠ¤íƒ¯ ì´ˆê¸°í™”
     /// </summary>
     public void InitCombatStats()
     {
         if (GameManager.Instance != null)
         {
-            // ÇÃ·¹ÀÌ¾î SO µ¥ÀÌÅÍ ¿¬°á (¾øÀ» °æ¿ì 50 ±âº»°ª ¾ÈÀüÀåÄ¡)
+            // í”Œë ˆì´ì–´ SO ë°ì´í„° ì—°ê²° (ì—†ì„ ê²½ìš° 50 ê¸°ë³¸ê°’ ì•ˆì „ì¥ì¹˜)
             int pMaxHp = GameManager.Instance.character != null ? GameManager.Instance.currentHP : 50;
             playerStats = new CombatEntityStats(pMaxHp);
 
-            // ¸ó½ºÅÍ SO µ¥ÀÌÅÍ ¿¬°á (¾øÀ» °æ¿ì 35 ±âº»°ª ¾ÈÀüÀåÄ¡)
+            // ëª¬ìŠ¤í„° SO ë°ì´í„° ì—°ê²° (ì—†ì„ ê²½ìš° 35 ê¸°ë³¸ê°’ ì•ˆì „ì¥ì¹˜)
             int mMaxHp = GameManager.Instance.monster != null ? GameManager.Instance.monster.maxHp : 35;
             monsterStats = new CombatEntityStats(mMaxHp);
 
-            Debug.Log($"[ÀüÅõ ½ºÅÈ ÃÊ±âÈ­ ¿Ï·á] ÇÃ·¹ÀÌ¾î HP: {playerStats.currentHp}/{playerStats.maxHp} | ¸ó½ºÅÍ HP: {monsterStats.currentHp}/{monsterStats.maxHp}");
+            Debug.Log($"[ì „íˆ¬ ìŠ¤íƒ¯ ì´ˆê¸°í™” ì™„ë£Œ] í”Œë ˆì´ì–´ HP: {playerStats.currentHp}/{playerStats.maxHp} | ëª¬ìŠ¤í„° HP: {monsterStats.currentHp}/{monsterStats.maxHp}");
         }
         else
         {
-            // ´Üµ¶ ¾À Å×½ºÆ®¿ë Fallback
+            // ë‹¨ë… ì”¬ í…ŒìŠ¤íŠ¸ìš© Fallback
             playerStats = new CombatEntityStats(50);
             monsterStats = new CombatEntityStats(35);
         }
     }
 
     /// <summary>
-    /// ÅÏ Á¾·á ¹öÆ° Å¬¸¯ ½Ã È£Ãâ
+    /// í„´ ì¢…ë£Œ ë²„íŠ¼ í´ë¦­ ì‹œ í˜¸ì¶œ
     /// </summary>
     public void TurnEnd()
     {
@@ -127,10 +126,10 @@ public class BattleManager : MonoBehaviour
 
         if (isGameOver) return;
 
-        /*// 5°³ ½½·Ô ¿ÏÃæ ¿©ºÎ °Ë»ç
+        /*// 5ê°œ ìŠ¬ë¡¯ ì™„ì¶© ì—¬ë¶€ ê²€ì‚¬
         if (!IsAllSlotsOccupied())
         {
-            Debug.LogWarning("[ÅÏ Á¾·á ºÒ°¡] ¸ğµç ½½·Ô¿¡ Ä«µå¸¦ ¹èÄ¡ÇØ¾ß ÅÏÀ» ¸¶Ä¥ ¼ö ÀÖ½À´Ï´Ù.");
+            Debug.LogWarning("[í„´ ì¢…ë£Œ ë¶ˆê°€] ëª¨ë“  ìŠ¬ë¡¯ì— ì¹´ë“œë¥¼ ë°°ì¹˜í•´ì•¼ í„´ì„ ë§ˆì¹  ìˆ˜ ìˆìŠµë‹ˆë‹¤.");
             return;
         }*/
 
@@ -138,18 +137,18 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¸ğµç ½½·ÔÀÌ Á¤»óÀûÀ¸·Î Ä«µå¸¦ ÀåÂøÇÏ°í ÀÖ´ÂÁö È®ÀÎ
+    /// ëª¨ë“  ìŠ¬ë¡¯ì´ ì •ìƒì ìœ¼ë¡œ ì¹´ë“œë¥¼ ì¥ì°©í•˜ê³  ìˆëŠ”ì§€ í™•ì¸
     /// </summary>
     private bool IsAllSlotsOccupied()
     {
-        // ½½·Ô ¸®½ºÆ®°¡ ºñ¾îÀÖ°Å³ª 5°³°¡ ¾Æ´Ï¸é ½ÇÇà ºÒ°¡
+        // ìŠ¬ë¡¯ ë¦¬ìŠ¤íŠ¸ê°€ ë¹„ì–´ìˆê±°ë‚˜ 5ê°œê°€ ì•„ë‹ˆë©´ ì‹¤í–‰ ë¶ˆê°€
         if (fieldCardSlots == null || fieldCardSlots.Count < 5) return false;
 
         foreach (var slot in fieldCardSlots)
         {
             if (slot == null || !slot.isOccupied || slot.currentCard == null)
             {
-                return false; // ºó ½½·Ô ¹ß°ß ½Ã Áï½Ã false ¹İÈ¯
+                return false; // ë¹ˆ ìŠ¬ë¡¯ ë°œê²¬ ì‹œ ì¦‰ì‹œ false ë°˜í™˜
             }
         }
 
@@ -158,7 +157,7 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator Co_ExecuteTurnSlots()
     {
-        // 1. ½½·Ô 5°³ ¼øÂ÷ ¹ßµ¿ (1ÃÊ °£°İ)
+        // 1. ìŠ¬ë¡¯ 5ê°œ ìˆœì°¨ ë°œë™ (1ì´ˆ ê°„ê²©)
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
             if (isGameOver) yield break;
@@ -166,12 +165,12 @@ public class BattleManager : MonoBehaviour
             BattleSlot slot = fieldCardSlots[i];
             if (slot == null) continue;
 
-            // [ºĞ±â 1] ½½·Ô¿¡ Ä«µå°¡ ÀåÂøµÇ¾î ÀÖ´Â °æ¿ì -> ±âÁ¸ Ä«µå È¿°ú ¹ßµ¿
+            // [ë¶„ê¸° 1] ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ì¥ì°©ë˜ì–´ ìˆëŠ” ê²½ìš° -> ê¸°ì¡´ ì¹´ë“œ íš¨ê³¼ ë°œë™
             if (slot.isOccupied && slot.currentCard != null)
             {
                 yield return StartCoroutine(ExecuteSlotAction(slot));
             }
-            // [ºĞ±â 2] ½½·ÔÀÌ ºñ¾îÀÖ´Â °æ¿ì (Ä«µå°¡ null) -> ½½·Ô ÀÚÃ¼ÀÇ ±âº» °ø°İ·Â ½ÇÇà
+            // [ë¶„ê¸° 2] ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆëŠ” ê²½ìš° (ì¹´ë“œê°€ null) -> ìŠ¬ë¡¯ ìì²´ì˜ ê¸°ë³¸ ê³µê²©ë ¥ ì‹¤í–‰
             else
             {
                 yield return StartCoroutine(Co_ExecuteSlotBaseAttack(slot));
@@ -181,13 +180,13 @@ public class BattleManager : MonoBehaviour
 
             yield return new WaitForSeconds(slotActionDelay);
 
-            // Àû »ç¸Á ½Ã ½½·Ô ·çÇÁ Á¶±â Á¾·á
+            // ì  ì‚¬ë§ ì‹œ ìŠ¬ë¡¯ ë£¨í”„ ì¡°ê¸° ì¢…ë£Œ
             if (monsterStats.currentHp <= 0) break;
         }
 
         if (isGameOver) yield break;
 
-        // [Ãß°¡] 1-1. 0~4¹ø ½½·Ô ¹× ¸ğµç ¿¬°è ½ÃÀüÀÌ ¿Ï·áµÈ ÈÄ, ½½·ÔÀÇ Ä«µåµéÀ» 0.2ÃÊ °£°İÀ¸·Î ¼øÂ÷ µğ½ºÄ«µå
+        // [ì¶”ê°€] 1-1. 0~4ë²ˆ ìŠ¬ë¡¯ ë° ëª¨ë“  ì—°ê³„ ì‹œì „ì´ ì™„ë£Œëœ í›„, ìŠ¬ë¡¯ì˜ ì¹´ë“œë“¤ì„ 0.2ì´ˆ ê°„ê²©ìœ¼ë¡œ ìˆœì°¨ ë””ìŠ¤ì¹´ë“œ
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
             BattleSlot slot = fieldCardSlots[i];
@@ -195,18 +194,18 @@ public class BattleManager : MonoBehaviour
             {
                 CardDisplay cardToDiscard = slot.currentCard;
 
-                // ½½·Ô ºñ¿ì±â
+                // ìŠ¬ë¡¯ ë¹„ìš°ê¸°
                 slot.ClearSlot();
 
-                // µğ½ºÄ«µå ½ÇÇà (BattleCardManager)
+                // ë””ìŠ¤ì¹´ë“œ ì‹¤í–‰ (BattleCardManager)
                 BattleCardManager.Instance?.DiscardCard(cardToDiscard);
 
-                // 0.2ÃÊ °£°İ ´ë±â
+                // 0.2ì´ˆ ê°„ê²© ëŒ€ê¸°
                 yield return new WaitForSeconds(0.2f);
             }
         }
 
-        // 2. ½½·Ô ¹ßµ¿ ¿Ï·á ÈÄ, ¼ÕÆĞ¿¡ ³²¾ÆÀÖ´Â À×¿© Ä«µåµé 0.5ÃÊ °£°İÀ¸·Î ¸ğµÎ ¹ö¸²
+        // 2. ìŠ¬ë¡¯ ë°œë™ ì™„ë£Œ í›„, ì†íŒ¨ì— ë‚¨ì•„ìˆëŠ” ì‰ì—¬ ì¹´ë“œë“¤ 0.5ì´ˆ ê°„ê²©ìœ¼ë¡œ ëª¨ë‘ ë²„ë¦¼
         if (BattleCardManager.Instance != null)
         {
             yield return StartCoroutine(BattleCardManager.Instance.Co_DiscardAllHandCards());
@@ -214,16 +213,16 @@ public class BattleManager : MonoBehaviour
 
         TurnResetGuardBuff();
 
-        // 3. ¼ÕÆĞ Á¤¸® ¿Ï·á ÈÄ 2ÃÊ ´ë±â (ÅÏ ÀüÈ¯ µô·¹ÀÌ ¿¬Ãâ)
+        // 3. ì†íŒ¨ ì •ë¦¬ ì™„ë£Œ í›„ 2ì´ˆ ëŒ€ê¸° (í„´ ì „í™˜ ë”œë ˆì´ ì—°ì¶œ)
         yield return new WaitForSeconds(nextTurnDelay);
 
-        // 4. ¸ğµç Á¤»ê ¿Ï·á ¹× »õ ÅÏ ½ÃÀÛ
+        // 4. ëª¨ë“  ì •ì‚° ì™„ë£Œ ë° ìƒˆ í„´ ì‹œì‘
         OnAllSlotsFinished();
         turnExecutionCoroutine = null;
     }
 
     /// <summary>
-    /// Ä«µå°¡ ºñ¾î ÀÖ´Â ½½·Ô¿¡¼­ ½½·Ô °íÀ¯ÀÇ ±âº» °ø°İ·ÂÀ» ½ÃÀüÇÏ´Â ÄÚ·çÆ¾
+    /// ì¹´ë“œê°€ ë¹„ì–´ ìˆëŠ” ìŠ¬ë¡¯ì—ì„œ ìŠ¬ë¡¯ ê³ ìœ ì˜ ê¸°ë³¸ ê³µê²©ë ¥ì„ ì‹œì „í•˜ëŠ” ì½”ë£¨í‹´
     /// </summary>
     private IEnumerator Co_ExecuteSlotBaseAttack(BattleSlot slot)
     {
@@ -235,14 +234,14 @@ public class BattleManager : MonoBehaviour
 
         int rawAtk = slot.slotBaseAttack;
 
-        // ÁÖÃ¼ÀÇ ¹öÇÁ/µğ¹öÇÁ °¡»ê Àû¿ë
+        // ì£¼ì²´ì˜ ë²„í”„/ë””ë²„í”„ ê°€ì‚° ì ìš©
         int finalDamage = Mathf.Max(0, rawAtk + user.buffValue - user.debuffValue);
         user.buffValue = 0;
         user.debuffValue = 0;
 
-        Debug.Log($"[ºó ½½·Ô ±âº» °ø°İ] {(isPlayerSlot ? "ÇÃ·¹ÀÌ¾î" : "Àû")} {slot.slotIndex}¹ø ½½·ÔÀÌ ºñ¾îÀÖ¾î ±âº» ÇÇÇØ {finalDamage}(¿ø·¡: {rawAtk}) ½ÃÀü!");
+        Debug.Log($"[ë¹ˆ ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©] {(isPlayerSlot ? "í”Œë ˆì´ì–´" : "ì ")} {slot.slotIndex}ë²ˆ ìŠ¬ë¡¯ì´ ë¹„ì–´ìˆì–´ ê¸°ë³¸ í”¼í•´ {finalDamage}(ì›ë˜: {rawAtk}) ì‹œì „!");
 
-        // ½½·Ô ÆİÄ¡/µ¹Áø ¿¬Ãâ
+        // ìŠ¬ë¡¯ í€ì¹˜/ëŒì§„ ì—°ì¶œ
         Sequence sequence = DOTweenManager.CardExecute(
             slot.transform,
             isPlayerSlot ? Vector3.right : Vector3.left
@@ -250,142 +249,182 @@ public class BattleManager : MonoBehaviour
 
         yield return sequence.WaitForCompletion();
 
-        // ÇÇÇØ Àû¿ë
+        // í”¼í•´ ì ìš©
         ApplyDamage(target, finalDamage);
         BattleUIManager.Instance?.UpdateAllUI();
     }
 
     /// <summary>
-    /// Ä«µåÀÇ Á¶°Ç(ConditionCategory) ÃæÁ· ¿©ºÎ¸¦ ÆÇº°ÇÕ´Ï´Ù.
+    /// ì¹´ë“œì˜ ì¡°ê±´(ConditionCategory) ì¶©ì¡± ì—¬ë¶€ë¥¼ íŒë³„í•©ë‹ˆë‹¤.
+    /// ê° ì¼€ì´ìŠ¤ëŠ” ê°€ì§€ì¹˜ê¸° ë°©ì‹: ì‹¤íŒ¨ ì¡°ê±´ì„ ìœ„ì—ì„œë¶€í„° ê±¸ëŸ¬ë‚´ê³ (break), ëê¹Œì§€ ì‚´ì•„ë‚¨ìœ¼ë©´ isConditionMet = true
+    /// conditionParam í¬ë§· (Prev/Next/Neighbor): "ìŠ¬ë¡¯ì£¼ì¸,ì¹´ë“œíƒ€ì…"  ì˜ˆ) "Enemy,Attack", "Any,Defense", "Player,Any"
     /// </summary>
     private bool CheckCardCondition(BattleSlot slot, CardSO cardData)
     {
         bool isConditionMet = false;
         int currentIdx = slot.slotIndex;
+        int lastIdx = fieldCardSlots.Count - 1;
         string param = cardData.conditionParam;
 
         switch (cardData.conditionCategory)
         {
-            // 1. Á¶°Ç ¾øÀ½: Ç×»ó Âü
+            // 0. ì¡°ê±´ ì—†ìŒ: í•­ìƒ ì°¸ (ë³´ìƒì´ ë¬´ì¡°ê±´ ë°œë™í•˜ëŠ” ì¹´ë“œìš©)
             case ConditionCategory.None:
                 isConditionMet = true;
                 break;
 
-            // 2. ½½·Ô ¹øÈ£ Á¦ÇÑ ("0,4" ¶Ç´Â "1" µî)
-            case ConditionCategory.SlotIndexRestriction:
-                if (!string.IsNullOrEmpty(param))
+            // 4. í˜„ì¬ ìŠ¬ë¡¯ ì¸ë±ìŠ¤ ê²€ì‚¬ ("0" ë˜ëŠ” "0,4")
+            case ConditionCategory.SlotIndex:
+                if (string.IsNullOrEmpty(param)) break;
+
+                foreach (string idxStr in param.Split(','))
                 {
-                    string[] targetIndices = param.Split(',');
-                    foreach (string idxStr in targetIndices)
+                    if (int.TryParse(idxStr.Trim(), out int targetIdx) && currentIdx == targetIdx)
                     {
-                        if (int.TryParse(idxStr.Trim(), out int targetIdx))
-                        {
-                            if (currentIdx == targetIdx)
-                            {
-                                isConditionMet = true;
-                                break;
-                            }
-                        }
+                        isConditionMet = true;
+                        break;
                     }
                 }
                 break;
 
-            // 3. ÀÎÁ¢ ½½·Ô Ä«µå Å¸ÀÔ °Ë»ç (0¹ø/4¹ø Á¦¿Ü, 1~3¹ø ½½·ÔÀÇ ¾ÕµÚ¿¡ Ä«µå°¡ ¸ğµÎ ÀÖ°í µÑ ´Ù Å¸ÀÔ ÀÏÄ¡)
-            case ConditionCategory.NeighborCardType:
-                if (currentIdx > 0 && currentIdx < fieldCardSlots.Count - 1)
-                {
-                    BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
-                    BattleSlot nextSlot = fieldCardSlots[currentIdx + 1];
+            // 2. ì´ì „ ìŠ¬ë¡¯ ê²€ì‚¬
+            case ConditionCategory.PrevCard:
+            {
+                // ê°€ì§€ì¹˜ê¸° 1: ë§¨ ì• ìŠ¬ë¡¯ì€ ì´ì „ ìŠ¬ë¡¯ì´ ì—†ìŒ
+                if (currentIdx <= 0) break;
 
-                    // ¾ÕµÚ ½½·Ô¿¡ ¸ğµÎ Ä«µå°¡ ¹èÄ¡µÇ¾î ÀÖ´ÂÁö °Ë»ç
-                    if (prevSlot != null && prevSlot.isOccupied && prevSlot.currentCard != null &&
-                        nextSlot != null && nextSlot.isOccupied && nextSlot.currentCard != null)
-                    {
-                        if (Enum.TryParse(param.Trim(), true, out CardType requiredType))
-                        {
-                            CardType prevType = prevSlot.currentCard.cardInstance.baseData.cardType;
-                            CardType nextType = nextSlot.currentCard.cardInstance.baseData.cardType;
+                // ê°€ì§€ì¹˜ê¸° 2: ì´ì „ ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ì—†ìŒ
+                BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
+                if (!HasCard(prevSlot)) break;
 
-                            if (prevType == requiredType && nextType == requiredType)
-                            {
-                                isConditionMet = true;
-                            }
-                        }
-                    }
-                }
+                // ê°€ì§€ì¹˜ê¸° 3: íŒŒë¼ë¯¸í„° í˜•ì‹ ì˜¤ë¥˜
+                if (!TrySplitSlotParam(param, cardData, out string ownerParam, out string typeParam)) break;
+
+                // ê°€ì§€ì¹˜ê¸° 4: ìŠ¬ë¡¯ ì£¼ì¸ -> ì¹´ë“œ íƒ€ì… ìˆœì„œë¡œ ê²€ì‚¬
+                isConditionMet = IsSlotMatch(prevSlot, ownerParam, typeParam);
                 break;
+            }
 
-            // 4. Á÷Àü ½½·Ô ¼ÒÀ¯ÀÚ °Ë»ç (0¹ø ½½·Ô Á¦¿Ü, 1~4¹øÀÇ Á÷Àü ½½·Ô OwnerType ÀÏÄ¡)
-            case ConditionCategory.PrevSlotOwner:
-                if (currentIdx > 0 && currentIdx < fieldCardSlots.Count)
-                {
-                    BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
-                    if (prevSlot != null)
-                    {
-                        if (Enum.TryParse(param.Trim(), true, out OwnerType targetOwner))
-                        {
-                            if (prevSlot.slotOwnerType == targetOwner)
-                            {
-                                isConditionMet = true;
-                            }
-                        }
-                    }
-                }
+            // 3. ë‹¤ìŒ ìŠ¬ë¡¯ ê²€ì‚¬ (PrevCardì™€ ë™ì¼, ë°©í–¥ë§Œ ë°˜ëŒ€)
+            case ConditionCategory.NextCard:
+            {
+                if (currentIdx >= lastIdx) break;
+
+                BattleSlot nextSlot = fieldCardSlots[currentIdx + 1];
+                if (!HasCard(nextSlot)) break;
+
+                if (!TrySplitSlotParam(param, cardData, out string ownerParam, out string typeParam)) break;
+
+                isConditionMet = IsSlotMatch(nextSlot, ownerParam, typeParam);
                 break;
+            }
 
-            // 5. ¼ÕÆĞ Ä«µå ¼ö·® °Ë»ç (¿¹: "Count>=5", "Count<=2")
-            case ConditionCategory.HandCount:
-                if (BattleCardManager.Instance != null)
-                {
-                    int currentHandCount = BattleCardManager.Instance.handCards.Count;
-                    // "Count" Á¢µÎ»ç Á¦°Å ÈÄ ºÎµîÈ£ ¿¬»ê ("Count>=5" -> ">=5")
-                    string expression = param.Replace("Count", "").Trim();
-                    isConditionMet = EvaluateComparison(currentHandCount, expression);
-                }
+            // 1. ì–‘ì˜† ìŠ¬ë¡¯ ëª¨ë‘ ê²€ì‚¬ (Prev + Next)
+            case ConditionCategory.NeighborCard:
+            {
+                // ê°€ì§€ì¹˜ê¸° 1: ì–‘ ë ìŠ¬ë¡¯ì€ ì´ì›ƒì´ í•œìª½ë¿
+                if (currentIdx <= 0 || currentIdx >= lastIdx) break;
+
+                // ê°€ì§€ì¹˜ê¸° 2: ì–‘ì˜† ì¤‘ í•˜ë‚˜ë¼ë„ ì¹´ë“œê°€ ì—†ìŒ
+                BattleSlot prevSlot = fieldCardSlots[currentIdx - 1];
+                BattleSlot nextSlot = fieldCardSlots[currentIdx + 1];
+                if (!HasCard(prevSlot) || !HasCard(nextSlot)) break;
+
+                if (!TrySplitSlotParam(param, cardData, out string ownerParam, out string typeParam)) break;
+
+                // ê°€ì§€ì¹˜ê¸° 3: ì• ìŠ¬ë¡¯ì´ ì‹¤íŒ¨í•˜ë©´ ë’¤ ìŠ¬ë¡¯ì€ ê²€ì‚¬í•˜ì§€ ì•ŠìŒ (&& ë‹¨ë½ í‰ê°€)
+                isConditionMet = IsSlotMatch(prevSlot, ownerParam, typeParam)
+                              && IsSlotMatch(nextSlot, ownerParam, typeParam);
                 break;
-
-            // 6. ¼ÕÆĞ Æ¯Á¤ Å¸ÀÔ ¸Å¼ö °Ë»ç (¿¹: "Attack>=4", "Defense>=2")
-            case ConditionCategory.HandType:
-                if (BattleCardManager.Instance != null)
-                {
-                    // Å¸ÀÔ¸í°ú ºÎµîÈ£ ¼ö½Ä ºĞ¸® (¿¹: "Attack"°ú ">=4")
-                    if (TryParseHandTypeExpression(param, out CardType targetType, out string expression))
-                    {
-                        int matchedTypeCount = 0;
-                        foreach (var handCard in BattleCardManager.Instance.handCards)
-                        {
-                            if (handCard != null && handCard.baseData != null && handCard.baseData.cardType == targetType)
-                            {
-                                matchedTypeCount++;
-                            }
-                        }
-
-                        isConditionMet = EvaluateComparison(matchedTypeCount, expression);
-                    }
-                }
-                break;
+            }
         }
 
         return isConditionMet;
     }
 
     /// <summary>
-    /// ÇÑ ÅÏÀÇ ¸ğµç ¿¬Ãâ°ú ¹ö¸®±â°¡ ³¡³ª°í »õ ÅÏÀÌ ½ÃÀÛµÉ ¶§ È£Ãâ
+    /// ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ì •ìƒì ìœ¼ë¡œ ë°°ì¹˜ë˜ì–´ ìˆëŠ”ì§€
+    /// </summary>
+    private bool HasCard(BattleSlot targetSlot)
+    {
+        return targetSlot != null && targetSlot.isOccupied && targetSlot.currentCard != null
+            && targetSlot.currentCard.cardInstance != null && targetSlot.currentCard.cardInstance.baseData != null;
+    }
+
+    /// <summary>
+    /// "Enemy,Attack" -> ownerParam = "Enemy", typeParam = "Attack"
+    /// </summary>
+    private bool TrySplitSlotParam(string param, CardSO cardData, out string ownerParam, out string typeParam)
+    {
+        ownerParam = string.Empty;
+        typeParam = string.Empty;
+
+        if (string.IsNullOrEmpty(param)) return Fail();
+
+        string[] split = param.Split(',');
+        if (split.Length != 2) return Fail();
+
+        ownerParam = split[0].Trim();
+        typeParam = split[1].Trim();
+        return true;
+
+        bool Fail()
+        {
+            Debug.LogWarning($"[ì¡°ê±´ íŒŒë¼ë¯¸í„° ì˜¤ë¥˜] ì¹´ë“œ {cardData.cardId} ({cardData.conditionCategory}) -> '{param}' ëŠ” \"ìŠ¬ë¡¯ì£¼ì¸,ì¹´ë“œíƒ€ì…\" í˜•ì‹ì´ì–´ì•¼ í•©ë‹ˆë‹¤.");
+            return false;
+        }
+    }
+
+    /// <summary>
+    /// ëŒ€ìƒ ìŠ¬ë¡¯ì˜ ì£¼ì¸(A)ê³¼ ë°°ì¹˜ëœ ì¹´ë“œ íƒ€ì…(B)ì„ ìˆœì„œëŒ€ë¡œ ê²€ì‚¬. í•˜ë‚˜ë¼ë„ ì–´ê¸‹ë‚˜ë©´ ì¦‰ì‹œ false
+    /// A: Enemy / Player / Any,  B: CardType ì´ë¦„ / Any
+    /// </summary>
+    private bool IsSlotMatch(BattleSlot targetSlot, string ownerParam, string typeParam)
+    {
+        // A. ìŠ¬ë¡¯ ì£¼ì¸ ê²€ì‚¬ (Anyë©´ ê²€ì‚¬ ìƒëµ)
+        if (ownerParam == "Enemy")
+        {
+            if (targetSlot.slotOwnerType != OwnerType.Enemy) return false;
+        }
+        else if (ownerParam == "Player")
+        {
+            if (targetSlot.slotOwnerType != OwnerType.Player) return false;
+        }
+        else if (ownerParam != "Any")
+        {
+            Debug.LogWarning($"[ì¡°ê±´ íŒŒë¼ë¯¸í„° ì˜¤ë¥˜] ìŠ¬ë¡¯ ì£¼ì¸ '{ownerParam}' ëŠ” Enemy / Player / Any ì¤‘ í•˜ë‚˜ì—¬ì•¼ í•©ë‹ˆë‹¤.");
+            return false;
+        }
+
+        // B. ì¹´ë“œ íƒ€ì… ê²€ì‚¬ (Anyë©´ í†µê³¼)
+        if (typeParam == "Any") return true;
+
+        if (!Enum.TryParse(typeParam, true, out CardType requiredType))
+        {
+            Debug.LogWarning($"[ì¡°ê±´ íŒŒë¼ë¯¸í„° ì˜¤ë¥˜] ì¹´ë“œ íƒ€ì… '{typeParam}' ë¥¼ CardTypeìœ¼ë¡œ ë³€í™˜í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return false;
+        }
+
+        return targetSlot.currentCard.cardInstance.baseData.cardType == requiredType;
+    }
+
+    /// <summary>
+    /// í•œ í„´ì˜ ëª¨ë“  ì—°ì¶œê³¼ ë²„ë¦¬ê¸°ê°€ ëë‚˜ê³  ìƒˆ í„´ì´ ì‹œì‘ë  ë•Œ í˜¸ì¶œ
     /// </summary>
     private void OnAllSlotsFinished()
     {
-        Debug.Log("[»õ ÅÏ ½ÃÀÛ] ´ÙÀ½ ÅÏ ½½·Ô Àç¹èÁ¤ ¹× µå·Î¿ì ½ÃÀÛ");
+        Debug.Log("[ìƒˆ í„´ ì‹œì‘] ë‹¤ìŒ í„´ ìŠ¬ë¡¯ ì¬ë°°ì • ë° ë“œë¡œìš° ì‹œì‘");
 
-        // ´ÙÀ½ ÅÏ ½½·Ô 5°³ Å¸ÀÔ(¾Æ±º/Àû) »õ·Î ¹èÁ¤
+        // ë‹¤ìŒ í„´ ìŠ¬ë¡¯ 5ê°œ íƒ€ì…(ì•„êµ°/ì ) ìƒˆë¡œ ë°°ì •
         BattleSlotManager.Instance?.GenerateTurnSlotTypes();
 
-        // ±âº» µå·Î¿ì ¼ö + Ä«µå È¿°ú·Î Àû¸³µÈ º¸³Ê½º µå·Î¿ì ÇÕ»ê ÈÄ 0À¸·Î ¸®¼Â
+        // ê¸°ë³¸ ë“œë¡œìš° ìˆ˜ + ì¹´ë“œ íš¨ê³¼ë¡œ ì ë¦½ëœ ë³´ë„ˆìŠ¤ ë“œë¡œìš° í•©ì‚° í›„ 0ìœ¼ë¡œ ë¦¬ì…‹
         if (BattleCardManager.Instance != null)
         {
             int finalDrawCount = BattleCardManager.Instance.drawCount + BattleCardManager.Instance.bonusDrawCount;
-            BattleCardManager.Instance.bonusDrawCount = 0; // µå·Î¿ì Á÷ÈÄ Áï½Ã ¸®¼Â
+            BattleCardManager.Instance.bonusDrawCount = 0; // ë“œë¡œìš° ì§í›„ ì¦‰ì‹œ ë¦¬ì…‹
 
-            Debug.Log($"[ÅÏ ½ÃÀÛ µå·Î¿ì] ±âº» {BattleCardManager.Instance.drawCount}Àå + º¸³Ê½º Àû¿ë -> ÃÑ {finalDrawCount}Àå µå·Î¿ì!");
+            Debug.Log($"[í„´ ì‹œì‘ ë“œë¡œìš°] ê¸°ë³¸ {BattleCardManager.Instance.drawCount}ì¥ + ë³´ë„ˆìŠ¤ ì ìš© -> ì´ {finalDrawCount}ì¥ ë“œë¡œìš°!");
             StartCoroutine(BattleCardManager.Instance.Co_DrawCards(finalDrawCount));
         }
 
@@ -408,19 +447,22 @@ public class BattleManager : MonoBehaviour
         CombatEntityStats user = isPlayerSlot ? playerStats : monsterStats;
         CombatEntityStats target = isPlayerSlot ? monsterStats : playerStats;
 
-        // 1. Á¶°Ç ¸¸Á· ¿©ºÎ °Ë»ç
+        // 1. ì¡°ê±´ ë§Œì¡± ì—¬ë¶€ ê²€ì‚¬
         bool isConditionMet = CheckCardCondition(slot, cardData);
-        string conditionStatus = isConditionMet ? "<color=#00FF00>[Á¶°Ç ´Ş¼º - º¸»ó È°¼ºÈ­]</color>" : "<color=#FF4444>[Á¶°Ç ¹Ì´Ş - ±âº» ½ÃÀü]</color>";
-        Debug.Log($"[Ä«µå È¿°ú ÆÇº°] ½½·Ô: {slot.slotIndex}¹ø | Ä«µå ID: {cardData.cardId} ({cardData.nameKey}) | Á¶°Ç Å¸ÀÔ: {cardData.conditionCategory} (ÆÄ¶ó¹ÌÅÍ: '{cardData.conditionParam}') -> {conditionStatus}");
+        string conditionStatus = isConditionMet ? "<color=#00FF00>[ì¡°ê±´ ë‹¬ì„± - ë³´ìƒ í™œì„±í™”]</color>" : "<color=#FF4444>[ì¡°ê±´ ë¯¸ë‹¬ - ê¸°ë³¸ ì‹œì „]</color>";
+        Debug.Log($"[ì¹´ë“œ íš¨ê³¼ íŒë³„] ìŠ¬ë¡¯: {slot.slotIndex}ë²ˆ | ì¹´ë“œ ID: {cardData.cardId} ({cardData.nameKey}) | ì¡°ê±´ íƒ€ì…: {cardData.conditionCategory} (íŒŒë¼ë¯¸í„°: '{cardData.conditionParam}') -> {conditionStatus}");
 
-        // 2. Ä«µåÀÇ ±âº» ¹ë·ù È®ÀÎ (°­È­ ¼öÄ¡ Àû¿ë)
+        // 2. ì¹´ë“œì˜ ê¸°ë³¸ ë°¸ë¥˜ í™•ì¸ (ê°•í™” ìˆ˜ì¹˜ ì ìš©)
         int cardValue = instance.GetValue();
 
-        // 3. ½ÃÀü ¹× º¸»ó °ü·Ã ÆÄ¶ó¹ÌÅÍ ÃÊ±âÈ­
-        int repeatExtraCount = 0;
-        int triggerNeighborTarget = -999; // -1: ÀÌÀü, 1: ´ÙÀ½
+        // 2-1. ë³´ìƒ íŒŒë¼ë¯¸í„° í™•ì¸ (ê°•í™” ë‹¨ê³„ ë°˜ì˜. upgradeTargetì´ 1ì¸ ì¹´ë“œë§Œ ë‹¨ê³„ë³„ë¡œ ê°’ì´ ë‹¤ë¦„)
+        float rewardParam = instance.GetRewardParam();
 
-        // 4. Á¶°Ç ÃæÁ· ½Ã º¸»ó Àû¿ë (½ºÀ§Ä¡¹®)
+        // 3. ì‹œì „ ë° ë³´ìƒ ê´€ë ¨ íŒŒë¼ë¯¸í„° ì´ˆê¸°í™”
+        int repeatExtraCount = 0;
+        int triggerNeighborTarget = -999; // -1: ì´ì „, 1: ë‹¤ìŒ
+
+        // 4. ì¡°ê±´ ì¶©ì¡± ì‹œ ë³´ìƒ ì ìš© (ìŠ¤ìœ„ì¹˜ë¬¸)
         if (isConditionMet)
         {
             switch (cardData.rewardCategory)
@@ -428,56 +470,56 @@ public class BattleManager : MonoBehaviour
                 case RewardCategory.None:
                     break;
 
-                // Á¤¼ö ¹ë·ù °¡»ê
+                // ì •ìˆ˜ ë°¸ë¥˜ ê°€ì‚°
                 case RewardCategory.FlatBonus:
-                    cardValue += Mathf.RoundToInt(cardData.rewardParam);
-                    Debug.Log($"[º¸»ó: FlatBonus] {cardData.nameKey} ¹ë·ù +{cardData.rewardParam} (ÃÖÁ¾: {cardValue})");
+                    cardValue += Mathf.RoundToInt(rewardParam);
+                    Debug.Log($"[ë³´ìƒ: FlatBonus] {cardData.nameKey} ë°¸ë¥˜ +{rewardParam} (ìµœì¢…: {cardValue})");
                     break;
 
-                // ¹ë·ù °ö¿¬»ê
+                // ë°¸ë¥˜ ê³±ì—°ì‚°
                 case RewardCategory.Multiplier:
-                    cardValue = Mathf.RoundToInt(cardValue * cardData.rewardParam);
-                    Debug.Log($"[º¸»ó: Multiplier] {cardData.nameKey} ¹ë·ù x{cardData.rewardParam} (ÃÖÁ¾: {cardValue})");
+                    cardValue = Mathf.RoundToInt(cardValue * rewardParam);
+                    Debug.Log($"[ë³´ìƒ: Multiplier] {cardData.nameKey} ë°¸ë¥˜ x{rewardParam} (ìµœì¢…: {cardValue})");
                     break;
 
-                // ´ÙÁß ½ÃÀü: ±âº» 1È¸ + Ãß°¡ rewardParamÈ¸
+                // ë‹¤ì¤‘ ì‹œì „: ê¸°ë³¸ 1íšŒ + ì¶”ê°€ rewardParamíšŒ
                 case RewardCategory.RepeatCast:
-                    repeatExtraCount = Mathf.Max(0, Mathf.RoundToInt(cardData.rewardParam));
-                    Debug.Log($"[º¸»ó: RepeatCast] {cardData.nameKey} Ãß°¡ {repeatExtraCount}È¸ ¿¬Å¸ ½ÃÀü ¿¹¾à!");
+                    repeatExtraCount = Mathf.Max(0, Mathf.RoundToInt(rewardParam));
+                    Debug.Log($"[ë³´ìƒ: RepeatCast] {cardData.nameKey} ì¶”ê°€ {repeatExtraCount}íšŒ ì—°íƒ€ ì‹œì „ ì˜ˆì•½!");
                     break;
 
-                // ÀÎÁ¢ ½½·Ô Ä«µå Ãß°¡ ½ÃÀü ¿¹¾à (0: ÀÌÀü ½½·Ô, 1: ´ÙÀ½ ½½·Ô)
+                // ì¸ì ‘ ìŠ¬ë¡¯ ì¹´ë“œ ì¶”ê°€ ì‹œì „ ì˜ˆì•½ (0: ì´ì „ ìŠ¬ë¡¯, 1: ë‹¤ìŒ ìŠ¬ë¡¯)
                 case RewardCategory.TriggerNeighborSlot:
-                    triggerNeighborTarget = Mathf.RoundToInt(cardData.rewardParam);
-                    Debug.Log($"[º¸»ó: TriggerNeighborSlot] {(triggerNeighborTarget == 0 ? "ÀÌÀü" : "´ÙÀ½")} ½½·Ô ¿¬°è ½ÃÀü ¿¹¾à!");
+                    triggerNeighborTarget = Mathf.RoundToInt(rewardParam);
+                    Debug.Log($"[ë³´ìƒ: TriggerNeighborSlot] {(triggerNeighborTarget == 0 ? "ì´ì „" : "ë‹¤ìŒ")} ìŠ¬ë¡¯ ì—°ê³„ ì‹œì „ ì˜ˆì•½!");
                     break;
 
-                // ´ÙÀ½ ÅÏ µå·Î¿ì ¸Å¼ö Ãß°¡ Àû¸³
+                // ë‹¤ìŒ í„´ ë“œë¡œìš° ë§¤ìˆ˜ ì¶”ê°€ ì ë¦½
                 case RewardCategory.ModifyNextDraw:
                     if (BattleCardManager.Instance != null)
                     {
-                        int extraDraw = Mathf.RoundToInt(cardData.rewardParam);
+                        int extraDraw = Mathf.RoundToInt(rewardParam);
                         BattleCardManager.Instance.bonusDrawCount += extraDraw;
-                        Debug.Log($"[º¸»ó: ModifyNextDraw] ´ÙÀ½ ÅÏ µå·Î¿ì +{extraDraw}Àå ¿¹¾à (´©Àû Ãß°¡: {BattleCardManager.Instance.bonusDrawCount})");
+                        Debug.Log($"[ë³´ìƒ: ModifyNextDraw] ë‹¤ìŒ í„´ ë“œë¡œìš° +{extraDraw}ì¥ ì˜ˆì•½ (ëˆ„ì  ì¶”ê°€: {BattleCardManager.Instance.bonusDrawCount})");
                     }
                     break;
             }
         }
 
-        // 5. ±âº» 1È¸ ½ÃÀü + RepeatCast Ãß°¡ È½¼ö¸¸Å­ ¹İº¹ ½ÇÇà
+        // 5. ê¸°ë³¸ 1íšŒ ì‹œì „ + RepeatCast ì¶”ê°€ íšŸìˆ˜ë§Œí¼ ë°˜ë³µ ì‹¤í–‰
         int totalCasts = 1 + repeatExtraCount;
 
         for (int i = 0; i < totalCasts; i++)
         {
-            // ÁÖÃ¼ ¹öÇÁ/µğ¹öÇÁ ¿¬»ê (À½¼ö º¸Á¤)
+            // ì£¼ì²´ ë²„í”„/ë””ë²„í”„ ì—°ì‚° (ìŒìˆ˜ ë³´ì •)
             int finalValue = Mathf.Max(0, cardValue + user.buffValue - user.debuffValue);
             user.buffValue = 0;
             user.debuffValue = 0;
 
-            // ½ÇÁ¦ È¿°ú ¹ßµ¿
+            // ì‹¤ì œ íš¨ê³¼ ë°œë™
             ApplyCardEffect(cardData.cardType, user, target, finalValue);
 
-            // »ç¿ë ¿¬Ãâ (½½·Ô¿¡ Ä«µå°¡ À¯ÁöµÈ Ã¤·Î Âî¸£±â)
+            // ì‚¬ìš© ì—°ì¶œ (ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ìœ ì§€ëœ ì±„ë¡œ ì°Œë¥´ê¸°)
             Sequence sequence = DOTweenManager.CardExecute(
                 cardDisplay.transform,
                 isPlayerSlot ? Vector3.right : Vector3.left
@@ -486,17 +528,17 @@ public class BattleManager : MonoBehaviour
             yield return sequence.WaitForCompletion();
             BattleUIManager.Instance?.UpdateAllUI();
 
-            // ¿¬Å¸ ½ÃÀü »çÀÌ ÂªÀº ¿¬Ãâ ´ë±â
+            // ì—°íƒ€ ì‹œì „ ì‚¬ì´ ì§§ì€ ì—°ì¶œ ëŒ€ê¸°
             if (i < totalCasts - 1)
             {
                 yield return new WaitForSeconds(0.15f);
             }
 
-            // ½ÃÀü µµÁß ÀûÀÌ ¾²·¯Áö¸é Áï½Ã ¿¬Å¸ Áß´Ü
+            // ì‹œì „ ë„ì¤‘ ì ì´ ì“°ëŸ¬ì§€ë©´ ì¦‰ì‹œ ì—°íƒ€ ì¤‘ë‹¨
             if (monsterStats.currentHp <= 0) break;
         }
 
-        // 6. ÀÎÁ¢ ½½·Ô ¿¬°è ½ÃÀü Ã³¸® (TriggerNeighborSlot)
+        // 6. ì¸ì ‘ ìŠ¬ë¡¯ ì—°ê³„ ì‹œì „ ì²˜ë¦¬ (TriggerNeighborSlot)
         if (triggerNeighborTarget != -999 && monsterStats.currentHp > 0)
         {
             int targetSlotIdx = (triggerNeighborTarget == 0) ? slot.slotIndex - 1 : slot.slotIndex + 1;
@@ -507,13 +549,13 @@ public class BattleManager : MonoBehaviour
 
                 if (neighborSlot != null && neighborSlot.isOccupied && neighborSlot.currentCard != null)
                 {
-                    Debug.Log($"[¿¬°è ¹ßµ¿] {targetSlotIdx}¹ø ½½·ÔÀÇ {neighborSlot.currentCard.cardInstance.baseData.nameKey} Ãß°¡ ½ÃÀü ½ÃÀÛ!");
+                    Debug.Log($"[ì—°ê³„ ë°œë™] {targetSlotIdx}ë²ˆ ìŠ¬ë¡¯ì˜ {neighborSlot.currentCard.cardInstance.baseData.nameKey} ì¶”ê°€ ì‹œì „ ì‹œì‘!");
                     yield return StartCoroutine(ExecuteNeighborSlotAction(neighborSlot));
                 }
             }
         }
 
-        // 7. ¸ğµç ´ÙÁß ½ÃÀü/¿¬°è°¡ ¿ÏÀüÈ÷ ³¡³­ ÈÄ ÃÖÁ¾ Ä«µå È¸¼ö ¹× Á¤¸®
+        // 7. ëª¨ë“  ë‹¤ì¤‘ ì‹œì „/ì—°ê³„ê°€ ì™„ì „íˆ ëë‚œ í›„ ìµœì¢… ì¹´ë“œ íšŒìˆ˜ ë° ì •ë¦¬
         //BattleCardManager.Instance?.DiscardCard(cardDisplay);
         //slot.ClearSlot();
 
@@ -523,9 +565,9 @@ public class BattleManager : MonoBehaviour
     public void ModifyHealth(CombatEntityStats entity, int amount)
     {
         entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
-        Debug.Log($"HP º¯°æ: {amount} (ÇöÀç HP: {entity.currentHp}/{entity.maxHp})");
+        Debug.Log($"HP ë³€ê²½: {amount} (í˜„ì¬ HP: {entity.currentHp}/{entity.maxHp})");
 
-        // ´ë»óÀÇ À§Ä¡ ÀÚµ¿ ÆÇº°
+        // ëŒ€ìƒì˜ ìœ„ì¹˜ ìë™ íŒë³„
         Vector3 spawnPos = GetEntityWorldPosition(entity);
 
         if (amount > 0)
@@ -541,7 +583,7 @@ public class BattleManager : MonoBehaviour
             DOTweenManager.ShakeByDamage(-amount, uiShakeRoot, cameraTransform);
         }
 
-        // ÇÃ·¹ÀÌ¾î¶ó¸é
+        // í”Œë ˆì´ì–´ë¼ë©´
         if (entity == playerStats)
         {
             SoundManager.Instance.PlaySFX(SFXType.Hit_Damage);
@@ -562,7 +604,7 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Ä«µå Å¸ÀÔ¿¡ µû¸¥ ½ÇÁ¦ ¼öÄ¡ È¿°ú Àû¿ë
+    /// ì¹´ë“œ íƒ€ì…ì— ë”°ë¥¸ ì‹¤ì œ ìˆ˜ì¹˜ íš¨ê³¼ ì ìš©
     /// </summary>
     private void ApplyCardEffect(CardType cardType, CombatEntityStats user, CombatEntityStats target, int finalValue)
     {
@@ -591,8 +633,8 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// TriggerNeighborSlot º¸»óÀ¸·Î ÀÎÇØ È£ÃâµÇ´Â ÀÎÁ¢ ½½·Ô 1È¸ ´Üµ¶ ½ÃÀü ÄÚ·çÆ¾
-    /// (ÇØ´ç Ä«µåÀÇ µğ½ºÄ«µå Ã³¸®´Â ³ªÁß¿¡ º»ÀÎ Â÷·Ê¿¡ ÇÏµµ·Ï ½½·Ô¿¡ ±×´ë·Î µÒ)
+    /// TriggerNeighborSlot ë³´ìƒìœ¼ë¡œ ì¸í•´ í˜¸ì¶œë˜ëŠ” ì¸ì ‘ ìŠ¬ë¡¯ 1íšŒ ë‹¨ë… ì‹œì „ ì½”ë£¨í‹´
+    /// (í•´ë‹¹ ì¹´ë“œì˜ ë””ìŠ¤ì¹´ë“œ ì²˜ë¦¬ëŠ” ë‚˜ì¤‘ì— ë³¸ì¸ ì°¨ë¡€ì— í•˜ë„ë¡ ìŠ¬ë¡¯ì— ê·¸ëŒ€ë¡œ ë‘ )
     /// </summary>
     private IEnumerator ExecuteNeighborSlotAction(BattleSlot targetSlot)
     {
@@ -621,23 +663,23 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// °ø°İ µ¥¹ÌÁö Ã³¸® (¹æ¾îµµ¸¦ ¸ÕÀú ¼ÒÁøÇÏ°í, ÃÊ°úºĞ¸¸ Ã¼·Â¿¡¼­ Â÷°¨)
+    /// ê³µê²© ë°ë¯¸ì§€ ì²˜ë¦¬ (ë°©ì–´ë„ë¥¼ ë¨¼ì € ì†Œì§„í•˜ê³ , ì´ˆê³¼ë¶„ë§Œ ì²´ë ¥ì—ì„œ ì°¨ê°)
     /// </summary>
     public void ApplyDamage(CombatEntityStats target, int damage)
     {
         if (damage <= 0) return;
 
-        // 1. ¹æ¾îµµ°¡ Á¸ÀçÇÏ´Â °æ¿ì
+        // 1. ë°©ì–´ë„ê°€ ì¡´ì¬í•˜ëŠ” ê²½ìš°
         if (target.guard > 0)
         {
-            // °ø°İ·ÂÀÌ ¹æ¾îµµº¸´Ù Å« °æ¿ì (¹æ¾îµµ Àü·® ÆÄ±« + ÀÜ¿© ÇÇÇØ Ã¼·Â Â÷°¨)
+            // ê³µê²©ë ¥ì´ ë°©ì–´ë„ë³´ë‹¤ í° ê²½ìš° (ë°©ì–´ë„ ì „ëŸ‰ íŒŒê´´ + ì”ì—¬ í”¼í•´ ì²´ë ¥ ì°¨ê°)
             if (damage > target.guard)
             {
                 int remainingDamage = damage - target.guard;
                 target.guard = 0;
                 ModifyHealth(target, -remainingDamage);
             }
-            // ¹æ¾îµµ°¡ °ø°İ·Â ÀÌ»óÀÎ °æ¿ì (¹æ¾îµµ¸¸ °ø°İ·Â¸¸Å­ Â÷°¨µÇ°í Ã¼·Â ÇÇÇØ ¾øÀ½)
+            // ë°©ì–´ë„ê°€ ê³µê²©ë ¥ ì´ìƒì¸ ê²½ìš° (ë°©ì–´ë„ë§Œ ê³µê²©ë ¥ë§Œí¼ ì°¨ê°ë˜ê³  ì²´ë ¥ í”¼í•´ ì—†ìŒ)
             else
             {
                 target.guard -= damage;
@@ -645,7 +687,7 @@ public class BattleManager : MonoBehaviour
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defense);
             }
         }
-        // 2. ¹æ¾îµµ°¡ 0ÀÎ °æ¿ì (µ¥¹ÌÁö Àü·® Ã¼·Â Â÷°¨)
+        // 2. ë°©ì–´ë„ê°€ 0ì¸ ê²½ìš° (ë°ë¯¸ì§€ ì „ëŸ‰ ì²´ë ¥ ì°¨ê°)
         else
         {
             ModifyHealth(target, -damage);
@@ -655,7 +697,7 @@ public class BattleManager : MonoBehaviour
     public void ModifyGuard(CombatEntityStats entity, int amount)
     {
         entity.guard = Mathf.Max(0, entity.guard + amount);
-        Debug.Log($"¹æ¾îµµ º¯°æ: {amount} (ÇöÀç ¹æ¾îµµ: {entity.guard})");
+        Debug.Log($"ë°©ì–´ë„ ë³€ê²½: {amount} (í˜„ì¬ ë°©ì–´ë„: {entity.guard})");
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
@@ -675,7 +717,7 @@ public class BattleManager : MonoBehaviour
     public void ModifyBuff(CombatEntityStats entity, int amount)
     {
         entity.buffValue = Mathf.Max(0, entity.buffValue + amount);
-        Debug.Log($"¹öÇÁ º¯°æ: {amount} (ÇöÀç ¹öÇÁ: {entity.buffValue})");
+        Debug.Log($"ë²„í”„ ë³€ê²½: {amount} (í˜„ì¬ ë²„í”„: {entity.buffValue})");
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
@@ -695,7 +737,7 @@ public class BattleManager : MonoBehaviour
     public void ModifyDebuff(CombatEntityStats entity, int amount)
     {
         entity.debuffValue = Mathf.Max(0, entity.debuffValue + amount);
-        Debug.Log($"µğ¹öÇÁ º¯°æ: {amount} (ÇöÀç µğ¹öÇÁ: {entity.debuffValue})");
+        Debug.Log($"ë””ë²„í”„ ë³€ê²½: {amount} (í˜„ì¬ ë””ë²„í”„: {entity.debuffValue})");
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
@@ -717,79 +759,17 @@ public class BattleManager : MonoBehaviour
 
         if (deadEntity == playerStats)
         {
-            Debug.Log("[ÀüÅõ Á¾·á] ÇÃ·¹ÀÌ¾î »ç¸Á - ÆĞ¹è");
+            Debug.Log("[ì „íˆ¬ ì¢…ë£Œ] í”Œë ˆì´ì–´ ì‚¬ë§ - íŒ¨ë°°");
             BattleUIManager.Instance?.DefeatUI();
             SoundManager.Instance.PlayBGM(BGMType.Defeat);
         }
         else
         {
-            Debug.Log("[ÀüÅõ Á¾·á] ¸ó½ºÅÍ Ã³Ä¡ - ½Â¸®");
+            Debug.Log("[ì „íˆ¬ ì¢…ë£Œ] ëª¬ìŠ¤í„° ì²˜ì¹˜ - ìŠ¹ë¦¬");
             BattleUIManager.Instance?.VictoryUI();
             SoundManager.Instance.PlayBGM(BGMType.Victory);
             GameManager.Instance.currentHP = playerStats.currentHp;
         }
-    }
-
-    /// <summary>
-    /// ">=5", "<=3", "==2" µîÀÇ ¹®ÀÚ¿­ ºÎµîÈ£ ¼ö½ÄÀ» ÆÄ½ÌÇÏ¿© ½ÇÁ¦ °ª°ú ºñ±³
-    /// </summary>
-    private bool EvaluateComparison(int actualValue, string expression)
-    {
-        expression = expression.Trim();
-
-        if (expression.StartsWith(">="))
-        {
-            if (int.TryParse(expression.Substring(2).Trim(), out int target))
-                return actualValue >= target;
-        }
-        else if (expression.StartsWith("<="))
-        {
-            if (int.TryParse(expression.Substring(2).Trim(), out int target))
-                return actualValue <= target;
-        }
-        else if (expression.StartsWith(">"))
-        {
-            if (int.TryParse(expression.Substring(1).Trim(), out int target))
-                return actualValue > target;
-        }
-        else if (expression.StartsWith("<"))
-        {
-            if (int.TryParse(expression.Substring(1).Trim(), out int target))
-                return actualValue < target;
-        }
-        else if (expression.StartsWith("=="))
-        {
-            if (int.TryParse(expression.Substring(2).Trim(), out int target))
-                return actualValue == target;
-        }
-        else
-        {
-            // ºÎµîÈ£ ¾øÀÌ ¼ıÀÚ¸¸ ÀûÈù °æ¿ì ±âº» >= ·Î ÆÇÁ¤
-            if (int.TryParse(expression, out int target))
-                return actualValue >= target;
-        }
-
-        return false;
-    }
-
-    /// <summary>
-    /// "Attack>=4" ÇüÅÂÀÇ ¹®ÀÚ¿­¿¡¼­ ">=4" ¼ö½ÄÀ» ºĞ¸®
-    /// </summary>
-    private bool TryParseHandTypeExpression(string rawParam, out CardType type, out string expression)
-    {
-        type = CardType.Attack;
-        expression = string.Empty;
-
-        if (string.IsNullOrEmpty(rawParam)) return false;
-
-        // ºÎµîÈ£ ±âÈ£ ½ÃÀÛ À§Ä¡ Å½»ö
-        int opIndex = rawParam.IndexOfAny(new char[] { '>', '<', '=' });
-        if (opIndex <= 0) return false;
-
-        string typeString = rawParam.Substring(0, opIndex).Trim();
-        expression = rawParam.Substring(opIndex).Trim();
-
-        return Enum.TryParse(typeString, true, out type);
     }
 
     private void TurnResetGuardBuff()
@@ -806,6 +786,6 @@ public class BattleManager : MonoBehaviour
     public void SetSlotActionDelay(float newDelay)
     {
         slotActionDelay = Mathf.Clamp(newDelay, 0.2f, 3.0f);
-        Debug.Log($"[ÀüÅõ ¸Å´ÏÀú] ½ÃÀü µô·¹ÀÌ Àû¿ë: {slotActionDelay:F2}ÃÊ");
+        Debug.Log($"[ì „íˆ¬ ë§¤ë‹ˆì €] ì‹œì „ ë”œë ˆì´ ì ìš©: {slotActionDelay:F2}ì´ˆ");
     }
 }

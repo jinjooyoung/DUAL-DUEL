@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+ï»¿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -55,7 +55,7 @@ public class ExcelToScriptableConverter : EditorWindow
         }
     }
 
-    // º¯È¯ ºĞ±âÁ¡: ´Ş¶óÁö´Â ºÎºĞ(µ¥ÀÌÅÍ ÆÄ½Ì ¹× SO °ª Ã¤¿ì±â)¸¸ Á¤ÀÇÇÏ¿© °øÅë ¿£Áø È£Ãâ
+    // ë³€í™˜ ë¶„ê¸°ì : ë‹¬ë¼ì§€ëŠ” ë¶€ë¶„(ë°ì´í„° íŒŒì‹± ë° SO ê°’ ì±„ìš°ê¸°)ë§Œ ì •ì˜í•˜ì—¬ ê³µí†µ ì—”ì§„ í˜¸ì¶œ
     private void ExecuteConversion()
     {
         switch (conversionType)
@@ -69,45 +69,19 @@ public class ExcelToScriptableConverter : EditorWindow
                     if (data.cardId < 0) return (null, null);
 
                     CardSO cardSO = CreateInstance<CardSO>();
-                    cardSO.cardId = data.cardId;
 
-                    // 1. Ä«µå Å¸ÀÔ ¹× µî±Ş ¸ÅÇÎ
-                    if (Enum.TryParse(data.cardType, true, out CardType type)) cardSO.cardType = type;
-                    if (Enum.IsDefined(typeof(RankType), data.rank)) cardSO.rank = (RankType)data.rank;
+                    // 1. ë°ì´í„° ê°’ ì„¸íŒ… (íƒ€ì…/ë“±ê¸‰/ê°•í™” ë‹¨ê³„ë³„ ìˆ˜ì¹˜/ì¡°ê±´/ë³´ìƒ íŒŒì‹±ì€ CardSOì—ì„œ ì¼ê´„ ì²˜ë¦¬)
+                    cardSO.SetupFromData(data);
 
-                    // 2. ·ÎÄÃ¶óÀÌÂ¡ Å° ¹× ¼öÄ¡ ¸®½ºÆ® ¸ÅÇÎ
-                    cardSO.nameKey = data.nameKey;
-                    cardSO.descKey = data.descKey;
-                    cardSO.values = new List<int> { data.baseValue, data.upgrade_1, data.upgrade_2, data.upgrade_3, data.upgrade_4, data.upgrade_5 };
+                    // 2. ë¦¬ì†ŒìŠ¤ ì•„íŠ¸ì›Œí¬ (Assets/Resources ê¸°ì¤€ ìƒëŒ€ê²½ë¡œ, í™•ì¥ì ì—†ì´)
+                    // AssetDatabase.LoadAssetAtPathëŠ” "Assets/...png" ì „ì²´ ê²½ë¡œê°€ í•„ìš”í•´ì„œ "Cards/Public/..." í˜•íƒœë¡œëŠ” nullì´ ë¨
+                    cardSO.artwork = LoadResourceSprite($"Cards/Card_{data.cardId}");
 
-                    // 3. ¼Ò¸ê ¿©ºÎ ¸ÅÇÎ
-                    cardSO.isExhaust = data.isExhaust;
-
-                    // 4. ¸ğµâÇü ±â¹Í Á¶°Ç(Condition) ¸ÅÇÎ
-                    if (!string.IsNullOrEmpty(data.conditionCategory) && Enum.TryParse(data.conditionCategory, true, out ConditionCategory cond))
-                        cardSO.conditionCategory = cond;
-                    else
-                        cardSO.conditionCategory = ConditionCategory.None;
-
-                    cardSO.conditionParam = data.conditionParam ?? string.Empty;
-
-                    // 5. ¸ğµâÇü ±â¹Í º¸»ó(Reward) ¸ÅÇÎ
-                    if (!string.IsNullOrEmpty(data.rewardCategory) && Enum.TryParse(data.rewardCategory, true, out RewardCategory rew))
-                        cardSO.rewardCategory = rew;
-                    else
-                        cardSO.rewardCategory = RewardCategory.None;
-
-                    cardSO.rewardParam = data.rewardParam;
-
-                    // 6. ¸®¼Ò½º ¾ÆÆ®¿öÅ© ¹× ÆÄÀÏ¸í ¼³Á¤
-                    string artworkPath = $"Assets/Resources/Cards/Card_{data.cardId}.png";
-                    cardSO.artwork = AssetDatabase.LoadAssetAtPath<Sprite>(artworkPath);
-
-                    cardSO.bgSprite = AssetDatabase.LoadAssetAtPath<Sprite>("Cards/Public/Card_BG");
-                    cardSO.typeIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/{cardSO.cardType}");
-                    cardSO.gimmikIconSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/GimmikIcon_Test");
-                    cardSO.FilledStarSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/FilledStar");
-                    cardSO.EmptyStartSprite = AssetDatabase.LoadAssetAtPath<Sprite>($"Cards/Public/EmptyStar");
+                    cardSO.bgSprite = LoadResourceSprite("Cards/Public/Card_BG");
+                    cardSO.typeIconSprite = LoadResourceSprite($"Cards/Public/{cardSO.cardType}");
+                    cardSO.gimmikIconSprite = LoadResourceSprite("Cards/Public/GimmikIcon_Test");
+                    cardSO.FilledStarSprite = LoadResourceSprite("Cards/Public/FilledStar");
+                    cardSO.EmptyStartSprite = LoadResourceSprite("Cards/Public/EmptyStar");
 
                     string assetName = $"Card_{data.cardId:D4}";
                     return (cardSO, assetName);
@@ -131,7 +105,7 @@ public class ExcelToScriptableConverter : EditorWindow
                     charSO.maxHp = data.maxHp;
                     charSO.startingLife = data.startingLife;
 
-                    // "1001,1002,1003" ¹®ÀÚ¿­À» List<int>·Î ÆÄ½Ì
+                    // "1001,1002,1003" ë¬¸ìì—´ì„ List<int>ë¡œ íŒŒì‹±
                     charSO.startDeckID = ParseIdList(data.startDeckID);
 
                     string assetName = $"Character_{data.characterID:D4}";
@@ -158,7 +132,7 @@ public class ExcelToScriptableConverter : EditorWindow
                     if (Enum.TryParse(data.gimmickType, true, out GimmickType gimmick))
                         monSO.gimmickType = gimmick;
 
-                    // "2001,2002" ¹®ÀÚ¿­À» List<int>·Î ÆÄ½Ì
+                    // "2001,2002" ë¬¸ìì—´ì„ List<int>ë¡œ íŒŒì‹±
                     monSO.monsterDeckID = ParseIdList(data.monsterDeckID);
 
                     string assetName = $"Monster_{data.monsterID:D4}";
@@ -173,8 +147,8 @@ public class ExcelToScriptableConverter : EditorWindow
     }
 
     /// <summary>
-    /// [¸ğµç µ¥ÀÌÅÍ Å¸ÀÔ °øÅë º¯È¯ ¿£Áø]
-    /// ¿¢¼¿ ¿­±â -> ½ÃÆ® Å½»ö -> Æú´õ Ã¼Å© -> SO ·çÇÁ »ı¼º -> DB »ı¼º -> ÀúÀå/»õ·Î°íÄ§ -> ÀÌ °øÅë ·ÎÁ÷À» ÇÏ³ªÀÇ ÇÔ¼ö·Î Ã³¸®
+    /// [ëª¨ë“  ë°ì´í„° íƒ€ì… ê³µí†µ ë³€í™˜ ì—”ì§„]
+    /// ì—‘ì…€ ì—´ê¸° -> ì‹œíŠ¸ íƒìƒ‰ -> í´ë” ì²´í¬ -> SO ë£¨í”„ ìƒì„± -> DB ìƒì„± -> ì €ì¥/ìƒˆë¡œê³ ì¹¨ -> ì´ ê³µí†µ ë¡œì§ì„ í•˜ë‚˜ì˜ í•¨ìˆ˜ë¡œ ì²˜ë¦¬
     /// </summary>
     private void ConvertSheet<TScriptable, TDatabase>(
         string sheetName,
@@ -215,34 +189,50 @@ public class ExcelToScriptableConverter : EditorWindow
 
                 List<TScriptable> createdList = new List<TScriptable>();
 
-                // 1. °¢ ÇàÀ» µ¹¸ç SO »ı¼º
+                // 1. ê° í–‰ì„ ëŒë©° SO ìƒì„±
                 foreach (DataRow row in targetTable.Rows)
                 {
                     var (so, assetName) = parseRowFunc(row);
                     if (so == null) continue;
 
                     string assetPath = $"{outputFolder}/{assetName}.asset";
-                    AssetDatabase.CreateAsset(so, assetPath);
-                    so.name = assetName;
+                    TScriptable existing = AssetDatabase.LoadAssetAtPath<TScriptable>(assetPath);
+
+                    if (existing != null)
+                    {
+                        // ê¸°ì¡´ ì—ì…‹ ìœ ì§€ + ë‚´ìš©ë§Œ êµì²´ -> GUIDê°€ ê·¸ëŒ€ë¡œë¼ í”„ë¦¬íŒ¹/ì”¬/ë‹¤ë¥¸ SOì˜ ì°¸ì¡°ê°€ ëŠê¸°ì§€ ì•ŠìŒ
+                        EditorUtility.CopySerialized(so, existing);
+                        existing.name = assetName;
+                        DestroyImmediate(so);
+                        so = existing;
+                    }
+                    else
+                    {
+                        AssetDatabase.CreateAsset(so, assetPath);
+                        so.name = assetName;
+                    }
 
                     createdList.Add(so);
                     EditorUtility.SetDirty(so);
                 }
 
-                // 2. µ¥ÀÌÅÍº£ÀÌ½º SO »ı¼º ¹× ÇÒ´ç (items¿¡ °øÅë ÁÖÀÔ)
+                // 2. ë°ì´í„°ë² ì´ìŠ¤ SO ìƒì„± ë° í• ë‹¹ (itemsì— ê³µí†µ ì£¼ì…)
                 if (createDatabase && createdList.Count > 0)
                 {
-                    TDatabase database = CreateInstance<TDatabase>();
+                    // ë°ì´í„°ë² ì´ìŠ¤ë„ ê¸°ì¡´ ì—ì…‹ì´ ìˆìœ¼ë©´ ì¬ì‚¬ìš© (GameManager ë“±ì—ì„œ ì°¸ì¡° ì¤‘ì¸ GUID ìœ ì§€)
+                    string databasePath = $"{outputFolder}/{dbFileName}.asset";
+                    TDatabase database = AssetDatabase.LoadAssetAtPath<TDatabase>(databasePath);
+                    bool isNewDatabase = database == null;
+                    if (isNewDatabase) database = CreateInstance<TDatabase>();
 
-                    // ¾Õ¼­ ÅëÀÏÇÑ BaseDatabaseSOÀÇ items ÇÊµå¸¦ Ã£¾Æ µ¿Àû ÇÒ´ç
+                    // ì•ì„œ í†µì¼í•œ BaseDatabaseSOì˜ items í•„ë“œë¥¼ ì°¾ì•„ ë™ì  í• ë‹¹
                     var itemsField = typeof(TDatabase).GetField("items");
                     if (itemsField != null)
                     {
                         itemsField.SetValue(database, createdList);
                     }
 
-                    string databasePath = $"{outputFolder}/{dbFileName}.asset";
-                    AssetDatabase.CreateAsset(database, databasePath);
+                    if (isNewDatabase) AssetDatabase.CreateAsset(database, databasePath);
                     EditorUtility.SetDirty(database);
                 }
 
@@ -259,30 +249,31 @@ public class ExcelToScriptableConverter : EditorWindow
         }
     }
 
-    // --- °¢ ½ÃÆ®º° ¼ø¼ö µ¥ÀÌÅÍ ÆÄ½Ì ÇïÆÛ ÇÔ¼öµé ---
+    // --- ê° ì‹œíŠ¸ë³„ ìˆœìˆ˜ ë°ì´í„° íŒŒì‹± í—¬í¼ í•¨ìˆ˜ë“¤ ---
 
     private CardData ReadCardData(DataRow row)
     {
+        // ì—´ì€ í—¤ë” ì´ë¦„ìœ¼ë¡œ ì½ìœ¼ë¯€ë¡œ ì—‘ì…€ ì—´ ìˆœì„œê°€ ë°”ë€Œì–´ë„ ìƒê´€ì—†ìŒ
+        // maxUpgradeCountê°€ 0~1ì¸ ì¹´ë“œëŠ” upgrade ì—´ì„ ë¹„ì›Œë‘˜ ìˆ˜ ìˆìœ¼ë¯€ë¡œ ë¹ˆ ì…€ì€ ê¸°ë³¸ê°’ ì²˜ë¦¬
         return new CardData
         {
-            cardId = Convert.ToInt32(row["cardId"]),
-            cardType = row["cardType"].ToString(),
-            rank = Convert.ToInt32(row["rank"]),
-            nameKey = row["nameKey"].ToString(),
-            descKey = row["descKey"].ToString(),
-            baseValue = Convert.ToInt32(row["baseValue"]),
-            upgrade_1 = Convert.ToInt32(row["upgrade_1"]),
-            upgrade_2 = Convert.ToInt32(row["upgrade_2"]),
-            upgrade_3 = Convert.ToInt32(row["upgrade_3"]),
-            upgrade_4 = Convert.ToInt32(row["upgrade_4"]),
-            upgrade_5 = Convert.ToInt32(row["upgrade_5"]),
+            cardId = GetCellInt(row, "cardId"),
+            cardType = GetCellString(row, "cardType"),
+            rank = GetCellInt(row, "rank", 1),
+            nameKey = GetCellString(row, "nameKey"),
+            descKey = GetCellString(row, "descKey"),
 
-            // [½Å±Ô ±â¹Í ÇÊµå] ºó ¼¿(DBNull) ´ëºñ ¾ÈÀü Ã³¸® Æ÷ÇÔ
+            baseValue = GetCellInt(row, "baseValue"),
+            upgrade_1 = GetCellFloat(row, "upgrade_1"),
+            upgrade_2 = GetCellFloat(row, "upgrade_2"),
+            upgradeTarget = GetCellInt(row, "upgradeTarget", CardSO.UPGRADE_TARGET_VALUE),
+            maxUpgradeCount = GetCellInt(row, "maxUpgradeCount", CardSO.MAX_UPGRADE_LIMIT),
+
             isExhaust = row["isExhaust"] != DBNull.Value && Convert.ToBoolean(row["isExhaust"]),
-            conditionCategory = row["conditionCategory"] != DBNull.Value ? row["conditionCategory"].ToString() : "None",
-            conditionParam = row["conditionParam"] != DBNull.Value ? row["conditionParam"].ToString() : string.Empty,
-            rewardCategory = row["rewardCategory"] != DBNull.Value ? row["rewardCategory"].ToString() : "None",
-            rewardParam = row["rewardParam"] != DBNull.Value ? Convert.ToSingle(row["rewardParam"]) : 0f
+            conditionCategory = GetCellString(row, "conditionCategory", "None"),
+            conditionParam = GetCellString(row, "conditionParam"),
+            rewardCategory = GetCellString(row, "rewardCategory", "None"),
+            rewardParam = GetCellFloat(row, "rewardParam")
         };
     }
 
@@ -316,7 +307,7 @@ public class ExcelToScriptableConverter : EditorWindow
         };
     }
 
-    // ;·Î ±¸ºĞµÈ ID ¹®ÀÚ¿­À» List<int>·Î ¾ÈÀüÇÏ°Ô º¯È¯ÇÏ´Â °øÅë ÇÔ¼ö
+    // ;ë¡œ êµ¬ë¶„ëœ ID ë¬¸ìì—´ì„ List<int>ë¡œ ì•ˆì „í•˜ê²Œ ë³€í™˜í•˜ëŠ” ê³µí†µ í•¨ìˆ˜
     private List<int> ParseIdList(string rawString)
     {
         if (string.IsNullOrWhiteSpace(rawString)) return new List<int>();
@@ -328,9 +319,31 @@ public class ExcelToScriptableConverter : EditorWindow
             .ToList();
     }
 
-    private string GetCellString(DataRow row, string columnName)
+    private string GetCellString(DataRow row, string columnName, string defaultValue = "")
     {
-        return (row[columnName] == DBNull.Value) ? string.Empty : row[columnName].ToString();
+        if (row[columnName] == DBNull.Value) return defaultValue;
+
+        string value = row[columnName].ToString().Trim();
+        return string.IsNullOrEmpty(value) ? defaultValue : value;
+    }
+
+    private int GetCellInt(DataRow row, string columnName, int defaultValue = 0)
+    {
+        if (row[columnName] == DBNull.Value) return defaultValue;
+        return Convert.ToInt32(row[columnName]);
+    }
+
+    private float GetCellFloat(DataRow row, string columnName, float defaultValue = 0f)
+    {
+        if (row[columnName] == DBNull.Value) return defaultValue;
+        return Convert.ToSingle(row[columnName]);
+    }
+
+    private Sprite LoadResourceSprite(string resourcePath)
+    {
+        Sprite sprite = Resources.Load<Sprite>(resourcePath);
+        if (sprite == null) Debug.LogWarning($"[ExcelConverter] ìŠ¤í”„ë¼ì´íŠ¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: Resources/{resourcePath}");
+        return sprite;
     }
 }
 #endif

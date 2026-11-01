@@ -15,8 +15,7 @@ public class RewardManager : MonoBehaviour
         { RankType.Uncommon, 45f },
         { RankType.Rare, 30f },
         { RankType.Epic, 18f },
-        { RankType.Legendary, 2f },
-        { RankType.Mythic, 0f }
+        { RankType.Legendary, 0f }
     };
 
     private readonly Dictionary<RankType, float> chapter2Weights = new()
@@ -25,8 +24,7 @@ public class RewardManager : MonoBehaviour
         { RankType.Uncommon, 35f },
         { RankType.Rare, 44f },
         { RankType.Epic, 22.8f },
-        { RankType.Legendary, 3f },
-        { RankType.Mythic, 0.2f }
+        { RankType.Legendary, 1f }
     };
 
     private readonly Dictionary<RankType, float> chapter3Weights = new()
@@ -35,8 +33,7 @@ public class RewardManager : MonoBehaviour
         { RankType.Uncommon, 25f },
         { RankType.Rare, 43f },
         { RankType.Epic, 42.6f },
-        { RankType.Legendary, 8.5f },
-        { RankType.Mythic, 0.9f }
+        { RankType.Legendary, 2f }
     };
 
     private SoftPityProbabilityCorrector<RankType> rankCorrector;

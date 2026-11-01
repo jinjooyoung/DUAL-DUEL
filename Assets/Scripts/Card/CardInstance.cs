@@ -1,29 +1,42 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [System.Serializable]
-public class CardInstance   // SO´Â Á¤Àû µ¥ÀÌÅÍ. ÀÌ°Ç ·±Å¸ÀÓ¿ë
+public class CardInstance   // SOëŠ” ì •ì  ë°ì´í„°. ì´ê±´ ëŸ°íƒ€ì„ìš©
 {
-    public string instanceId;       // °íÀ¯ ID (ÀÎ½ºÅÏ½º ±¸º°¿ë Guid)
-    public CardSO baseData;         // ¿øº» Á¤Àû SO ÂüÁ¶
-    public int upgradeLevel = 0;    // ÇöÀç °­È­ ´Ü°è (0 = ±âº», 1 = +1°­ ...)
+    public string instanceId;       // ê³ ìœ  ID (ì¸ìŠ¤í„´ìŠ¤ êµ¬ë³„ìš© Guid)
+    public CardSO baseData;         // ì›ë³¸ ì •ì  SO ì°¸ì¡°
+    public int upgradeLevel = 0;    // í˜„ì¬ ê°•í™” ë‹¨ê³„ (0 = ê¸°ë³¸, 1 = +1ê°•, 2 = +2ê°•)
 
-    // »ı¼ºÀÚ
+    // ìƒì„±ì
     public CardInstance(CardSO data, int level = 0)
     {
         this.instanceId = System.Guid.NewGuid().ToString();
         this.baseData = data;
-        this.upgradeLevel = level;
+
+        // ì¹´ë“œë³„ ìµœëŒ€ ê°•í™” íšŸìˆ˜ë¥¼ ë„˜ëŠ” ë‹¨ê³„ë¡œ ìƒì„±ë˜ì§€ ì•Šë„ë¡ ë³´ì •
+        int maxLevel = data != null ? data.maxUpgradeCount : 0;
+        this.upgradeLevel = Mathf.Clamp(level, 0, maxLevel);
     }
 
     /// <summary>
-    /// ÇöÀç °­È­ ´Ü°è¿¡ ¸Â´Â ¼öÄ¡¸¦ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// í˜„ì¬ ê°•í™” ë‹¨ê³„ì— ë§ëŠ” ê¸°ë³¸ ë°¸ë¥˜ë¥¼ ë°˜í™˜í•©ë‹ˆë‹¤. (ë²”ìœ„ ë³´ì •ì€ CardSOì—ì„œ ì²˜ë¦¬)
     /// </summary>
     public int GetValue()
     {
-        if (baseData == null || baseData.values == null || baseData.values.Count == 0) return 0;
-
-        // °­È­ ´Ü°è°¡ values ¸®½ºÆ® ¹üÀ§¸¦ ³ÑÁö ¾Êµµ·Ï Clamp
-        int safeIndex = Mathf.Clamp(upgradeLevel, 0, baseData.values.Count - 1);
-        return baseData.values[safeIndex];
+        return baseData != null ? baseData.GetValue(upgradeLevel) : 0;
     }
+
+    /// <summary>
+    /// í˜„ì¬ ê°•í™” ë‹¨ê³„ì— ë§ëŠ” ë¦¬ì›Œë“œ íŒŒëŒì„ ë°˜í™˜í•©ë‹ˆë‹¤.
+    /// upgradeTargetì´ 0(ë°¸ë¥˜ ê°•í™”)ì¸ ì¹´ë“œëŠ” ë‹¨ê³„ì™€ ìƒê´€ì—†ì´ 0ê°• ê°’ê³¼ ê°™ìŠµë‹ˆë‹¤.
+    /// </summary>
+    public float GetRewardParam()
+    {
+        return baseData != null ? baseData.GetRewardParam(upgradeLevel) : 0f;
+    }
+
+    /// <summary>
+    /// ë” ê°•í™”í•  ìˆ˜ ìˆëŠ”ì§€ (ê°•í™” ë¡œì§ êµ¬í˜„ ì‹œ ì‚¬ìš©)
+    /// </summary>
+    public bool CanUpgrade => baseData != null && baseData.CanUpgrade(upgradeLevel);
 }

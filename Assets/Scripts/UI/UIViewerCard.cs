@@ -47,9 +47,6 @@ public class UIViewerCard : MonoBehaviour
                 case RankType.Legendary:
                     background.color = Hex("#9071E6");
                     break;
-                case RankType.Mythic:
-                    background.color = Hex("#FCE66F");
-                    break;
             }
         }
 

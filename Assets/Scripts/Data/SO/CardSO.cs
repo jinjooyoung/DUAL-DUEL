@@ -11,95 +11,189 @@ public enum CardType
     Debuff
 }
 
+// ì¼ë°˜, ê³ ê¸‰, í¬ê·€, ì—í”½, ì „ì„¤ (Mythic ì‚­ì œ)
 public enum RankType
 {
     Common = 1,
     Uncommon = 2,
     Rare = 3,
     Epic = 4,
-    Legendary = 5,
-    Mythic = 6
+    Legendary = 5
 }
 
-// Ãß°¡ È¿°ú Á¶°Ç Å¸ÀÔ
+// ì¶”ê°€ íš¨ê³¼ ì¡°ê±´ íƒ€ì…
+// conditionParam í¬ë§·
+//  - NeighborCard / PrevCard / NextCard : "ìŠ¬ë¡¯ì£¼ì¸,ì¹´ë“œíƒ€ì…"  (ìŠ¬ë¡¯ì£¼ì¸: Enemy, Player, Any / ì¹´ë“œíƒ€ì…: CardType ì´ë¦„ ë˜ëŠ” Any)
+//  - SlotIndex                          : "0" ë˜ëŠ” "0,4"
 public enum ConditionCategory
 {
     None = 0,
-    SlotIndexRestriction = 1,   // ½½·Ô ¹øÈ£ °Ë»ç (¿¹: 0, 4, "0,4")
-    NeighborCardType = 2,       // ÀÎÁ¢(¾Õ/µÚ) ½½·ÔÀÇ Ä«µå Å¸ÀÔ °Ë»ç (¿¹: Attack)
-    PrevSlotOwner = 3,          // Á÷Àü ½½·Ô ¼ÒÀ¯ÀÚ °Ë»ç (Player, Enemy)
-    HandCount = 4,              // ¼ÕÆĞ Ä«µå Àå¼ö °Ë»ç (¿¹: "Count>=5")
-    HandType = 5                // ¼ÕÆĞ Æ¯Á¤ Å¸ÀÔ ¸Å¼ö °Ë»ç (¿¹: "Attack>=4")
+    NeighborCard = 1,   // ì–‘ì˜† ìŠ¬ë¡¯ 2ê°œì˜ ìŠ¬ë¡¯ ì£¼ì¸ + ë°°ì¹˜ëœ ì¹´ë“œ íƒ€ì… ê²€ì‚¬ (ì˜ˆ: "Enemy,Attack")
+    PrevCard = 2,       // ì´ì „ ìŠ¬ë¡¯ì˜ ìŠ¬ë¡¯ ì£¼ì¸ + ë°°ì¹˜ëœ ì¹´ë“œ íƒ€ì… ê²€ì‚¬ (ì˜ˆ: "Enemy,Attack")
+    NextCard = 3,       // ë‹¤ìŒ ìŠ¬ë¡¯ì˜ ìŠ¬ë¡¯ ì£¼ì¸ + ë°°ì¹˜ëœ ì¹´ë“œ íƒ€ì… ê²€ì‚¬ (ì˜ˆ: "Enemy,Attack")
+    SlotIndex = 4       // í˜„ì¬ ì¹´ë“œê°€ ë°°ì¹˜ëœ ìŠ¬ë¡¯ ì¸ë±ìŠ¤ ê²€ì‚¬ (ì˜ˆ: "0", "0,4")
 }
 
-// Á¶°Ç ´Ş¼º ½Ã º¸»ó Å¸ÀÔ
+// ì¡°ê±´ ë‹¬ì„± ì‹œ ë³´ìƒ íƒ€ì…
 public enum RewardCategory
 {
     None = 0,
-    FlatBonus = 1,              // Á¤¼ö ¹ë·ù °¡»ê (+N)
-    Multiplier = 2,             // ¹ë·ù °ö¿¬»ê (*N)
-    RepeatCast = 3,             // ÇØ´ç Ä«µå NÈ¸ ´ÙÁß ½ÃÀü (¿¬Å¸)
-    TriggerNeighborSlot = 4,    // ÀÎÁ¢ ½½·Ô Ä«µå Ãß°¡ ¹ßµ¿ (0: ¾çÂÊ, -1: ¾Õ, 1: µÚ)
-    ModifyNextDraw = 5,         // ´ÙÀ½ ÅÏ µå·Î¿ì ¸Å¼ö Á¶Á¤ (+NÀå)
+    FlatBonus = 1,              // ì •ìˆ˜ ë°¸ë¥˜ ê°€ì‚° (+N)
+    Multiplier = 2,             // ë°¸ë¥˜ ê³±ì—°ì‚° (*N)
+    RepeatCast = 3,             // í•´ë‹¹ ì¹´ë“œ NíšŒ ì¶”ê°€ ì‹œì „ (ì—°íƒ€)
+    TriggerNeighborSlot = 4,    // ì¸ì ‘ ìŠ¬ë¡¯ ì¹´ë“œ ì¶”ê°€ ë°œë™ (ì½”ë“œ ê¸°ì¤€ 0: ì´ì „ ìŠ¬ë¡¯, ê·¸ ì™¸: ë‹¤ìŒ ìŠ¬ë¡¯)
+    ModifyNextDraw = 5,         // ë‹¤ìŒ í„´ ë“œë¡œìš° ë§¤ìˆ˜ ì¡°ì • (+Nì¥)
 }
 
+/// <summary>
+/// ì—‘ì…€ í•œ í–‰ì„ ê·¸ëŒ€ë¡œ ë°›ëŠ” ì¤‘ê°„ ë°ì´í„° (ì—´ ìˆœì„œ = ì—‘ì…€ Card ì‹œíŠ¸ ì—´ ìˆœì„œ)
+/// </summary>
 [Serializable]
 public class CardData
 {
     public int cardId;
-    public string cardType;     // Ä«µåÀÇ Å¸ÀÔ (°ø°İ, ¹æ¾î, ¹öÇÁ µî)
-    public int rank;            // 1~6±îÁöÀÇ µî±ŞÀ» ³ªÅ¸³¿. ³ôÀ»¼ö·Ï Èñ±Í(ÁÁÀº) µî±Ş
+    public string cardType;         // ì¹´ë“œ íƒ€ì… (Attack, Defense ...)
+    public int rank;                // 1~5 (ì¼ë°˜ ~ ì „ì„¤)
 
-    public string nameKey;      // ÃßÈÄ ·ÎÄÃ¶óÀÌÂ¡ Àû¿ëÇÒ ¶§ »ç¿ëÇÒ Ä«µå ÀÌ¸§ Å°
-    public string descKey;      // ¼³¸í Å°
+    public string nameKey;
+    public string descKey;
 
-    public int baseValue;       // ±âº» ¼öÄ¡
-    public int upgrade_1;       // ¾÷±×·¹ÀÌµå 1È¸ ¼öÄ¡
-    public int upgrade_2;       // ¾÷±×·¹ÀÌµå 2È¸ ¼öÄ¡
-    public int upgrade_3;       // ¾÷±×·¹ÀÌµå 3È¸ ¼öÄ¡
-    public int upgrade_4;       // ¾÷±×·¹ÀÌµå 4È¸ ¼öÄ¡
-    public int upgrade_5;       // ¾÷±×·¹ÀÌµå 5È¸ ¼öÄ¡
+    public int baseValue;           // ê¸°ë³¸ ë°¸ë¥˜ (0ê°•)
+    public float upgrade_1;         // 1ê°• ì‹œ ê°•í™” ëŒ€ìƒ ê°’ (upgradeTarget 0: ë°¸ë¥˜ / 1: ë¦¬ì›Œë“œ íŒŒëŒ)
+    public float upgrade_2;         // 2ê°• ì‹œ ê°•í™” ëŒ€ìƒ ê°’
 
-    public bool isExhaust;      // ¼Ò¸ê ¿©ºÎ (ÇØ´ç ÀüÅõ¿¡¼­ 1È¸¸¸ »ç¿ë °¡´ÉÇÑ Ä«µåÀÎÁö)
+    public int upgradeTarget;       // 0: ê¸°ë³¸ ë°¸ë¥˜ ê°•í™” ì¹´ë“œ, 1: ë¦¬ì›Œë“œ íŒŒëŒ ê°•í™” ì¹´ë“œ
+    public int maxUpgradeCount;     // ìµœëŒ€ ê°•í™” ê°€ëŠ¥ íšŸìˆ˜ (0~2)
 
-    public string conditionCategory;    // Ãß°¡ È¿°ú Á¶°Ç Å¸ÀÔ
-    public string conditionParam;       // Á¶°Ç ¼öÄ¡
+    public bool isExhaust;
 
-    public string rewardCategory;       // Á¶°Ç ´Ş¼º ½Ã º¸»ó Å¸ÀÔ
-    public float rewardParam;           // º¸»ó ¼öÄ¡
+    public string conditionCategory;
+    public string conditionParam;
+
+    public string rewardCategory;
+    public float rewardParam;       // ë¦¬ì›Œë“œ íŒŒëŒ (0ê°•)
 }
 
 
 [CreateAssetMenu(fileName = "CardSO", menuName = "SO/DataSO/CardSO")]
 public class CardSO : ScriptableObject
 {
-    [Header("±âº» Á¤º¸")]
+    // ê°•í™” ëŒ€ìƒ êµ¬ë¶„ê°’ (enum ëŒ€ì‹  ì •ìˆ˜ë¡œ êµ¬ë¶„)
+    public const int UPGRADE_TARGET_VALUE = 0;     // ê¸°ë³¸ ë°¸ë¥˜ ê°•í™”
+    public const int UPGRADE_TARGET_REWARD = 1;    // ë¦¬ì›Œë“œ íŒŒëŒ ê°•í™”
+    public const int MAX_UPGRADE_LIMIT = 2;        // ì‹œìŠ¤í…œ ìµœëŒ€ ê°•í™” ë‹¨ê³„
+
+    [Header("ê¸°ë³¸ ì •ë³´")]
     public int cardId;
     public CardType cardType;
-    public RankType rank;           // µ¥ÀÌÅÍÅ×ÀÌºíÀº ¼ıÀÚ·Î ÀÛ¼ºÇÏ°í SO¿¡´Â Å¸ÀÔÀ¸·Î ºÒ·¯¿È
-    public Sprite artwork;          // ½ºÇÁ¶óÀÌÆ®´Â SO »ı¼º ¿¡µğÅÍ¿¡¼­ ¸®¼Ò½ºÆú´õ¿¡ ÀÖ´Â Card_XXXX ¾ÆÀÌµğ·Î Ã£¾Æ¿Í¼­ ÇÒ´çÇÏµµ·Ï ÇÒ ¿¹Á¤
+    public RankType rank;
+    public Sprite artwork;
 
-    public Sprite bgSprite;         // Ä«µå ¹è°æ
-    public Sprite typeIconSprite;   // Å¸ÀÔ ¾ÆÀÌÄÜ
-    public Sprite gimmikIconSprite; // ±â¹Í ¾ÆÀÌÄÜ
+    public Sprite bgSprite;
+    public Sprite typeIconSprite;
+    public Sprite gimmikIconSprite;
     public Sprite FilledStarSprite;
     public Sprite EmptyStartSprite;
 
-    [Header("·ÎÄÃ¶óÀÌÂ¡ Å°")]
+    [Header("ë¡œì»¬ë¼ì´ì§• í‚¤")]
     public string nameKey;
-    public string descKey;          // ÅøÆÁÀ¸·Î ¶ç¿ï ³»¿ë
+    public string descKey;
 
-    [Header("¼ºÀå ¼öÄ¡ (Index 0: ±âº», 1~5: °­È­ ´Ü°è)")]
-    public List<int> values = new List<int>();
+    [Header("ê°•í™” ì„¤ì •")]
+    [Tooltip("0: ê¸°ë³¸ ë°¸ë¥˜ ê°•í™” ì¹´ë“œ, 1: ë¦¬ì›Œë“œ íŒŒëŒ ê°•í™” ì¹´ë“œ")]
+    [Range(0, 1)] public int upgradeTarget;
+    [Tooltip("ìµœëŒ€ ê°•í™” ê°€ëŠ¥ íšŸìˆ˜")]
+    [Range(0, MAX_UPGRADE_LIMIT)] public int maxUpgradeCount;
 
-    [Header("¼Ò¸ê ¿©ºÎ")]
+    [Header("ê°•í™” ë‹¨ê³„ë³„ ìˆ˜ì¹˜ (Index = ê°•í™” ë‹¨ê³„, ê¸¸ì´ = maxUpgradeCount + 1)")]
+    public List<int> values = new List<int>();          // ë‹¨ê³„ë³„ ê¸°ë³¸ ë°¸ë¥˜
+    public List<float> rewardParams = new List<float>(); // ë‹¨ê³„ë³„ ë¦¬ì›Œë“œ íŒŒëŒ
+
+    [Header("ì†Œë©¸ ì—¬ë¶€")]
     public bool isExhaust;
 
-    [Header("¸ğµâÇü ±â¹Í Á¶°Ç")]
+    [Header("ëª¨ë“ˆí˜• ê¸°ë¯¹ ì¡°ê±´")]
     public ConditionCategory conditionCategory;
     public string conditionParam;
 
-    [Header("Á¶°Ç ´Ş¼º º¸»ó")]
+    [Header("ì¡°ê±´ ë‹¬ì„± ë³´ìƒ")]
     public RewardCategory rewardCategory;
-    public float rewardParam;
+
+    /// <summary>
+    /// ê°•í™” ë‹¨ê³„ì— ë§ëŠ” ê¸°ë³¸ ë°¸ë¥˜ (ìµœëŒ€ ê°•í™” ë‹¨ê³„ë¥¼ ë„˜ìœ¼ë©´ ë§ˆì§€ë§‰ ê°’ìœ¼ë¡œ ê³ ì •)
+    /// </summary>
+    public int GetValue(int upgradeLevel)
+    {
+        if (values == null || values.Count == 0) return 0;
+        return values[Mathf.Clamp(upgradeLevel, 0, values.Count - 1)];
+    }
+
+    /// <summary>
+    /// ê°•í™” ë‹¨ê³„ì— ë§ëŠ” ë¦¬ì›Œë“œ íŒŒëŒ
+    /// </summary>
+    public float GetRewardParam(int upgradeLevel)
+    {
+        if (rewardParams == null || rewardParams.Count == 0) return 0f;
+        return rewardParams[Mathf.Clamp(upgradeLevel, 0, rewardParams.Count - 1)];
+    }
+
+    public bool CanUpgrade(int currentLevel) => currentLevel < maxUpgradeCount;
+
+    /// <summary>
+    /// ì—‘ì…€ CardData -> SO ê°’ ì„¸íŒ… (ìŠ¤í”„ë¼ì´íŠ¸ í• ë‹¹ì€ ì—ë””í„° ìŠ¤í¬ë¦½íŠ¸ì—ì„œ ë³„ë„ë¡œ)
+    /// ê°•í™” ëŒ€ìƒì´ ì•„ë‹Œ ìª½ ë¦¬ìŠ¤íŠ¸ëŠ” 0ê°• ê°’ìœ¼ë¡œ ì±„ì›Œì„œ, ëŸ°íƒ€ì„ì€ ë¶„ê¸° ì—†ì´ [ë‹¨ê³„]ë¡œë§Œ ì½ìœ¼ë©´ ë˜ë„ë¡ í•¨
+    /// </summary>
+    public void SetupFromData(CardData data)
+    {
+        cardId = data.cardId;
+        nameKey = data.nameKey;
+        descKey = data.descKey;
+        isExhaust = data.isExhaust;
+        conditionParam = data.conditionParam;
+
+        cardType = ParseEnum(data.cardType, CardType.Attack, "cardType");
+        conditionCategory = ParseEnum(data.conditionCategory, ConditionCategory.None, "conditionCategory");
+        rewardCategory = ParseEnum(data.rewardCategory, RewardCategory.None, "rewardCategory");
+
+        if (!Enum.IsDefined(typeof(RankType), data.rank))
+            Debug.LogWarning($"[CardSO] {data.cardId}ë²ˆ ì¹´ë“œ rank {data.rank} ëŠ” ë²”ìœ„(1~5) ë°–ì´ë¼ ë³´ì •í•©ë‹ˆë‹¤.");
+        rank = (RankType)Mathf.Clamp(data.rank, (int)RankType.Common, (int)RankType.Legendary);
+
+        upgradeTarget = data.upgradeTarget == UPGRADE_TARGET_REWARD ? UPGRADE_TARGET_REWARD : UPGRADE_TARGET_VALUE;
+        maxUpgradeCount = Mathf.Clamp(data.maxUpgradeCount, 0, MAX_UPGRADE_LIMIT);
+
+        float[] upgradeColumns = { data.upgrade_1, data.upgrade_2 };
+
+        values.Clear();
+        rewardParams.Clear();
+
+        for (int level = 0; level <= maxUpgradeCount; level++)
+        {
+            if (level == 0)
+            {
+                values.Add(data.baseValue);
+                rewardParams.Add(data.rewardParam);
+            }
+            else if (upgradeTarget == UPGRADE_TARGET_VALUE)
+            {
+                values.Add(Mathf.RoundToInt(upgradeColumns[level - 1]));
+                rewardParams.Add(data.rewardParam);
+            }
+            else // UPGRADE_TARGET_REWARD
+            {
+                values.Add(data.baseValue);
+                rewardParams.Add(upgradeColumns[level - 1]);
+            }
+        }
+    }
+
+    private T ParseEnum<T>(string raw, T fallback, string columnName) where T : struct
+    {
+        if (!string.IsNullOrWhiteSpace(raw) && Enum.TryParse(raw.Trim(), true, out T result) && Enum.IsDefined(typeof(T), result))
+            return result;
+
+        if (!string.IsNullOrWhiteSpace(raw))
+            Debug.LogWarning($"[CardSO] {cardId}ë²ˆ ì¹´ë“œ {columnName} '{raw}' ë¥¼ {typeof(T).Name}ìœ¼ë¡œ ë³€í™˜í•  ìˆ˜ ì—†ì–´ {fallback} ë¡œ ì„¤ì •í•©ë‹ˆë‹¤.");
+        return fallback;
+    }
 }

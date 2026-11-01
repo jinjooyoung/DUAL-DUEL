@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -6,47 +6,50 @@ using UnityEngine.Localization.Components;
 
 public class CardDisplay : MonoBehaviour
 {
-    [Header("Ä«µå µ¥ÀÌÅÍ(SO)")]
+    [Header("ì¹´ë“œ ë°ì´í„°(SO)")]
     public CardInstance cardInstance;
     public int cardIndex;
     public BattleSlot currentSlot;
 
-    [Header("·ÎÄÃ¶óÀÌÁ¦ÀÌ¼Ç Å×ÀÌºí Á¤º¸")]
+    [Header("ë¡œì»¬ë¼ì´ì œì´ì…˜ í…Œì´ë¸” ì •ë³´")]
     [SerializeField] private string tableName = "Card_Table";
-    [Header("·ÎÄÃ¶óÀÌÁ¦ÀÌ¼Ç ÀÌº¥Æ® ÄÄÆ÷³ÍÆ®")]
+    [Header("ë¡œì»¬ë¼ì´ì œì´ì…˜ ì´ë²¤íŠ¸ ì»´í¬ë„ŒíŠ¸")]
     public LocalizeStringEvent nameLocalizeEvent;
     public LocalizeStringEvent typeLocalizeEvent;
 
-    [Header("ÀÌ¹ÌÁö")]
+    [Header("ì´ë¯¸ì§€")]
     public SpriteRenderer background;
     public SpriteRenderer cardResource;
     public SpriteRenderer typeIcon;
     public SpriteRenderer gimmickIcon;
 
-    [Header("·©Å© º° ¾ÆÀÌÄÜ")]
+    [Header("ë­í¬ ë³„ ì•„ì´ì½˜")]
     public List<SpriteRenderer> rankStarIcons;
 
-    [Header("ÅØ½ºÆ®")]
+    // ë­í¬ ë‹¨ê³„ ìˆ˜ (RankType ìµœëŒ“ê°’ = 5). ë“±ê¸‰ ê°œìˆ˜ê°€ ë°”ë€Œì–´ë„ ìë™ìœ¼ë¡œ ë”°ë¼ê°
+    private static readonly int MaxRankStarCount = (int)RankType.Legendary;
+
+    [Header("í…ìŠ¤íŠ¸")]
     public TextMeshPro nameText;
     public TextMeshPro typeText;
     public TextMeshPro valueText;
     public TextMeshPro gimmikValueText;
 
-    [Header("Å¸ÀÔ, ±â¹Í ¿ÀºêÁ§Æ®")]
+    [Header("íƒ€ì…, ê¸°ë¯¹ ì˜¤ë¸Œì íŠ¸")]
     public GameObject typeGroup;
     public GameObject GimmikGroup;
 
-    [Header("»óÅÂ ÇÃ·¡±×")]
+    [Header("ìƒíƒœ í”Œë˜ê·¸")]
     public bool isDragging = false;
-    public bool isPlaced = false;      // ½½·Ô¿¡ °íÁ¤µÈ »óÅÂÀÎÁö ¿©ºÎ
-    public bool isSnapFixed = false;    // ÇÚµå Ä«µå ¼ø¼­ º¯°æ. trueÀÏ ½Ã Lerp X
-    public bool isTweening = false; // µå·Î¿ì/µğ½ºÄ«µå µî Æ®À© Á¦¾î ÁßÀÏ ¶§ true
+    public bool isPlaced = false;      // ìŠ¬ë¡¯ì— ê³ ì •ëœ ìƒíƒœì¸ì§€ ì—¬ë¶€
+    public bool isSnapFixed = false;    // í•¸ë“œ ì¹´ë“œ ìˆœì„œ ë³€ê²½. trueì¼ ì‹œ Lerp X
+    public bool isTweening = false; // ë“œë¡œìš°/ë””ìŠ¤ì¹´ë“œ ë“± íŠ¸ìœˆ ì œì–´ ì¤‘ì¼ ë•Œ true
 
     private Vector3 originalPosition;
     private Vector3 originalScale = Vector3.one;
     private Vector3 originalTypeGroupPos;
 
-    [Header("·¹ÀÌ¾î ¸¶½ºÅ©")]
+    [Header("ë ˆì´ì–´ ë§ˆìŠ¤í¬")]
     public LayerMask slotLayer;
 
     private void Awake()
@@ -60,7 +63,7 @@ public class CardDisplay : MonoBehaviour
         slotLayer = LayerMask.GetMask("Slot");
     }
 
-    // Ä«µå µ¥ÀÌÅÍ ¼³Á¤
+    // ì¹´ë“œ ë°ì´í„° ì„¤ì •
     public void SetupCard(CardInstance instance)
     {
         cardInstance = instance;
@@ -68,32 +71,26 @@ public class CardDisplay : MonoBehaviour
 
         CardSO data = cardInstance.baseData;
 
-        // 1. Ä«µå ÀÌ¸§ ÅØ½ºÆ® ¼¼ÆÃ
+        // 1. ì¹´ë“œ ì´ë¦„ í…ìŠ¤íŠ¸ ì„¸íŒ…
         if (nameText != null && nameLocalizeEvent != null)
         {
             nameLocalizeEvent.StringReference.SetReference(tableName, data.nameKey);
             nameLocalizeEvent.RefreshString();
 
-            Debug.Log("Ä«µå ÀÌ¸§ ÅØ½ºÆ® ¼¼ÆÃ");
+            Debug.Log("ì¹´ë“œ ì´ë¦„ í…ìŠ¤íŠ¸ ì„¸íŒ…");
         }
 
-        // 2. Ä«µå Å¸ÀÔ ÅØ½ºÆ® ¼¼ÆÃ
+        // 2. ì¹´ë“œ íƒ€ì… í…ìŠ¤íŠ¸ ì„¸íŒ…
         if (typeText != null && typeLocalizeEvent != null)
         {
             string typeKey = $"{data.cardType.ToString().ToUpper()}_KEY";
             typeLocalizeEvent.StringReference.SetReference(tableName, typeKey);
             typeLocalizeEvent.RefreshString();
 
-            Debug.Log("Ä«µå Å¸ÀÔ ÅØ½ºÆ® ¼¼ÆÃ");
+            Debug.Log("ì¹´ë“œ íƒ€ì… í…ìŠ¤íŠ¸ ì„¸íŒ…");
         }
 
-        // 3. Ä«µå ¼öÄ¡ (¼³¸íÀº ÅøÆÁÀ¸·Î ÀÌµ¿)
-        if (valueText != null)
-        {
-            valueText.text = cardInstance.GetValue().ToString();
-        }
-
-        // Ä«µå ¸®¼Ò½º
+        // ì¹´ë“œ ë¦¬ì†ŒìŠ¤
         if (cardResource != null && data.artwork != null)
             cardResource.sprite = data.artwork;
 
@@ -107,78 +104,96 @@ public class CardDisplay : MonoBehaviour
             {
                 if (rankStarIcons[i] == null) continue;
 
+                // ë­í¬ ë‹¨ê³„ ìˆ˜(í˜„ì¬ 5)ë¥¼ ë„˜ëŠ” ë³„ ì˜¤ë¸Œì íŠ¸ëŠ” ìˆ¨ê¹€ (í”„ë¦¬íŒ¹ì— ë³„ì´ 6ê°œ ë‚¨ì•„ìˆì–´ë„ ì•ˆì „)
+                bool isUsedStar = i < MaxRankStarCount;
+                rankStarIcons[i].gameObject.SetActive(isUsedStar);
+                if (!isUsedStar) continue;
+
                 rankStarIcons[i].sprite = i < activeStarCount ? data.FilledStarSprite : data.EmptyStartSprite;
             }
         }
 
         if (typeIcon != null) typeIcon.sprite = data.typeIconSprite;
 
-        RewardCategory rewardCategory = data.rewardCategory;
+        if (gimmickIcon != null) gimmickIcon.sprite = data.gimmikIconSprite;
 
-        if (rewardCategory == RewardCategory.None)
+        // ê¸°ë¯¹ ê·¸ë£¹ ë…¸ì¶œ ì—¬ë¶€ (ë³´ìƒì´ ì—†ëŠ” ì¹´ë“œëŠ” íƒ€ì… ê·¸ë£¹ì„ ê°€ìš´ë°ë¡œ)
+        bool hasReward = data.rewardCategory != RewardCategory.None;
+        GimmikGroup.SetActive(hasReward);
+        typeGroup.transform.localPosition = hasReward
+            ? originalTypeGroupPos
+            : new Vector3(0, originalTypeGroupPos.y, originalTypeGroupPos.z);
+
+        // 3. ìˆ˜ì¹˜ í…ìŠ¤íŠ¸ (ë°¸ë¥˜ + ë¦¬ì›Œë“œ íŒŒëŒ)
+        RefreshValueTexts();
+    }
+
+    /// <summary>
+    /// ê°•í™” ë‹¨ê³„ê°€ ë°˜ì˜ëœ ë°¸ë¥˜ / ë¦¬ì›Œë“œ íŒŒëŒ í…ìŠ¤íŠ¸ ê°±ì‹ 
+    /// ê°•í™” ì‹œ ë¦¬ì›Œë“œ íŒŒëŒë„ ë³€í•  ìˆ˜ ìˆìœ¼ë¯€ë¡œ, ê°•í™” ë¡œì§ì—ì„œëŠ” ì´ í•¨ìˆ˜ë§Œ ë‹¤ì‹œ í˜¸ì¶œí•˜ë©´ ë¨
+    /// </summary>
+    public void RefreshValueTexts()
+    {
+        if (cardInstance == null || cardInstance.baseData == null) return;
+
+        CardSO data = cardInstance.baseData;
+
+        // ì¹´ë“œ ê¸°ë³¸ ë°¸ë¥˜
+        if (valueText != null)
         {
-            GimmikGroup.SetActive(false);
-            typeGroup.transform.localPosition = new Vector3(0, typeGroup.transform.localPosition.y, typeGroup.transform.localPosition.z);
-            return;
+            valueText.text = cardInstance.GetValue().ToString();
         }
-        else
-        {
-            GimmikGroup.SetActive(true);
-            typeGroup.transform.localPosition = originalTypeGroupPos;
-        }
 
-        string temp;
+        if (gimmikValueText == null) return;
 
-        switch (rewardCategory)
+        float rewardParam = cardInstance.GetRewardParam();
+
+        switch (data.rewardCategory)
         {
+            case RewardCategory.None:
+                gimmikValueText.text = string.Empty;
+                break;
+
             case RewardCategory.FlatBonus:
-                temp = $"+{data.rewardParam}"; // ¿¹: +4
+                gimmikValueText.text = $"+{rewardParam}";  // ì˜ˆ: +4
                 break;
 
             case RewardCategory.Multiplier:
-                temp = $"x{data.rewardParam}"; // ¿¹: x2
+                gimmikValueText.text = $"x{rewardParam}";  // ì˜ˆ: x2
                 break;
 
             case RewardCategory.RepeatCast:
-                temp = $"+{data.rewardParam}"; // ¿¹: 2
+                gimmikValueText.text = $"+{rewardParam}";  // ì˜ˆ: +2 (ì¶”ê°€ ì‹œì „ íšŸìˆ˜)
                 break;
 
             case RewardCategory.TriggerNeighborSlot:
-                temp = "+1"; // "1È¸ Ãß°¡ ½ÃÀü" ÀÇ¹Ì
+                gimmikValueText.text = "+1";                // ì¸ì ‘ ì¹´ë“œ 1íšŒ ì¶”ê°€ ì‹œì „ (íŒŒëŒì€ ë°©í–¥ê°’ì´ë¼ í‘œì‹œ ì•ˆ í•¨)
                 break;
 
             case RewardCategory.ModifyNextDraw:
-                temp = $"+{data.rewardParam}"; // ¿¹: +1 (µå·Î¿ì Áõ°¡)
+                gimmikValueText.text = $"+{rewardParam}";  // ì˜ˆ: +1 (ë“œë¡œìš° ì¦ê°€)
                 break;
 
             default:
-                temp = data.rewardParam > 0 ? ((int)data.rewardParam).ToString() : string.Empty;
+                gimmikValueText.text = rewardParam > 0 ? ((int)rewardParam).ToString() : string.Empty;
                 break;
         }
-
-        // 3-1. Ä«µå ±â¹Í ¹ë·ù
-        if (gimmikValueText != null)
-        {
-            gimmikValueText.text = temp;
-        }
-
-        if (gimmickIcon != null) gimmickIcon.sprite = data.gimmikIconSprite;
     }
 
     /// <summary>
-    /// ÅÏ Á¾·á µîÀ¸·Î ½½·ÔÀÌ³ª ¸Å´ÏÀú¿¡ ÀÇÇØ °­Á¦·Î ¹èÄ¡°¡ ÃÊ±âÈ­µÉ ¶§ È£Ãâ
+    /// í„´ ì¢…ë£Œ ë“±ìœ¼ë¡œ ìŠ¬ë¡¯ì´ë‚˜ ë§¤ë‹ˆì €ì— ì˜í•´ ê°•ì œë¡œ ë°°ì¹˜ê°€ ì´ˆê¸°í™”ë  ë•Œ í˜¸ì¶œ
     /// </summary>
     public void ResetPlacement()
     {
-        isPlaced = false;      // "½½·Ô¿¡ °íÁ¤µÊ" »óÅÂ¸¦ ÇØÁ¦
-        currentSlot = null;    // ¿¬°áµÇ¾î ÀÖ´ø ½½·Ô ÂüÁ¶ Á¦°Å
-        isDragging = false;    // µå·¡±× Áß ÇÃ·¡±× ¾ÈÀü ÃÊ±âÈ­
-        isTweening = false;    // ¿¬Ãâ Áß ¾Æ´Ô
-        transform.localScale = originalScale;   // Å©±â ÃÊ±âÈ­
+        isPlaced = false;      // "ìŠ¬ë¡¯ì— ê³ ì •ë¨" ìƒíƒœë¥¼ í•´ì œ
+        currentSlot = null;    // ì—°ê²°ë˜ì–´ ìˆë˜ ìŠ¬ë¡¯ ì°¸ì¡° ì œê±°
+        isDragging = false;    // ë“œë˜ê·¸ ì¤‘ í”Œë˜ê·¸ ì•ˆì „ ì´ˆê¸°í™”
+        isTweening = false;    // ì—°ì¶œ ì¤‘ ì•„ë‹˜
+        transform.localScale = originalScale;   // í¬ê¸° ì´ˆê¸°í™”
     }
 
     /// <summary>
-    /// ÇöÀç ²ÈÇôÀÖ´ø ½½·Ô°úÀÇ ¿¬°áÀ» ²÷°í ÇÚµå·Î º¹±Í °¡´ÉÇÑ »óÅÂ·Î ÀüÈ¯
+    /// í˜„ì¬ ê½‚í˜€ìˆë˜ ìŠ¬ë¡¯ê³¼ì˜ ì—°ê²°ì„ ëŠê³  í•¸ë“œë¡œ ë³µê·€ ê°€ëŠ¥í•œ ìƒíƒœë¡œ ì „í™˜
     /// </summary>
     public void DetachFromCurrentSlot()
     {
@@ -190,13 +205,13 @@ public class CardDisplay : MonoBehaviour
         isPlaced = false;
     }
 
-    // ¸¶¿ì½º È£¹ö ¿¬Ãâ (½½·Ô¿¡ ²ÈÈ÷Áö ¾Ê°í, µå·¡±× ÁßÀÌ ¾Æ´Ò ¶§¸¸)
+    // ë§ˆìš°ìŠ¤ í˜¸ë²„ ì—°ì¶œ (ìŠ¬ë¡¯ì— ê½‚íˆì§€ ì•Šê³ , ë“œë˜ê·¸ ì¤‘ì´ ì•„ë‹ ë•Œë§Œ)
     private void OnMouseEnter()
     {
         if (BattleManager.Instance.isGameOver) return;
         if (isDragging || isPlaced || isTweening) return;
 
-        // È£¹ö ½ÃÀÛ ½Ã ÇöÀç ¼ÕÆĞ À§Ä¡¸¦ ±âÁØÁ¡À¸·Î ÀúÀå
+        // í˜¸ë²„ ì‹œì‘ ì‹œ í˜„ì¬ ì†íŒ¨ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ì ìœ¼ë¡œ ì €ì¥
         originalPosition = transform.position;
 
         DOTweenManager.CardHover(transform, originalPosition, originalScale, 1.08f, 0.2f, 0.12f, 0.04f, 0.8f);
@@ -206,7 +221,7 @@ public class CardDisplay : MonoBehaviour
     {
         if (BattleManager.Instance.isGameOver) return;
         if (isDragging || isPlaced || isTweening) return;
-        // ÀúÀåÇØ µĞ ¼ÕÆĞ ¿ø·¡ À§Ä¡(hoverOriginPos)¿Í ¿ø·¡ ½ºÄÉÀÏ, È¸Àü°ªÀ¸·Î ±ò²ûÇÏ°Ô º¹±Í
+        // ì €ì¥í•´ ë‘” ì†íŒ¨ ì›ë˜ ìœ„ì¹˜(hoverOriginPos)ì™€ ì›ë˜ ìŠ¤ì¼€ì¼, íšŒì „ê°’ìœ¼ë¡œ ê¹”ë”í•˜ê²Œ ë³µê·€
         DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
     }
 
@@ -214,7 +229,7 @@ public class CardDisplay : MonoBehaviour
     {
         if (BattleManager.Instance.isGameOver) return;
         if (isTweening) return;
-        DOTween.Kill(GetInstanceID() + "_card"); // ±âÁ¸ È£¹ö Æ®À© Á¤¸®
+        DOTween.Kill(GetInstanceID() + "_card"); // ê¸°ì¡´ í˜¸ë²„ íŠ¸ìœˆ ì •ë¦¬
 
         isDragging = true;
         SoundManager.Instance.PlaySFX(SFXType.CardPlay);
@@ -231,7 +246,7 @@ public class CardDisplay : MonoBehaviour
     {
         if (isDragging)
         {
-            // ¸¶¿ì½º À§Ä¡·Î Ä«µå ÀÌµ¿
+            // ë§ˆìš°ìŠ¤ ìœ„ì¹˜ë¡œ ì¹´ë“œ ì´ë™
             Vector3 mousePos = Input.mousePosition;
             mousePos.z = Camera.main.WorldToScreenPoint(transform.position).z;
             Vector3 worldPos = Camera.main.ScreenToWorldPoint(mousePos);
@@ -254,43 +269,43 @@ public class CardDisplay : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // ¸¶¿ì½º ¶¾ ÀÚ¸®¿¡ ½½·ÔÀÌ ÀÖ´Â °æ¿ì
+        // ë§ˆìš°ìŠ¤ ë—€ ìë¦¬ì— ìŠ¬ë¡¯ì´ ìˆëŠ” ê²½ìš°
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
         {
             BattleSlot targetSlot = hit.collider.GetComponent<BattleSlot>();
 
             if (targetSlot != null)
             {
-                // [ºĞ±â A] ¿ø·¡ ²ÈÇôÀÖ´ø µ¿ÀÏ ½½·Ô¿¡ ±×´ë·Î ´Ù½Ã ³»·Á³õÀº °æ¿ì
+                // [ë¶„ê¸° A] ì›ë˜ ê½‚í˜€ìˆë˜ ë™ì¼ ìŠ¬ë¡¯ì— ê·¸ëŒ€ë¡œ ë‹¤ì‹œ ë‚´ë ¤ë†“ì€ ê²½ìš°
                 if (targetSlot == currentSlot)
                 {
                     DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
                     return;
                 }
 
-                // ±âÁ¸¿¡ ´Ù¸¥ ½½·Ô¿¡ ²ÈÇôÀÖ´ø Ä«µå¶ó¸é ÀÌÀü ½½·Ô°úÀÇ ¿¬°áÀ» ¸ÕÀú ²÷À½
+                // ê¸°ì¡´ì— ë‹¤ë¥¸ ìŠ¬ë¡¯ì— ê½‚í˜€ìˆë˜ ì¹´ë“œë¼ë©´ ì´ì „ ìŠ¬ë¡¯ê³¼ì˜ ì—°ê²°ì„ ë¨¼ì € ëŠìŒ
                 DetachFromCurrentSlot();
 
-                // [ºĞ±â B] ¸ñÇ¥ ½½·ÔÀÌ ÀÌ¹Ì ´Ù¸¥ Ä«µå·Î Â÷ ÀÖ´Â °æ¿ì (¹Ù¿î½º/±³Ã¼)
+                // [ë¶„ê¸° B] ëª©í‘œ ìŠ¬ë¡¯ì´ ì´ë¯¸ ë‹¤ë¥¸ ì¹´ë“œë¡œ ì°¨ ìˆëŠ” ê²½ìš° (ë°”ìš´ìŠ¤/êµì²´)
                 if (targetSlot.isOccupied && targetSlot.currentCard != null)
                 {
                     targetSlot.currentCard.DetachFromCurrentSlot();
                 }
 
-                // [ºĞ±â C] ¸ñÇ¥ ½½·Ô¿¡ »õ Ä«µå ¾ÈÂø
+                // [ë¶„ê¸° C] ëª©í‘œ ìŠ¬ë¡¯ì— ìƒˆ ì¹´ë“œ ì•ˆì°©
                 isPlaced = true;
                 currentSlot = targetSlot;
                 targetSlot.PlaceCard(this);
 
-                // ½½·Ô¿¡ Ä«µå°¡ ¼º°øÀûÀ¸·Î ³õ¿´À» ¶§ È£Ãâ
+                // ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ì„±ê³µì ìœ¼ë¡œ ë†“ì˜€ì„ ë•Œ í˜¸ì¶œ
                 if (BattleCardManager.Instance != null && this.cardInstance != null)
                 {
-                    // ¼ÕÆĞ µ¥ÀÌÅÍ ¸®½ºÆ®¿¡¼­ Áï½Ã Á¦°Å (½ÇÁ¦ ¿ÀºêÁ§Æ®´Â ½½·Ô¿¡ Á¸Àç)
+                    // ì†íŒ¨ ë°ì´í„° ë¦¬ìŠ¤íŠ¸ì—ì„œ ì¦‰ì‹œ ì œê±° (ì‹¤ì œ ì˜¤ë¸Œì íŠ¸ëŠ” ìŠ¬ë¡¯ì— ì¡´ì¬)
                     BattleCardManager.Instance.handCards.Remove(this.cardInstance);
                     BattleUIManager.Instance?.UpdateDeckUI();
                 }
 
-                // ½½·Ô ¾ÈÂø ÀÚ¼® ¿¬Ãâ + ½½·Ô ÆİÄ¡ ¹İÀÀ
+                // ìŠ¬ë¡¯ ì•ˆì°© ìì„ ì—°ì¶œ + ìŠ¬ë¡¯ í€ì¹˜ ë°˜ì‘
                 DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
                 DOTweenManager.SlotCardPlaced(targetSlot.transform);
 
@@ -300,10 +315,10 @@ public class CardDisplay : MonoBehaviour
 
         SoundManager.Instance.PlaySFX(SFXType.CardPlace);
 
-        // ¸¶¿ì½º ¶¾ ÀÚ¸®°¡ ½½·ÔÀÌ ¾Æ´Ñ °æ¿ì (Çã°ø ¶Ç´Â ÇÚµå ¿µ¿ª)
+        // ë§ˆìš°ìŠ¤ ë—€ ìë¦¬ê°€ ìŠ¬ë¡¯ì´ ì•„ë‹Œ ê²½ìš° (í—ˆê³µ ë˜ëŠ” í•¸ë“œ ì˜ì—­)
         DetachFromCurrentSlot();
 
-        // Ä«µå¸¦ ³õÀº Y À§Ä¡°¡ -1.5 ÀÌÇÏÀÎ °æ¿ì ÇÚµå µ¦ ¸®½ºÆ® ÀÎµ¦½º ¼ø¼­ º¯°æ
+        // ì¹´ë“œë¥¼ ë†“ì€ Y ìœ„ì¹˜ê°€ -1.5 ì´í•˜ì¸ ê²½ìš° í•¸ë“œ ë± ë¦¬ìŠ¤íŠ¸ ì¸ë±ìŠ¤ ìˆœì„œ ë³€ê²½
         if (transform.position.y <= -1.5f)
         {
             isSnapFixed = true;
