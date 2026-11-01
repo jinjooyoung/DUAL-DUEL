@@ -178,6 +178,7 @@ public class CardDisplay : MonoBehaviour
     private void OnMouseEnter()
     {
         if (BattleManager.Instance.isGameOver) return;
+        if (BattleManager.Instance.isTurnExecuting) return;
         if (isDragging || isPlaced || isTweening) return;
 
         // 호버 시작 시 현재 손패 위치를 기준점으로 저장
@@ -189,6 +190,7 @@ public class CardDisplay : MonoBehaviour
     private void OnMouseExit()
     {
         if (BattleManager.Instance.isGameOver) return;
+        if (BattleManager.Instance.isTurnExecuting) return;
         if (isDragging || isPlaced || isTweening) return;
         // 저장해 둔 손패 원래 위치(hoverOriginPos)와 원래 스케일, 회전값으로 깔끔하게 복귀
         DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
@@ -197,6 +199,7 @@ public class CardDisplay : MonoBehaviour
     private void OnMouseDown()
     {
         if (BattleManager.Instance.isGameOver) return;
+        if (BattleManager.Instance.isTurnExecuting) return;
         if (isTweening) return;
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
@@ -213,6 +216,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseDrag()
     {
+        if (BattleManager.Instance.isGameOver) return;
+        if (BattleManager.Instance.isTurnExecuting) return;
+
         if (isDragging)
         {
             // 마우스 위치로 카드 이동
@@ -225,6 +231,9 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseUp()
     {
+        if (BattleManager.Instance.isGameOver) return;
+        if (BattleManager.Instance.isTurnExecuting) return;
+
         if (!isDragging) return;
         isDragging = false;
 

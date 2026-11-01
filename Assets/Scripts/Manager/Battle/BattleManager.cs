@@ -74,6 +74,7 @@ public class BattleManager : MonoBehaviour
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
 
     public bool isGameOver = false;
+    public bool isTurnExecuting = false;
 
     private Coroutine turnExecutionCoroutine;
 
@@ -125,6 +126,10 @@ public class BattleManager : MonoBehaviour
         if (turnExecutionCoroutine != null) return;
 
         if (isGameOver) return;
+
+        if (isTurnExecuting) return;
+
+        isTurnExecuting = true;
 
         /*// 5개 슬롯 완충 여부 검사
         if (!IsAllSlotsOccupied())
@@ -181,7 +186,11 @@ public class BattleManager : MonoBehaviour
             yield return new WaitForSeconds(slotActionDelay);
 
             // 적 사망 시 슬롯 루프 조기 종료
-            if (monsterStats.currentHp <= 0) break;
+            if (monsterStats.currentHp <= 0)
+            {
+                isTurnExecuting = false;
+                break;
+            }
         }
 
         if (isGameOver) yield break;
@@ -212,6 +221,8 @@ public class BattleManager : MonoBehaviour
         }
 
         TurnResetGuardBuff();
+
+        isTurnExecuting = false;
 
         // 3. 손패 정리 완료 후 2초 대기 (턴 전환 딜레이 연출)
         yield return new WaitForSeconds(nextTurnDelay);
