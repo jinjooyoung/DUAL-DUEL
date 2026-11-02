@@ -4,22 +4,137 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// 버프 / 디버프 종류. 정수값 = UI 아이콘 리스트 인덱스 (BattleUIManager의 BuffIcons 순서와 동일하게 유지)
+/// </summary>
+public enum StatusEffectType
+{
+    Regeneration = 0,   // [버프] 재생 : 턴 종료 시 체력 +n
+    Force = 1,          // [버프] 힘 : 공격 피해량 +n
+    Lifesteal = 2,      // [버프] 흡혈 : 체력에 들어간 피해의 n% 회복 (최대 100)
+    Poison = 3,         // [디버프] 중독 : 턴 종료 시 피해 n
+    Bleed = 4,          // [디버프] 출혈 : 공격받을 때 피해 +n
+    Weaken = 5          // [디버프] 약화 : 카드 밸류 -n
+}
+
 [Serializable]
 public class CombatEntityStats
 {
+    public const int STATUS_DURATION = 3;   // 버프/디버프 시전 시 덮어씌울 유지 턴수
+    public const int LIFESTEAL_MAX = 100;   // 흡혈 최대치 (%)
+    public const int STATUS_COUNT = 6;      // StatusEffectType 개수
+
     [Tooltip("현재 체력")] public int currentHp;
     [Tooltip("최대 체력")] public int maxHp;
     [Tooltip("현재 방어도")] public int guard;
-    [Tooltip("버프 밸류 (공격력/위력 가산 등)")] public int buffValue;
-    [Tooltip("디버프 밸류 (약화 등)")] public int debuffValue;
+
+    [Header("버프 수치")]
+    [Tooltip("재생: 턴 종료 시 회복량")] public int regeneration;
+    [Tooltip("힘: 공격 피해 가산")] public int force;
+    [Tooltip("흡혈: 체력 피해의 n% 회복")] public int lifesteal;
+
+    [Header("디버프 수치")]
+    [Tooltip("중독: 턴 종료 시 피해량")] public int poison;
+    [Tooltip("출혈: 피격 시 추가 피해")] public int bleed;
+    [Tooltip("약화: 카드 밸류 감소")] public int weaken;
+
+    [Header("버프 유지 턴수")]
+    public int regenerationTurns;
+    public int forceTurns;
+    public int lifestealTurns;
+
+    [Header("디버프 유지 턴수")]
+    public int poisonTurns;
+    public int bleedTurns;
+    public int weakenTurns;
 
     public CombatEntityStats(int maxHp)
     {
         this.maxHp = maxHp;
         this.currentHp = maxHp;
         this.guard = 0;
-        this.buffValue = 0;
-        this.debuffValue = 0;
+        ClearAllStatus();
+    }
+
+    public static bool IsBuff(StatusEffectType type) => type <= StatusEffectType.Lifesteal;
+
+    public int GetStatusValue(StatusEffectType type) => StatusValueRef(type);
+    public int GetStatusTurns(StatusEffectType type) => StatusTurnsRef(type);
+
+    /// <summary>
+    /// 버프/디버프 시전: 수치 누적 + 유지 턴수 3으로 덮어씌움. 실제로 증가한 수치를 반환
+    /// </summary>
+    public int AddStatus(StatusEffectType type, int amount)
+    {
+        ref int value = ref StatusValueRef(type);
+        ref int turns = ref StatusTurnsRef(type);
+
+        int before = value;
+        value += amount;
+
+        // 흡혈은 100%가 최대치 (이미 100이면 더 이상 증가하지 않음)
+        if (type == StatusEffectType.Lifesteal)
+            value = Mathf.Min(value, LIFESTEAL_MAX);
+
+        turns = STATUS_DURATION;
+        return value - before;
+    }
+
+    /// <summary>
+    /// 모든 버프/디버프 유지 턴수 -1. 0이 된 효과는 수치도 0으로 초기화
+    /// </summary>
+    public void TickStatusDurations()
+    {
+        for (int i = 0; i < STATUS_COUNT; i++)
+        {
+            StatusEffectType type = (StatusEffectType)i;
+            ref int turns = ref StatusTurnsRef(type);
+            if (turns < 1) continue;
+
+            turns--;
+            if (turns == 0)
+            {
+                StatusValueRef(type) = 0;
+            }
+        }
+    }
+
+    public void ClearAllStatus()
+    {
+        for (int i = 0; i < STATUS_COUNT; i++)
+        {
+            StatusValueRef((StatusEffectType)i) = 0;
+            StatusTurnsRef((StatusEffectType)i) = 0;
+        }
+    }
+
+    // 개별 int 필드를 타입으로 접근하기 위한 참조 반환 (get/set 스위치문 중복 방지)
+    private ref int StatusValueRef(StatusEffectType type)
+    {
+        switch (type)
+        {
+            case StatusEffectType.Regeneration: return ref regeneration;
+            case StatusEffectType.Force:        return ref force;
+            case StatusEffectType.Lifesteal:    return ref lifesteal;
+            case StatusEffectType.Poison:       return ref poison;
+            case StatusEffectType.Bleed:        return ref bleed;
+            case StatusEffectType.Weaken:       return ref weaken;
+            default: throw new ArgumentOutOfRangeException(nameof(type));
+        }
+    }
+
+    private ref int StatusTurnsRef(StatusEffectType type)
+    {
+        switch (type)
+        {
+            case StatusEffectType.Regeneration: return ref regenerationTurns;
+            case StatusEffectType.Force:        return ref forceTurns;
+            case StatusEffectType.Lifesteal:    return ref lifestealTurns;
+            case StatusEffectType.Poison:       return ref poisonTurns;
+            case StatusEffectType.Bleed:        return ref bleedTurns;
+            case StatusEffectType.Weaken:       return ref weakenTurns;
+            default: throw new ArgumentOutOfRangeException(nameof(type));
+        }
     }
 }
 
@@ -63,12 +178,20 @@ public class BattleManager : MonoBehaviour
         return entity == playerStats ? playerTransform : monsterTransform;
     }
 
+    private CombatEntityStats GetOpponent(CombatEntityStats entity)
+    {
+        return entity == playerStats ? monsterStats : playerStats;
+    }
+
     [Header("카메라 쉐이크")]
     [SerializeField] private RectTransform uiShakeRoot;
     [SerializeField] private Transform cameraTransform;
 
     [Header("카드 시전 딜레이")]
     [SerializeField] private float slotActionDelay = 0.5f;
+
+    [Header("재생/중독 정산 연출 대기 시간")]
+    [SerializeField] private float statusTickDelay = 0.4f;
 
     [Header("턴 전환 대기 시간")]
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
@@ -162,6 +285,10 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator Co_ExecuteTurnSlots()
     {
+        // 0. 카드 시전 전 재생 -> 중독 정산
+        yield return StartCoroutine(Co_ApplyTurnEndStatusEffects());
+        if (isGameOver) yield break;
+
         // 1. 슬롯 5개 순차 발동 (1초 간격)
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
@@ -195,6 +322,11 @@ public class BattleManager : MonoBehaviour
 
         if (isGameOver) yield break;
 
+        // 1-0. 모든 카드 시전 종료 -> 버프/디버프 유지 턴수 일괄 -1 (0이 되면 수치 초기화)
+        playerStats.TickStatusDurations();
+        monsterStats.TickStatusDurations();
+        BattleUIManager.Instance?.UpdateAllUI();
+
         // [추가] 1-1. 0~4번 슬롯 및 모든 연계 시전이 완료된 후, 슬롯의 카드들을 0.2초 간격으로 순차 디스카드
         for (int i = 0; i < fieldCardSlots.Count; i++)
         {
@@ -220,7 +352,7 @@ public class BattleManager : MonoBehaviour
             yield return StartCoroutine(BattleCardManager.Instance.Co_DiscardAllHandCards());
         }
 
-        TurnResetGuardBuff();
+        TurnResetGuard();
 
         isTurnExecuting = false;
 
@@ -230,6 +362,52 @@ public class BattleManager : MonoBehaviour
         // 4. 모든 정산 완료 및 새 턴 시작
         OnAllSlotsFinished();
         turnExecutionCoroutine = null;
+    }
+
+    /// <summary>
+    /// 턴 종료 버튼 직후, 카드 시전 전에 재생 회복 -> 중독 피해 순서로 정산
+    /// </summary>
+    private IEnumerator Co_ApplyTurnEndStatusEffects()
+    {
+        // 1. 재생 (각 엔티티가 자기 재생 수치만큼 회복)
+        bool isRegenApplied = false;
+        isRegenApplied |= ApplyRegeneration(playerStats);
+        isRegenApplied |= ApplyRegeneration(monsterStats);
+
+        if (isRegenApplied)
+        {
+            BattleUIManager.Instance?.UpdateAllUI();
+            yield return new WaitForSeconds(statusTickDelay);
+        }
+
+        // 2. 중독 (각 엔티티가 자기 중독 수치만큼 피해. 방어도 무시)
+        bool isPoisonApplied = false;
+        isPoisonApplied |= ApplyPoison(playerStats);
+        isPoisonApplied |= ApplyPoison(monsterStats);
+
+        if (isPoisonApplied)
+        {
+            BattleUIManager.Instance?.UpdateAllUI();
+            yield return new WaitForSeconds(statusTickDelay);
+        }
+    }
+
+    private bool ApplyRegeneration(CombatEntityStats entity)
+    {
+        if (isGameOver || entity.regeneration <= 0) return false;
+
+        Debug.Log($"[재생] {(entity == playerStats ? "플레이어" : "몬스터")} 체력 +{entity.regeneration}");
+        ModifyHealth(entity, entity.regeneration);
+        return true;
+    }
+
+    private bool ApplyPoison(CombatEntityStats entity)
+    {
+        if (isGameOver || entity.poison <= 0) return false;
+
+        Debug.Log($"[중독] {(entity == playerStats ? "플레이어" : "몬스터")} 피해 {entity.poison}");
+        ModifyHealth(entity, -entity.poison, false);
+        return true;
     }
 
     /// <summary>
@@ -245,10 +423,8 @@ public class BattleManager : MonoBehaviour
 
         int rawAtk = slot.slotBaseAttack;
 
-        // 주체의 버프/디버프 가산 적용
-        int finalDamage = Mathf.Max(0, rawAtk + user.buffValue - user.debuffValue);
-        user.buffValue = 0;
-        user.debuffValue = 0;
+        // 카드가 아니므로 약화는 적용되지 않음. 힘/출혈은 ApplyDamage에서 가산
+        int finalDamage = Mathf.Max(0, rawAtk);
 
         Debug.Log($"[빈 슬롯 기본 공격] {(isPlayerSlot ? "플레이어" : "적")} {slot.slotIndex}번 슬롯이 비어있어 기본 피해 {finalDamage}(원래: {rawAtk}) 시전!");
 
@@ -522,12 +698,8 @@ public class BattleManager : MonoBehaviour
 
         for (int i = 0; i < totalCasts; i++)
         {
-            // 주체 버프/디버프 연산 (음수 보정)
-            int finalValue = Mathf.Max(0, cardValue + user.buffValue - user.debuffValue);
-            user.buffValue = 0;
-            user.debuffValue = 0;
-
-            // 실제 효과 발동
+            // 실제 효과 발동 (약화 차감은 ApplyCardEffect에서 처리)
+            int finalValue = Mathf.Max(0, cardValue);
             ApplyCardEffect(cardData.cardType, user, target, finalValue);
 
             // 사용 연출 (슬롯에 카드가 유지된 채로 찌르기)
@@ -573,7 +745,8 @@ public class BattleManager : MonoBehaviour
         BattleUIManager.Instance?.UpdateAllUI();
     }
 
-    public void ModifyHealth(CombatEntityStats entity, int amount)
+    /// <param name="isAttack">false면 공격자 모션 없이 피격만 연출 (중독 등)</param>
+    public void ModifyHealth(CombatEntityStats entity, int amount, bool isAttack = true)
     {
         entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
         Debug.Log($"HP 변경: {amount} (현재 HP: {entity.currentHp}/{entity.maxHp})");
@@ -598,13 +771,13 @@ public class BattleManager : MonoBehaviour
         if (entity == playerStats)
         {
             SoundManager.Instance.PlaySFX(SFXType.Hit_Damage);
-            BattleUIManager.Instance.PlayMonsterAttack();
+            if (isAttack) BattleUIManager.Instance.PlayMonsterAttack();
             BattleUIManager.Instance.PlayPlayerHit();
         }
         else
         {
             SoundManager.Instance.PlaySFX(SFXType.Attack_Slash);
-            BattleUIManager.Instance.PlayPlayerAttack();
+            if (isAttack) BattleUIManager.Instance.PlayPlayerAttack();
             BattleUIManager.Instance.PlayMonsterHit();
         }
 
@@ -619,6 +792,14 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void ApplyCardEffect(CardType cardType, CombatEntityStats user, CombatEntityStats target, int finalValue)
     {
+        // [약화] 시전자의 약화 수치만큼 카드 밸류 감소 (최솟값 0)
+        if (user.weaken > 0)
+        {
+            int before = finalValue;
+            finalValue = Mathf.Max(0, finalValue - user.weaken);
+            Debug.Log($"[약화] 카드 밸류 {before} -> {finalValue} (약화 {user.weaken})");
+        }
+
         switch (cardType)
         {
             case CardType.Attack:
@@ -630,15 +811,33 @@ public class BattleManager : MonoBehaviour
                 break;
 
             case CardType.Heal:
-                ModifyHealth(user, finalValue);
+                if (finalValue > 0) ModifyHealth(user, finalValue);   // 0 회복은 ModifyHealth에서 피격 연출로 처리되므로 생략
                 break;
 
-            case CardType.Buff:
-                ModifyBuff(user, finalValue);
+            // 버프: 시전자 본인에게
+            case CardType.Buff_Regeneration:
+                ApplyStatusEffect(user, user, StatusEffectType.Regeneration, finalValue);
                 break;
 
-            case CardType.Debuff:
-                ModifyDebuff(target, finalValue);
+            case CardType.Buff_Force:
+                ApplyStatusEffect(user, user, StatusEffectType.Force, finalValue);
+                break;
+
+            case CardType.Buff_Lifesteal:
+                ApplyStatusEffect(user, user, StatusEffectType.Lifesteal, finalValue);
+                break;
+
+            // 디버프: 시전자의 상대에게
+            case CardType.Debuff_Poison:
+                ApplyStatusEffect(user, target, StatusEffectType.Poison, finalValue);
+                break;
+
+            case CardType.Debuff_Bleed:
+                ApplyStatusEffect(user, target, StatusEffectType.Bleed, finalValue);
+                break;
+
+            case CardType.Debuff_Weaken:
+                ApplyStatusEffect(user, target, StatusEffectType.Weaken, finalValue);
                 break;
         }
     }
@@ -657,10 +856,7 @@ public class BattleManager : MonoBehaviour
         CombatEntityStats user = isPlayer ? playerStats : monsterStats;
         CombatEntityStats target = isPlayer ? monsterStats : playerStats;
 
-        int value = cardDisplay.cardInstance.GetValue();
-        int finalValue = Mathf.Max(0, value + user.buffValue - user.debuffValue);
-        user.buffValue = 0;
-        user.debuffValue = 0;
+        int finalValue = Mathf.Max(0, cardDisplay.cardInstance.GetValue());
 
         ApplyCardEffect(cardData.cardType, user, target, finalValue);
 
@@ -674,35 +870,55 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <summary>
-    /// 공격 데미지 처리 (방어도를 먼저 소진하고, 초과분만 체력에서 차감)
+    /// 공격 데미지 처리 (힘/출혈 가산 -> 방어도 소진 -> 초과분 체력 차감 + 공격자 흡혈)
+    /// 공격자는 항상 target의 상대 (카드 공격, 슬롯 기본 공격 공통)
     /// </summary>
     public void ApplyDamage(CombatEntityStats target, int damage)
     {
+        CombatEntityStats attacker = GetOpponent(target);
+
+        // [힘] 공격자 힘 수치 가산 -> [출혈] 피격자 출혈 수치 가산
+        int baseDamage = damage;
+        damage += attacker.force;
+        damage += target.bleed;
+
+        if (attacker.force > 0 || target.bleed > 0)
+            Debug.Log($"[피해 가산] {baseDamage} + 힘 {attacker.force} + 출혈 {target.bleed} = {damage}");
+
         if (damage <= 0) return;
 
-        // 1. 방어도가 존재하는 경우
-        if (target.guard > 0)
+        // 1. 방어도가 공격력 이상인 경우 (방어도만 차감, 체력 피해 없음 -> 흡혈 없음)
+        if (target.guard >= damage)
         {
-            // 공격력이 방어도보다 큰 경우 (방어도 전량 파괴 + 잔여 피해 체력 차감)
-            if (damage > target.guard)
-            {
-                int remainingDamage = damage - target.guard;
-                target.guard = 0;
-                ModifyHealth(target, -remainingDamage);
-            }
-            // 방어도가 공격력 이상인 경우 (방어도만 공격력만큼 차감되고 체력 피해 없음)
-            else
-            {
-                target.guard -= damage;
-                SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
-                BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defense);
-            }
+            target.guard -= damage;
+            SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
+            BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defense);
+            return;
         }
-        // 2. 방어도가 0인 경우 (데미지 전량 체력 차감)
-        else
-        {
-            ModifyHealth(target, -damage);
-        }
+
+        // 2. 방어도를 넘는 초과분만 체력 피해
+        int hpDamage = damage - target.guard;
+        target.guard = 0;
+
+        // [흡혈] 실제로 깎이는 체력 기준으로 회복 (피격자 처치 시 승리 처리 전에 회복이 반영되도록 먼저 적용)
+        ApplyLifesteal(attacker, Mathf.Min(hpDamage, target.currentHp));
+
+        ModifyHealth(target, -hpDamage);
+    }
+
+    /// <summary>
+    /// 흡혈: 체력 피해량 * 흡혈% (정수 반올림)
+    /// </summary>
+    private void ApplyLifesteal(CombatEntityStats attacker, int hpDamage)
+    {
+        if (attacker.lifesteal <= 0 || hpDamage <= 0) return;
+
+        // Mathf.RoundToInt는 0.5를 짝수 쪽으로 반올림(2.5 -> 2)하므로 일반 반올림으로 처리
+        int heal = Mathf.FloorToInt(hpDamage * attacker.lifesteal / 100f + 0.5f);
+        if (heal <= 0) return;
+
+        Debug.Log($"[흡혈] 체력 피해 {hpDamage} x {attacker.lifesteal}% -> 회복 {heal}");
+        ModifyHealth(attacker, heal);
     }
 
     public void ModifyGuard(CombatEntityStats entity, int amount)
@@ -725,47 +941,52 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    public void ModifyBuff(CombatEntityStats entity, int amount)
+    /// <summary>
+    /// 버프/디버프 부여 (수치 누적 + 유지 턴수 갱신)
+    /// </summary>
+    /// <param name="caster">시전자 (모션 연출용)</param>
+    /// <param name="receiver">효과를 받는 대상 (버프: 시전자 본인, 디버프: 상대)</param>
+    public void ApplyStatusEffect(CombatEntityStats caster, CombatEntityStats receiver, StatusEffectType type, int amount)
     {
-        entity.buffValue = Mathf.Max(0, entity.buffValue + amount);
-        Debug.Log($"버프 변경: {amount} (현재 버프: {entity.buffValue})");
+        // 약화 등으로 밸류가 0이 되면 아무 효과 없음 (지속시간도 갱신하지 않음)
+        if (amount <= 0) return;
 
-        Vector3 spawnPos = GetEntityWorldPosition(entity);
-        BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
-        BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Buff);
+        int added = receiver.AddStatus(type, amount);
+        bool isBuff = CombatEntityStats.IsBuff(type);
+
+        Debug.Log($"[{(isBuff ? "버프" : "디버프")}] {GetStatusName(type)} +{added} " +
+                  $"(현재 {receiver.GetStatusValue(type)}, {receiver.GetStatusTurns(type)}턴)");
+
+        // 플로팅 텍스트 (흡혈은 %로 표시)
+        string suffix = type == StatusEffectType.Lifesteal ? "%" : string.Empty;
+        Color color = isBuff ? new Color(1f, 0.85f, 0.2f) : new Color(0.75f, 0.35f, 1f);
+        BattleUIManager.Instance?.ShowStatusText(GetEntityWorldPosition(receiver), $"{GetStatusName(type)} +{added}{suffix}", color);
+
+        if (isBuff) BattleVFXPlayer.Instance?.Play(GetEntityTransform(receiver), VFXType.Buff);
         SoundManager.Instance.PlaySFX(SFXType.Buff);
 
-        if (entity == playerStats)
-        {
-            BattleUIManager.Instance.PlayPlayerAttack();
-        }
-        else
-        {
-            BattleUIManager.Instance.PlayMonsterAttack();
-        }
+        // 시전자 모션
+        if (caster == playerStats) BattleUIManager.Instance.PlayPlayerAttack();
+        else BattleUIManager.Instance.PlayMonsterAttack();
     }
 
-    public void ModifyDebuff(CombatEntityStats entity, int amount)
+    public static string GetStatusName(StatusEffectType type)
     {
-        entity.debuffValue = Mathf.Max(0, entity.debuffValue + amount);
-        Debug.Log($"디버프 변경: {amount} (현재 디버프: {entity.debuffValue})");
-
-        Vector3 spawnPos = GetEntityWorldPosition(entity);
-        BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
-        SoundManager.Instance.PlaySFX(SFXType.Buff);
-
-        if (entity == playerStats)
+        switch (type)
         {
-            BattleUIManager.Instance.PlayPlayerAttack();
-        }
-        else
-        {
-            BattleUIManager.Instance.PlayMonsterAttack();
+            case StatusEffectType.Regeneration: return "재생";
+            case StatusEffectType.Force:        return "힘";
+            case StatusEffectType.Lifesteal:    return "흡혈";
+            case StatusEffectType.Poison:       return "중독";
+            case StatusEffectType.Bleed:        return "출혈";
+            case StatusEffectType.Weaken:       return "약화";
+            default:                            return type.ToString();
         }
     }
 
     private void HandleDeath(CombatEntityStats deadEntity)
     {
+        if (isGameOver) return;     // 이미 승패가 결정됐다면 무시
         isGameOver = true;
 
         if (deadEntity == playerStats)
@@ -783,14 +1004,13 @@ public class BattleManager : MonoBehaviour
         }
     }
 
-    private void TurnResetGuardBuff()
+    /// <summary>
+    /// 턴 종료 시 방어도만 초기화 (버프/디버프는 유지 턴수로 관리)
+    /// </summary>
+    private void TurnResetGuard()
     {
         playerStats.guard = 0;
-        playerStats.buffValue = 0;
-        playerStats.debuffValue = 0;
         monsterStats.guard = 0;
-        monsterStats.buffValue = 0;
-        monsterStats.debuffValue = 0;
         BattleUIManager.Instance?.UpdateAllUI();
     }
 

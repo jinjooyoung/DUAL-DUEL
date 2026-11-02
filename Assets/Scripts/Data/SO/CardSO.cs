@@ -1,14 +1,23 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+// 정수값이 에셋에 저장되므로 순서를 바꾸거나 중간에 끼워넣지 말 것 (새 타입은 맨 뒤에 추가)
 public enum CardType
 {
-    Attack,
-    Defense,
-    Heal,
-    Buff,
-    Debuff
+    Attack = 0,
+    Defense = 1,
+    Heal = 2,
+
+    // 버프 (시전자 본인에게 부여)
+    Buff_Regeneration = 3,  // 재생 : 턴 종료 시 체력 +n
+    Buff_Force = 4,         // 힘 : 공격 피해량 +n
+    Buff_Lifesteal = 5,     // 흡혈 : 체력 피해의 n% 회복 (최대 100)
+
+    // 디버프 (시전자의 상대에게 부여)
+    Debuff_Poison = 6,      // 중독 : 턴 종료 시 피해 n
+    Debuff_Bleed = 7,       // 출혈 : 공격받을 때 피해 +n
+    Debuff_Weaken = 8       // 약화 : 카드 밸류 -n
 }
 
 // 일반, 고급, 희귀, 에픽, 전설 (Mythic 삭제)
@@ -52,7 +61,7 @@ public enum RewardCategory
 public class CardData
 {
     public int cardId;
-    public string cardType;         // 카드 타입 (Attack, Defense ...)
+    public string cardType;         // 카드 타입 (Attack, Defense, Heal, Buff_Regeneration ... Debuff_Weaken)
     public int rank;                // 1~5 (일반 ~ 전설)
 
     public string nameKey;

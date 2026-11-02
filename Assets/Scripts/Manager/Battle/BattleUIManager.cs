@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -8,41 +8,45 @@ public class BattleUIManager : MonoBehaviour
 {
     public static BattleUIManager Instance { get; private set; }
 
-    [Header("ÅØ½ºÆ® UI (TextMeshPro)")]
-    [Tooltip("»ÌÀ» Ä«µå ´õ¹Ì Ä«¿îÆ® ÅØ½ºÆ®")]
+    [Header("í…ìŠ¤íŠ¸ UI (TextMeshPro)")]
+    [Tooltip("ë½‘ì„ ì¹´ë“œ ë”ë¯¸ ì¹´ìš´íŠ¸ í…ìŠ¤íŠ¸")]
     [SerializeField] private TextMeshProUGUI drawDeckText;
 
-    [Tooltip("¹ö·ÁÁø Ä«µå ´õ¹Ì Ä«¿îÆ® ÅØ½ºÆ®")]
+    [Tooltip("ë²„ë ¤ì§„ ì¹´ë“œ ë”ë¯¸ ì¹´ìš´íŠ¸ í…ìŠ¤íŠ¸")]
     [SerializeField] private TextMeshProUGUI discardDeckText;
 
-    [Header("ÇÃ·¹ÀÌ¾î ½ºÅÈ UI")]
+    [Header("í”Œë ˆì´ì–´ ìŠ¤íƒ¯ UI")]
     [SerializeField] private TextMeshProUGUI playerStatText;
     [SerializeField] private Slider playerHpSlider;
     [SerializeField] private Slider playerShieldSlider;
 
-    [Header("ÇÃ·¹ÀÌ¾î Ç¥Á¤")]
+    [Header("í”Œë ˆì´ì–´ í‘œì •")]
     [SerializeField] private CharacterExpression playerExpression;
 
-    [Header("¸ó½ºÅÍ ½ºÅÈ UI")]
+    [Header("ëª¬ìŠ¤í„° ìŠ¤íƒ¯ UI")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
     [SerializeField] private Slider monsterHpSlider;
     [SerializeField] private Slider monsterShieldSlider;
 
-    [Header("¸ó½ºÅÍ Ç¥Á¤")]
+    [Header("ëª¬ìŠ¤í„° í‘œì •")]
     [SerializeField] private CharacterExpression monsterExpression;
 
-    [Header("¹èÆ² Á¾·á ÆĞ³Î")]
+    [Header("ë²„í”„/ë””ë²„í”„ ì•„ì´ì½˜ (ìˆœì„œ ê³ ì •: ì¬ìƒ, í˜, í¡í˜ˆ, ì¤‘ë…, ì¶œí˜ˆ, ì•½í™”)")]
+    [SerializeField] private List<BuffIconUI> playerBuffIcons = new List<BuffIconUI>();
+    [SerializeField] private List<BuffIconUI> monsterBuffIcons = new List<BuffIconUI>();
+
+    [Header("ë°°í‹€ ì¢…ë£Œ íŒ¨ë„")]
     public GameObject endOfBattlePanel;
     [SerializeField] private TextMeshProUGUI titleText;
     [SerializeField] private TextMeshProUGUI reviewText;
 
-    [Header("ÇÃ·ÎÆÃ ÅØ½ºÆ® ¿ÀºêÁ§Æ®")]
-    [Tooltip("3D TextMeshPro°¡ ºÙÀº ÇÃ·ÎÆÃ ÅØ½ºÆ® ÇÁ¸®ÆÕ")]
+    [Header("í”Œë¡œíŒ… í…ìŠ¤íŠ¸ ì˜¤ë¸Œì íŠ¸")]
+    [Tooltip("3D TextMeshProê°€ ë¶™ì€ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ í”„ë¦¬íŒ¹")]
     [SerializeField] private GameObject floatingTextPrefab;
-    [Tooltip("ÃÊ±â »ı¼º ¼ö·®")]
+    [Tooltip("ì´ˆê¸° ìƒì„± ìˆ˜ëŸ‰")]
     [SerializeField] private int initialPoolSize = 2;
 
-    // ºñÈ°¼ºÈ­µÈ ¿ÀºêÁ§Æ®µéÀ» ´ã¾ÆµÑ Ç® ¸®½ºÆ®
+    // ë¹„í™œì„±í™”ëœ ì˜¤ë¸Œì íŠ¸ë“¤ì„ ë‹´ì•„ë‘˜ í’€ ë¦¬ìŠ¤íŠ¸
     public List<FloatingTextEffect> floatingTextPool = new List<FloatingTextEffect>();
 
     private void Awake()
@@ -66,7 +70,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// °ÔÀÓ ½ÃÀÛ ½Ã ÃÊ±â Ç® »ı¼º
+    /// ê²Œì„ ì‹œì‘ ì‹œ ì´ˆê¸° í’€ ìƒì„±
     /// </summary>
     private void InitFloatingTextPool()
     {
@@ -98,7 +102,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// µ¿Àû È®Àå¿ë ÀÎ½ºÅÏ½ºÈ­
+    /// ë™ì  í™•ì¥ìš© ì¸ìŠ¤í„´ìŠ¤í™”
     /// </summary>
     private FloatingTextEffect CreateNewFloatingText()
     {
@@ -113,22 +117,22 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Ç®¿¡¼­ ºñÈ°¼ºÈ­µÈ ÅØ½ºÆ®¸¦ °¡Á®¿À°Å³ª ºÎÁ·ÇÏ¸é »õ·Î »ı¼º (µ¿Àû È®Àå)
+    /// í’€ì—ì„œ ë¹„í™œì„±í™”ëœ í…ìŠ¤íŠ¸ë¥¼ ê°€ì ¸ì˜¤ê±°ë‚˜ ë¶€ì¡±í•˜ë©´ ìƒˆë¡œ ìƒì„± (ë™ì  í™•ì¥)
     /// </summary>
     private FloatingTextEffect GetOrCreateFloatingText()
     {
-        // 1. ²¨Á® ÀÖ´Â ¿ÀºêÁ§Æ® Å½»ö
+        // 1. êº¼ì ¸ ìˆëŠ” ì˜¤ë¸Œì íŠ¸ íƒìƒ‰
         FloatingTextEffect available = floatingTextPool.Find(t => t != null && !t.gameObject.activeSelf);
         if (available != null) return available;
 
-        // 2. ¸ğÀÚ¶ó¸é È®Àå »ı¼º
+        // 2. ëª¨ìë¼ë©´ í™•ì¥ ìƒì„±
         return CreateNewFloatingText();
     }
 
-    #region ÇÃ·ÎÆÃ ÅØ½ºÆ® È£Ãâ API
+    #region í”Œë¡œíŒ… í…ìŠ¤íŠ¸ í˜¸ì¶œ API
 
     /// <summary>
-    /// µ¥¹ÌÁö ÇÃ·ÎÆÃ ÅØ½ºÆ® (»¡°£»ö)
+    /// ë°ë¯¸ì§€ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (ë¹¨ê°„ìƒ‰)
     /// </summary>
     public void ShowDamageText(Vector3 worldPos, int damage)
     {
@@ -141,7 +145,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Èú ÇÃ·ÎÆÃ ÅØ½ºÆ® (ÃÊ·Ï»ö)
+    /// í í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (ì´ˆë¡ìƒ‰)
     /// </summary>
     public void ShowHealText(Vector3 worldPos, int heal)
     {
@@ -154,7 +158,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ¹æ¾îµµ/¹öÇÁ ÇÃ·ÎÆÃ ÅØ½ºÆ® (ÇÏ´Ã»ö/³ë¶õ»ö)
+    /// ë°©ì–´ë„ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (í•˜ëŠ˜ìƒ‰)
     /// </summary>
     public void ShowShieldText(Vector3 worldPos, int shield)
     {
@@ -162,14 +166,27 @@ public class BattleUIManager : MonoBehaviour
         FloatingTextEffect effect = GetOrCreateFloatingText();
         if (effect != null)
         {
-            effect.Play($"+{shield} ¹æ¾î", new Color(0.3f, 0.7f, 1f), randomPos, Vector3.up, 0.4f, 0.6f);
+            effect.Play($"+{shield} ë°©ì–´", new Color(0.3f, 0.7f, 1f), randomPos, Vector3.up, 0.4f, 0.6f);
+        }
+    }
+
+    /// <summary>
+    /// ë²„í”„/ë””ë²„í”„ ë¶€ì—¬ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (ì˜ˆ: "í˜ +2", "í¡í˜ˆ +10%")
+    /// </summary>
+    public void ShowStatusText(Vector3 worldPos, string text, Color color)
+    {
+        Vector3 randomPos = worldPos + new Vector3(Random.Range(-0.25f, 0.25f), Random.Range(0.2f, 0.5f), -0.05f);
+        FloatingTextEffect effect = GetOrCreateFloatingText();
+        if (effect != null)
+        {
+            effect.Play(text, color, randomPos, Vector3.up, 0.4f, 0.6f);
         }
     }
 
     #endregion
 
     /// <summary>
-    /// ¸ğµç ¹èÆ² UI ÅØ½ºÆ® Áï½Ã °»½Å
+    /// ëª¨ë“  ë°°í‹€ UI í…ìŠ¤íŠ¸ ì¦‰ì‹œ ê°±ì‹ 
     /// </summary>
     public void UpdateAllUI()
     {
@@ -178,7 +195,7 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// µå·Î¿ì µ¦ ¹× ¹ö¸² µ¦ Ä«¿îÆ® °»½Å
+    /// ë“œë¡œìš° ë± ë° ë²„ë¦¼ ë± ì¹´ìš´íŠ¸ ê°±ì‹ 
     /// </summary>
     public void UpdateDeckUI()
     {
@@ -196,13 +213,13 @@ public class BattleUIManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î ¹× ¸ó½ºÅÍ ÀüÅõ ½ºÅÈ ÅØ½ºÆ® °»½Å
+    /// í”Œë ˆì´ì–´ ë° ëª¬ìŠ¤í„° ì „íˆ¬ ìŠ¤íƒ¯ í…ìŠ¤íŠ¸ ê°±ì‹ 
     /// </summary>
     public void UpdateCombatStatsUI()
     {
         if (BattleManager.Instance == null) return;
 
-        // ÇÃ·¹ÀÌ¾î ½ºÅÈ
+        // í”Œë ˆì´ì–´ ìŠ¤íƒ¯
         if (BattleManager.Instance.playerStats != null)
         {
             var stats = BattleManager.Instance.playerStats;
@@ -218,9 +235,11 @@ public class BattleUIManager : MonoBehaviour
 
             if (playerShieldSlider != null)
                 playerShieldSlider.value = stats.guard;
+
+            UpdateBuffIcons(stats, playerBuffIcons);
         }
 
-        // ¸ó½ºÅÍ ½ºÅÈ
+        // ëª¬ìŠ¤í„° ìŠ¤íƒ¯
         if (BattleManager.Instance.monsterStats != null)
         {
             var stats = BattleManager.Instance.monsterStats;
@@ -236,6 +255,26 @@ public class BattleUIManager : MonoBehaviour
 
             if (monsterShieldSlider != null)
                 monsterShieldSlider.value = stats.guard;
+
+            UpdateBuffIcons(stats, monsterBuffIcons);
+        }
+    }
+
+    /// <summary>
+    /// ì—”í‹°í‹°ì˜ ë²„í”„/ë””ë²„í”„ ìˆ˜ì¹˜ì— ë§ì¶° ì•„ì´ì½˜ 6ê°œ on/off + ìˆ˜ì¹˜ ê°±ì‹ 
+    /// ë¦¬ìŠ¤íŠ¸ ì¸ë±ìŠ¤ = StatusEffectType ì •ìˆ˜ê°’
+    /// </summary>
+    private void UpdateBuffIcons(CombatEntityStats stats, List<BuffIconUI> icons)
+    {
+        if (icons == null) return;
+
+        int count = Mathf.Min(icons.Count, CombatEntityStats.STATUS_COUNT);
+        for (int i = 0; i < count; i++)
+        {
+            if (icons[i] == null) continue;
+
+            StatusEffectType type = (StatusEffectType)i;
+            icons[i].Refresh(stats.GetStatusValue(type), type == StatusEffectType.Lifesteal);
         }
     }
 
@@ -246,7 +285,7 @@ public class BattleUIManager : MonoBehaviour
 
     public void VictoryUI()
     {
-        titleText.text = "½Â¸®!";
+        titleText.text = "ìŠ¹ë¦¬!";
         reviewText.text = "";
 
         OnEndOfBattlePanel();
@@ -254,7 +293,7 @@ public class BattleUIManager : MonoBehaviour
 
     public void DefeatUI()
     {
-        titleText.text = "ÆĞ¹è!";
+        titleText.text = "íŒ¨ë°°!";
         reviewText.text = "";
 
         OnEndOfBattlePanel();
