@@ -1,4 +1,4 @@
-using System.Collections;
+ï»¿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -7,19 +7,22 @@ public class StageManager : MonoBehaviour
 {
     public static StageManager Instance { get; private set; }
 
-    [Header("¸Ê »ı¼º ¿É¼Ç")]
+    [Header("ë§µ ìƒì„± ì˜µì…˜")]
     public int mapWidth = 5;
     public int mapHeight = 10;
 
-    [Header("·±Å¸ÀÓ ¸Ê µ¥ÀÌÅÍ")]
+    [Header("ëŸ°íƒ€ì„ ë§µ ë°ì´í„°")]
     public int currentChapter = 1;
     public List<List<StageNode>> floors = new List<List<StageNode>>();
-    public StageNode currentNode; // ÇöÀç ¼±ÅÃ/ÁøÀÔÇÑ ³ëµå
+    public StageNode currentNode; // í˜„ì¬ ì„ íƒ/ì§„ì…í•œ ë…¸ë“œ
 
     private StageNodeUI selectedNodeUI;
 
-    [Header("¿¬°á ÄÄÆ÷³ÍÆ®")]
+    [Header("ì—°ê²° ì»´í¬ë„ŒíŠ¸")]
     [SerializeField] private StageGenerator generator;
+
+    [Header("ëª¬ìŠ¤í„° ë°ì´í„°ë² ì´ìŠ¤ (ì „íˆ¬ ì§„ì… ì‹œ ëœë¤ ëª¬ìŠ¤í„° ì„ íƒ)")]
+    [SerializeField] private MonsterDatabaseSO monsterDatabase;
 
     private void Awake()
     {
@@ -103,7 +106,7 @@ public class StageManager : MonoBehaviour
 
     public void CreateNewRunData()
     {
-        // 6°³ Å¸ÀÔ ºñÀ² ¼³Á¤
+        // 6ê°œ íƒ€ì… ë¹„ìœ¨ ì„¤ì •
         Dictionary<StageType, float> weights = new Dictionary<StageType, float>
         {
             { StageType.Normal, 40f },
@@ -118,7 +121,7 @@ public class StageManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ³ëµå¸¦ Å¬¸¯ÇßÀ» ¶§ ¼±ÅÃ »óÅÂ °»½Å ¹× Á¤º¸ ÆĞ³Î Ç¥½Ã
+    /// ë…¸ë“œë¥¼ í´ë¦­í–ˆì„ ë•Œ ì„ íƒ ìƒíƒœ ê°±ì‹  ë° ì •ë³´ íŒ¨ë„ í‘œì‹œ
     /// </summary>
     public void SelectNode(StageNodeUI nodeUI)
     {
@@ -139,27 +142,34 @@ public class StageManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Á¤º¸ ÆĞ³ÎÀÇ ½ÃÀÛ ¹öÆ° Å¬¸¯ ½Ã ½ÇÁ¦ ¾À ÁøÀÔ
+    /// ì •ë³´ íŒ¨ë„ì˜ ì‹œì‘ ë²„íŠ¼ í´ë¦­ ì‹œ ì‹¤ì œ ì”¬ ì§„ì…
     /// </summary>
     public void StartCurrentSelectedStage()
     {
         if (currentNode == null || !currentNode.canGo) return;
 
-        currentNode.isVisited = true;
-
-        // µ¿ÀÏ Ãş ³ëµå ºñÈ°¼ºÈ­
-        foreach (var node in floors[currentNode.floor])
-        {
-            node.canGo = false;
-        }
-
-        // Random ³ëµå Ã³¸®: Normal, Elite, Rest, Shop Áß ÇÏ³ª¸¦ ¹«ÀÛÀ§ °áÁ¤
+        // 1. Random ë…¸ë“œ ì²˜ë¦¬: Normal, Elite, Rest, Shop ì¤‘ í•˜ë‚˜ë¥¼ ë¬´ì‘ìœ„ ê²°ì •
         StageType executionType = currentNode.stageType;
         if (executionType == StageType.Random)
         {
             StageType[] pool = { StageType.Normal, StageType.Elite, StageType.Rest, StageType.Shop };
             executionType = pool[Random.Range(0, pool.Length)];
-            Debug.Log($"<color=magenta>[StageManager] ·£´ı ³ëµå °áÁ¤: {executionType}</color>");
+            Debug.Log($"<color=magenta>[StageManager] ëœë¤ ë…¸ë“œ ê²°ì •: {executionType}</color>");
+        }
+
+        // 2. ì „íˆ¬ ìŠ¤í…Œì´ì§€ë¼ë©´ ëª¬ìŠ¤í„°ë¥¼ ë¨¼ì € ë½‘ì•„ GameManagerì— í• ë‹¹
+        //    (ì‹¤íŒ¨ ì‹œ ë…¸ë“œ ìƒíƒœë¥¼ ë°”ê¾¸ê¸° ì „ì— ì¤‘ë‹¨í•´ì•¼ ê°™ì€ ë…¸ë“œë¡œ ë‹¤ì‹œ ì‹œë„í•  ìˆ˜ ìˆìŒ)
+        if (MonsterSO.IsBattleStageType(executionType))
+        {
+            if (!TryAssignRandomMonster(executionType)) return;
+        }
+
+        // 3. ì§„ì… í™•ì •: ë°©ë¬¸ ì²˜ë¦¬ + ë™ì¼ ì¸µ ë…¸ë“œ ë¹„í™œì„±í™”
+        currentNode.isVisited = true;
+
+        foreach (var node in floors[currentNode.floor])
+        {
+            node.canGo = false;
         }
 
         string targetScene = GetSceneNameForType(executionType);
@@ -167,19 +177,47 @@ public class StageManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ½ºÅ×ÀÌÁö Å¬¸®¾î/Á¾·á ÈÄ È£Ãâ:
-    /// ÇöÀç ³ëµå¸¦ ¿Ï·á Ã³¸®ÇÏ°í, ´ÙÀ½ ¿¬°á ³ëµåµéÀ» °³¹æ(canGo = true)ÇÑ µÚ ½ºÅ×ÀÌÁö ¼±ÅÃ ¾ÀÀ¸·Î º¹±ÍÇÕ´Ï´Ù.
-    /// UI ¹öÆ°ÀÇ OnClick() ÀÌº¥Æ®¿¡ Á÷Á¢ ¿¬°á
+    /// ìŠ¤í…Œì´ì§€ íƒ€ì… + í˜„ì¬ ì±•í„°/ì¸µ ì¡°ê±´ìœ¼ë¡œ ëª¬ìŠ¤í„°ë¥¼ ëœë¤ ì„ íƒí•´ GameManager.monsterì— í• ë‹¹
+    /// </summary>
+    private bool TryAssignRandomMonster(StageType battleType)
+    {
+        if (monsterDatabase == null)
+        {
+            Debug.LogError("[StageManager] MonsterDatabaseSOê°€ ì—°ê²°ë˜ì§€ ì•Šì•˜ìŠµë‹ˆë‹¤. ì¸ìŠ¤í™í„°ì—ì„œ í• ë‹¹í•´ì£¼ì„¸ìš”.");
+            return false;
+        }
+
+        if (GameManager.Instance == null)
+        {
+            Debug.LogError("[StageManager] GameManagerê°€ ì—†ì–´ ëª¬ìŠ¤í„°ë¥¼ í• ë‹¹í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return false;
+        }
+
+        // floors ì¸ë±ìŠ¤(currentNode.floor)ëŠ” 0ë¶€í„° ì‹œì‘í•˜ë¯€ë¡œ ë°ì´í„° í…Œì´ë¸” ê¸°ì¤€(1ì¸µë¶€í„°)ìœ¼ë¡œ +1
+        int floor = currentNode.floor + 1;
+
+        MonsterSO monster = monsterDatabase.GetRandomMonster(battleType, currentChapter, floor);
+        if (monster == null) return false;
+
+        GameManager.Instance.monster = monster;
+        Debug.Log($"<color=cyan>[StageManager] {currentChapter}ì±•í„° {floor}ì¸µ {battleType} ì „íˆ¬ -> ëª¬ìŠ¤í„° {monster.monsterID} ({monster.monsterName})</color>");
+        return true;
+    }
+
+    /// <summary>
+    /// ìŠ¤í…Œì´ì§€ í´ë¦¬ì–´/ì¢…ë£Œ í›„ í˜¸ì¶œ:
+    /// í˜„ì¬ ë…¸ë“œë¥¼ ì™„ë£Œ ì²˜ë¦¬í•˜ê³ , ë‹¤ìŒ ì—°ê²° ë…¸ë“œë“¤ì„ ê°œë°©(canGo = true)í•œ ë’¤ ìŠ¤í…Œì´ì§€ ì„ íƒ ì”¬ìœ¼ë¡œ ë³µê·€í•©ë‹ˆë‹¤.
+    /// UI ë²„íŠ¼ì˜ OnClick() ì´ë²¤íŠ¸ì— ì§ì ‘ ì—°ê²°
     /// </summary>
     public void ReturnToStageSelect()
     {
         if (currentNode != null)
         {
-            // 1. ÇöÀç ³ëµå ¿Ï·á ¸¶Å·
+            // 1. í˜„ì¬ ë…¸ë“œ ì™„ë£Œ ë§ˆí‚¹
             currentNode.isVisited = true;
             currentNode.canGo = false;
 
-            // 2. ÇöÀç ³ëµå¿¡¼­ »¸¾î³ª°£ ´ÙÀ½ ³ëµå(nextStages)µé¸¸ ÁøÀÔ °¡´É(canGo = true)À¸·Î È°¼ºÈ­
+            // 2. í˜„ì¬ ë…¸ë“œì—ì„œ ë»—ì–´ë‚˜ê°„ ë‹¤ìŒ ë…¸ë“œ(nextStages)ë“¤ë§Œ ì§„ì… ê°€ëŠ¥(canGo = true)ìœ¼ë¡œ í™œì„±í™”
             if (currentNode.nextStages != null && currentNode.nextStages.Count > 0)
             {
                 foreach (var nextNode in currentNode.nextStages)
@@ -189,17 +227,17 @@ public class StageManager : MonoBehaviour
             }
             else
             {
-                Debug.Log("<color=gold>[StageManager] ¸¶Áö¸· ³ëµå(º¸½º) Å¬¸®¾î! ·± ½Â¸®!</color>");
-                // TODO: ¿£µù ¾À ÀÌµ¿ ¶Ç´Â ·± Å¬¸®¾î ÆË¾÷ ¿¬Ãâ
+                Debug.Log("<color=gold>[StageManager] ë§ˆì§€ë§‰ ë…¸ë“œ(ë³´ìŠ¤) í´ë¦¬ì–´! ëŸ° ìŠ¹ë¦¬!</color>");
+                // TODO: ì—”ë”© ì”¬ ì´ë™ ë˜ëŠ” ëŸ° í´ë¦¬ì–´ íŒì—… ì—°ì¶œ
             }
         }
         else
         {
-            Debug.LogWarning("[StageManager] currentNode°¡ nullÀÎ »óÅÂ¿¡¼­ º¹±Í¸¦ ½ÃµµÇß½À´Ï´Ù.");
+            Debug.LogWarning("[StageManager] currentNodeê°€ nullì¸ ìƒíƒœì—ì„œ ë³µê·€ë¥¼ ì‹œë„í–ˆìŠµë‹ˆë‹¤.");
         }
 
-        // 3. ½ºÅ×ÀÌÁö ¼±ÅÃ ¾ÀÀ¸·Î ÀÌµ¿
-        // (StageManager°¡ DontDestroyOnLoadÀÌ¹Ç·Î OnSceneLoaded¸¦ ÅëÇØ ÀÚµ¿À¸·Î ¸Ê UI°¡ °»½ÅµË´Ï´Ù)
+        // 3. ìŠ¤í…Œì´ì§€ ì„ íƒ ì”¬ìœ¼ë¡œ ì´ë™
+        // (StageManagerê°€ DontDestroyOnLoadì´ë¯€ë¡œ OnSceneLoadedë¥¼ í†µí•´ ìë™ìœ¼ë¡œ ë§µ UIê°€ ê°±ì‹ ë©ë‹ˆë‹¤)
         SceneManager.LoadScene("StageSelectScene");
     }
 

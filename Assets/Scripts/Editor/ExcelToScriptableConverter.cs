@@ -122,22 +122,15 @@ public class ExcelToScriptableConverter : EditorWindow
                     if (data.monsterID < 0) return (null, null);
 
                     MonsterSO monSO = CreateInstance<MonsterSO>();
-                    monSO.monsterID = data.monsterID;
-                    monSO.monsterName = data.monsterName;
-                    monSO.maxHp = data.maxHp;
-                    monSO.slotCreateType = data.slotCreateType;
-                    monSO.rewardCardRank = data.rewardCardRank;
-                    monSO.gimmickValue = data.gimmickValue;
 
-                    if (Enum.TryParse(data.gimmickType, true, out GimmickType gimmick))
-                        monSO.gimmickType = gimmick;
-
-                    // "2001,2002" 문자열을 List<int>로 파싱
-                    monSO.monsterDeckID = ParseIdList(data.monsterDeckID);
+                    // 타입/등장 스테이지/기믹 파싱은 MonsterSO에서 일괄 처리
+                    monSO.SetupFromData(data);
 
                     string assetName = $"Monster_{data.monsterID:D4}";
                     return (monSO, assetName);
-                });
+                },
+                // DB items를 등장 스테이지 오름차순으로 저장 (타입별 리스트도 이 순서를 그대로 따라감)
+                MonsterDatabaseSO.CompareByAppearStage);
                 break;
 
             case ConversionType.Reward:
@@ -153,7 +146,8 @@ public class ExcelToScriptableConverter : EditorWindow
     private void ConvertSheet<TScriptable, TDatabase>(
         string sheetName,
         string dbFileName,
-        Func<DataRow, (TScriptable so, string assetName)> parseRowFunc)
+        Func<DataRow, (TScriptable so, string assetName)> parseRowFunc,
+        Comparison<TScriptable> sortComparison = null)
         where TScriptable : ScriptableObject
         where TDatabase : ScriptableObject, IInitializableDatabase
     {
@@ -215,6 +209,9 @@ public class ExcelToScriptableConverter : EditorWindow
                     createdList.Add(so);
                     EditorUtility.SetDirty(so);
                 }
+
+                // 1-1. 정렬 기준이 있으면 DB에 넣기 전에 정렬
+                if (sortComparison != null) createdList.Sort(sortComparison);
 
                 // 2. 데이터베이스 SO 생성 및 할당 (items에 공통 주입)
                 if (createDatabase && createdList.Count > 0)
@@ -296,14 +293,16 @@ public class ExcelToScriptableConverter : EditorWindow
     {
         return new MonsterData
         {
-            monsterID = Convert.ToInt32(row["monsterID"]),
-            monsterName = row["monsterName"].ToString(),
-            maxHp = Convert.ToInt32(row["maxHp"]),
-            slotCreateType = Convert.ToInt32(row["slotCreateType"]),
-            monsterDeckID = row["monsterDeckID"].ToString(),
-            rewardCardRank = Convert.ToInt32(row["rewardCardRank"]),
-            gimmickType = row["gimmickType"].ToString(),
-            gimmickValue = Convert.ToInt32(row["gimmickValue"])
+            monsterID = GetCellInt(row, "monsterID"),
+            monsterName = GetCellString(row, "monsterName"),
+            monsterType = GetCellString(row, "monsterType", "Normal"),   // "Elite " 같은 뒤 공백은 GetCellString에서 Trim
+            appearStartStage = GetCellInt(row, "appearStartStage", 101),
+            maxHp = GetCellInt(row, "maxHp"),
+
+            gimmickType1 = GetCellString(row, "gimmickType1", "None"),
+            gimmickParam1 = GetCellInt(row, "gimmickParam1"),
+            gimmickType2 = GetCellString(row, "gimmickType2", "None"),
+            gimmickParam2 = GetCellInt(row, "gimmickParam2")
         };
     }
 
