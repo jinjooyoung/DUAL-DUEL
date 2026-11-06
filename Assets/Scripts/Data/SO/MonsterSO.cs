@@ -52,6 +52,21 @@ public class MonsterSO : ScriptableObject
     public GimmickType gimmickType2;
     public int gimmickParam2;
 
+    /// <summary>
+    /// 기믹 1, 2번 슬롯 중 해당 기믹이 있으면 파라미터와 함께 true (1번 우선)
+    /// </summary>
+    public bool TryGetGimmick(GimmickType type, out int param)
+    {
+        param = 0;
+        if (type == GimmickType.None) return false;
+
+        if (gimmickType1 == type) { param = gimmickParam1; return true; }
+        if (gimmickType2 == type) { param = gimmickParam2; return true; }
+        return false;
+    }
+
+    public bool HasGimmick(GimmickType type) => TryGetGimmick(type, out _);
+
     public int AppearChapter => appearStartStage / 100;
     public int AppearFloor => appearStartStage % 100;
 
