@@ -1,14 +1,14 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using UnityEngine;
 
 public class BattleSlotManager : MonoBehaviour
 {
     public static BattleSlotManager Instance { get; private set; }
 
-    [Header("°íÁ¤ ½½·Ô 5°³ (¼ø¼­´ë·Î)")]
+    [Header("ê³ ì • ìŠ¬ë¡¯ 5ê°œ (ìˆœì„œëŒ€ë¡œ)")]
     public List<BattleSlot> slots = new List<BattleSlot>();
 
-    // 10Ãş ±âÁØ ½½·Ô Å¸ÀÔ °¡ÁßÄ¡ Å×ÀÌºí (Key: ¸ó½ºÅÍ ½½·Ô °³¼ö 0~5, Value: °¡ÁßÄ¡)
+    // 10ì¸µ ê¸°ì¤€ ìŠ¬ë¡¯ íƒ€ì… ê°€ì¤‘ì¹˜ í…Œì´ë¸” (Key: ëª¬ìŠ¤í„° ìŠ¬ë¡¯ ê°œìˆ˜ 0~5, Value: ê°€ì¤‘ì¹˜)
     private readonly Dictionary<int, float> floor10Weights = new()
     {
         { 0, 0f },
@@ -26,32 +26,32 @@ public class BattleSlotManager : MonoBehaviour
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
 
-        // ÀÛ¼ºÇØ µĞ È®·ü º¸Á¤ ½Ã½ºÅÛ ÃÊ±âÈ­
+        // ì‘ì„±í•´ ë‘” í™•ë¥  ë³´ì • ì‹œìŠ¤í…œ ì´ˆê¸°í™”
         slotCorrector = new ProbabilityCorrector<int>(floor10Weights);
     }
 
     void Start()
     {
-        // °ÔÀÓ ½ÃÀÛ ½Ã Ã¹ ÅÏ ½½·Ô Å¸ÀÔ ¹«ÀÛÀ§ »ı¼º
+        // ê²Œì„ ì‹œì‘ ì‹œ ì²« í„´ ìŠ¬ë¡¯ íƒ€ì… ë¬´ì‘ìœ„ ìƒì„±
         GenerateTurnSlotTypes();
     }
 
     /// <summary>
-    /// ¸Å ÅÏ ½ÃÀÛ ½Ã È£Ãâ: º¸Á¤ ½Ã½ºÅÛÀ¸·Î Å¸ÀÔÀ» °áÁ¤ÇÏ°í 5°³ ½½·Ô¿¡ ¹«ÀÛÀ§ ¹èÁ¤
+    /// ë§¤ í„´ ì‹œì‘ ì‹œ í˜¸ì¶œ: ë³´ì • ì‹œìŠ¤í…œìœ¼ë¡œ íƒ€ì…ì„ ê²°ì •í•˜ê³  5ê°œ ìŠ¬ë¡¯ì— ë¬´ì‘ìœ„ ë°°ì •
     /// </summary>
     public (int playerCount, int enemyCount) GenerateTurnSlotTypes()
     {
-        // 1. º¸Á¤ Å¬·¡½º¿¡¼­ ÀÌ¹ø ÅÏ¿¡ µîÀåÇÒ Àû ½½·Ô °³¼ö(0~5) ÃßÃ·
+        // 1. ë³´ì • í´ë˜ìŠ¤ì—ì„œ ì´ë²ˆ í„´ì— ë“±ì¥í•  ì  ìŠ¬ë¡¯ ê°œìˆ˜(0~5) ì¶”ì²¨
         int enemyCount = slotCorrector.EvaluateNext();
-        // È®·ü Å¬·¡½º µğ¹ö±ë¿ë ÄÚµå Debug.Log(slotCorrector.GetStatusReport());
+        // í™•ë¥  í´ë˜ìŠ¤ ë””ë²„ê¹…ìš© ì½”ë“œ Debug.Log(slotCorrector.GetStatusReport());
         int playerCount = slots.Count - enemyCount;
 
-        // 2. ½½·Ô ¼ö·®¸¸Å­ Å¸ÀÔ ¸®½ºÆ® ±¸¼º
+        // 2. ìŠ¬ë¡¯ ìˆ˜ëŸ‰ë§Œí¼ íƒ€ì… ë¦¬ìŠ¤íŠ¸ êµ¬ì„±
         List<OwnerType> slotTypes = new List<OwnerType>();
         for (int i = 0; i < enemyCount; i++) slotTypes.Add(OwnerType.Enemy);
         for (int i = 0; i < playerCount; i++) slotTypes.Add(OwnerType.Player);
 
-        // 3. ½½·Ô ¼ø¼­ ¹«ÀÛÀ§ ¼ÅÇÃ (Fisher-Yates)
+        // 3. ìŠ¬ë¡¯ ìˆœì„œ ë¬´ì‘ìœ„ ì…”í”Œ (Fisher-Yates)
         for (int i = 0; i < slotTypes.Count; i++)
         {
             OwnerType temp = slotTypes[i];
@@ -60,29 +60,105 @@ public class BattleSlotManager : MonoBehaviour
             slotTypes[rand] = temp;
         }
 
-        // 4. ÀÎ½ºÆåÅÍ¿¡ ¿¬°áµÈ °íÁ¤ ½½·Ô 5°³¿¡ Å¸ÀÔ ÁÖÀÔ
+        // 4. ì¸ìŠ¤í™í„°ì— ì—°ê²°ëœ ê³ ì • ìŠ¬ë¡¯ 5ê°œì— íƒ€ì… ì£¼ì…
         for (int i = 0; i < slots.Count; i++)
         {
             if (slots[i] != null)
             {
-                slots[i].ClearSlot();               // ÀÌÀü ÅÏ ÀÜ¿© Ä«µå ÂüÁ¶ ÃÊ±âÈ­
+                slots[i].ClearSlot();               // ì´ì „ í„´ ì”ì—¬ ì¹´ë“œ ì°¸ì¡° ì´ˆê¸°í™”
 
-                // ½½·Ô Å¸ÀÔ¿¡ µû¶ó ·£´ı ±âº» °ø°İ·Â °áÁ¤ (int Random.Range´Â ÃÖ´ñ°ª ¹ÌÆ÷ÇÔÀÌ¹Ç·Î +1)
+                // ìŠ¬ë¡¯ íƒ€ì…ì— ë”°ë¼ ëœë¤ ê¸°ë³¸ ê³µê²©ë ¥ ê²°ì • (int Random.RangeëŠ” ìµœëŒ“ê°’ ë¯¸í¬í•¨ì´ë¯€ë¡œ +1)
                 OwnerType type = slotTypes[i];
                 int randomAtk = (type == OwnerType.Player)
-                    ? Random.Range(1, 9)   // ÇÃ·¹ÀÌ¾î: 1 ~ 8
-                    : Random.Range(5, 16); // Àû: 5 ~ 15
+                    ? Random.Range(1, 9)   // í”Œë ˆì´ì–´: 1 ~ 8
+                    : Random.Range(5, 16); // ì : 5 ~ 15
 
-                slots[i].SetSlotType(slotTypes[i], randomAtk); // ½½·Ô Å¸ÀÔ ¹× ¿ÜÇü °»½Å
+                slots[i].SetSlotType(slotTypes[i], randomAtk); // ìŠ¬ë¡¯ íƒ€ì… ë° ì™¸í˜• ê°±ì‹ 
             }
         }
 
-        Debug.Log($"[½½·Ô ¹èÁ¤ ¿Ï·á] ÇÃ·¹ÀÌ¾î ½½·Ô: {playerCount}°³ | Àû ½½·Ô: {enemyCount}°³");
+        Debug.Log($"[ìŠ¬ë¡¯ ë°°ì • ì™„ë£Œ] í”Œë ˆì´ì–´ ìŠ¬ë¡¯: {playerCount}ê°œ | ì  ìŠ¬ë¡¯: {enemyCount}ê°œ");
+
+        // 5. ìŠ¬ë¡¯ ë°°ì • ì§í›„ ëª¬ìŠ¤í„° ê¸°ë¯¹ ì ìš© (ë¸”ë¼ì¸ë“œ, ë°¸ë¥˜ ì™œê³¡)
+        ApplyMonsterSlotGimmicks();
+
         return (playerCount, enemyCount);
     }
 
+    #region ëª¬ìŠ¤í„° ìŠ¬ë¡¯ ê¸°ë¯¹
+
+    private void ApplyMonsterSlotGimmicks()
+    {
+        MonsterSO monster = GameManager.Instance != null ? GameManager.Instance.monster : null;
+        if (monster == null) return;    // ë°°í‹€ ì”¬ ë‹¨ë… í…ŒìŠ¤íŠ¸ ë“±
+
+        if (monster.TryGetGimmick(GimmickType.BlindSlot, out int blindCount))
+            ApplyBlindSlots(blindCount);
+
+        if (monster.TryGetGimmick(GimmickType.ScaleSlotValue, out int maxAbsValue))
+            ApplyScaleSlotValue(maxAbsValue);
+    }
+
     /// <summary>
-    /// Ãş/½ºÅ×ÀÌÁö º¯°æ ½Ã »õ °¡ÁßÄ¡ Å×ÀÌºí·Î ±³Ã¼
+    /// [BlindSlot] ë¬´ì‘ìœ„ ìŠ¬ë¡¯ blindCountê°œë¥¼ ë¬¼ìŒí‘œë¡œ ê°€ë¦¼ (í„´ ì¢…ë£Œ ì‹œ BattleManagerê°€ ê³µê°œ)
+    /// </summary>
+    private void ApplyBlindSlots(int blindCount)
+    {
+        List<int> indices = GetShuffledSlotIndices();
+        int count = Mathf.Clamp(blindCount, 0, indices.Count);
+
+        for (int i = 0; i < count; i++)
+        {
+            slots[indices[i]].SetBlind(true);
+        }
+
+        Debug.Log($"[ëª¬ìŠ¤í„° ê¸°ë¯¹: BlindSlot] ìŠ¬ë¡¯ {count}ê°œ ë¸”ë¼ì¸ë“œ");
+    }
+
+    /// <summary>
+    /// [ScaleSlotValue] ìŠ¬ë¡¯ 1~2ê°œì— ë°¸ë¥˜ ë³´ì • ë¶€ì—¬.
+    /// ì ˆëŒ“ê°’ 1 ~ maxAbsValue, ë¶€í˜¸ëŠ” ë”°ë¡œ ë½‘ì•„ì„œ 0ì´ ë‚˜ì˜¤ì§€ ì•Šê²Œ í•¨. 2ê°œë©´ ë‘ ë²ˆì§¸ ìŠ¬ë¡¯ì€ ë¶€í˜¸ë§Œ ë°˜ëŒ€
+    /// </summary>
+    private void ApplyScaleSlotValue(int maxAbsValue)
+    {
+        List<int> indices = GetShuffledSlotIndices();
+        if (indices.Count == 0) return;
+
+        int slotCount = Mathf.Min(Random.Range(1, 3), indices.Count);           // 1 ë˜ëŠ” 2
+        int magnitude = Random.Range(1, Mathf.Max(1, maxAbsValue) + 1);        // 1 ~ maxAbsValue
+        int sign = Random.Range(0, 2) == 0 ? -1 : 1;                           // 0: ìŒìˆ˜, 1: ì–‘ìˆ˜
+
+        slots[indices[0]].SetValueModifier(sign * magnitude);
+        if (slotCount == 2) slots[indices[1]].SetValueModifier(-sign * magnitude);
+
+        Debug.Log($"[ëª¬ìŠ¤í„° ê¸°ë¯¹: ScaleSlotValue] {indices[0]}ë²ˆ ìŠ¬ë¡¯ {sign * magnitude:+0;-0}" +
+                  (slotCount == 2 ? $", {indices[1]}ë²ˆ ìŠ¬ë¡¯ {-sign * magnitude:+0;-0}" : string.Empty));
+    }
+
+    /// <summary>
+    /// ìœ íš¨í•œ ìŠ¬ë¡¯ ì¸ë±ìŠ¤ë¥¼ Fisher-Yatesë¡œ ì„ì–´ì„œ ë°˜í™˜ (ì¤‘ë³µ ì—†ëŠ” ë¬´ì‘ìœ„ ì„ íƒìš©)
+    /// </summary>
+    private List<int> GetShuffledSlotIndices()
+    {
+        List<int> indices = new List<int>();
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (slots[i] != null) indices.Add(i);
+        }
+
+        for (int i = 0; i < indices.Count; i++)
+        {
+            int rand = Random.Range(i, indices.Count);
+            (indices[i], indices[rand]) = (indices[rand], indices[i]);
+        }
+
+        return indices;
+    }
+
+    #endregion
+
+    /// <summary>
+    /// ì¸µ/ìŠ¤í…Œì´ì§€ ë³€ê²½ ì‹œ ìƒˆ ê°€ì¤‘ì¹˜ í…Œì´ë¸”ë¡œ êµì²´
     /// </summary>
     public void UpdateFloorWeights(Dictionary<int, float> newWeights)
     {

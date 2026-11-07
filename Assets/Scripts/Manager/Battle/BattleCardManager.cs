@@ -1,58 +1,64 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ÀüÅõ Áß ´ÜÀÏ µå·Î¿ì µ¦, ÇÚµå, ¹ö¸² µ¦À» °ü¸®ÇÏ°í Ä«µå ¿ÀºêÁ§Æ® Ç®À» Á¦¾îÇÏ´Â ¸Å´ÏÀú Å¬·¡½ºÀÔ´Ï´Ù.
+/// ì „íˆ¬ ì¤‘ ë‹¨ì¼ ë“œë¡œìš° ë±, í•¸ë“œ, ë²„ë¦¼ ë±ì„ ê´€ë¦¬í•˜ê³  ì¹´ë“œ ì˜¤ë¸Œì íŠ¸ í’€ì„ ì œì–´í•˜ëŠ” ë§¤ë‹ˆì € í´ë˜ìŠ¤ì…ë‹ˆë‹¤.
 /// </summary>
 public class BattleCardManager : MonoBehaviour
 {
     public static BattleCardManager Instance { get; private set; }
 
-    [Header("µ¦ µ¥ÀÌÅÍ")]
-    // ³ªÁß¿¡ Ä³¸¯ÅÍ ¼±ÅÃÃ¢¿¡¼­ ¼±ÅÃ > ÃÊ±âµ¦ ID·Î SO Ã£¾Æ¼­ °ÔÀÓ¸Å´ÏÀú deck¿¡ ÇÒ´ç ÈÄ °ÔÀÓ ½ÃÀÛ Èå¸§À¸·Î ÁøÇàÇÒ ¿¹Á¤
-    // ±Ùµ¥ ±×°Ç ³ªÁß¿¡ ÇÏ°í ÀÏ´ÜÀº Å×½ºÆ®¿ëÀ¸·Î SO Ã£¾Ò´Ù Ä¡°í Èå¸§ È®ÀÎ¿ëÀ¸·Î
-    [Tooltip("Å×½ºÆ®¿ë ÃÊ±â µ¦ (GameManager°¡ ¾øÀ» ¶§¸¸ »ç¿ë)")]
+    [Header("ë± ë°ì´í„°")]
+    // ë‚˜ì¤‘ì— ìºë¦­í„° ì„ íƒì°½ì—ì„œ ì„ íƒ > ì´ˆê¸°ë± IDë¡œ SO ì°¾ì•„ì„œ ê²Œì„ë§¤ë‹ˆì € deckì— í• ë‹¹ í›„ ê²Œì„ ì‹œì‘ íë¦„ìœ¼ë¡œ ì§„í–‰í•  ì˜ˆì •
+    // ê·¼ë° ê·¸ê±´ ë‚˜ì¤‘ì— í•˜ê³  ì¼ë‹¨ì€ í…ŒìŠ¤íŠ¸ìš©ìœ¼ë¡œ SO ì°¾ì•˜ë‹¤ ì¹˜ê³  íë¦„ í™•ì¸ìš©ìœ¼ë¡œ
+    [Tooltip("í…ŒìŠ¤íŠ¸ìš© ì´ˆê¸° ë± (GameManagerê°€ ì—†ì„ ë•Œë§Œ ì‚¬ìš©)")]
     [SerializeField] private List<CardSO> testInitialDeckSO = new List<CardSO>();
 
-    [Tooltip("»ÌÀ» Ä«µå ´õ¹Ì")]
+    [Tooltip("ë½‘ì„ ì¹´ë“œ ë”ë¯¸")]
     public List<CardInstance> drawDeck = new List<CardInstance>();
-    [Tooltip("ÇöÀç ÇÚµå¿¡ µé°í ÀÖ´Â Ä«µå µ¥ÀÌÅÍ")]
+    [Tooltip("í˜„ì¬ í•¸ë“œì— ë“¤ê³  ìˆëŠ” ì¹´ë“œ ë°ì´í„°")]
     public List<CardInstance> handCards = new List<CardInstance>();
-    [Tooltip("»ç¿ëµÇ°Å³ª ¹ö·ÁÁø Ä«µå ´õ¹Ì")]
+    [Tooltip("ì‚¬ìš©ë˜ê±°ë‚˜ ë²„ë ¤ì§„ ì¹´ë“œ ë”ë¯¸")]
     public List<CardInstance> discardDeck = new List<CardInstance>();
 
-    [Header("Ä«µå Ç® ¹× ÇÁ¸®ÆÕ")]
-    [Tooltip("Ç®ÀÌ °í°¥µÇ¾úÀ» ¶§ »õ·Î µ¿Àû ÀÎ½ºÅÏ½ºÈ­ÇÒ Ä«µå ÇÁ¸®ÆÕ")]
+    [Header("ì¹´ë“œ í’€ ë° í”„ë¦¬íŒ¹")]
+    [Tooltip("í’€ì´ ê³ ê°ˆë˜ì—ˆì„ ë•Œ ìƒˆë¡œ ë™ì  ì¸ìŠ¤í„´ìŠ¤í™”í•  ì¹´ë“œ í”„ë¦¬íŒ¹")]
     [SerializeField] private GameObject cardPrefab;
-    [Tooltip("Ä«µå ¿ÀºêÁ§Æ® Ç® (ÃÊ±â 6°³ ¹èÄ¡ + ÇÊ¿ä ½Ã µ¿Àû È®Àå)")]
+    [Tooltip("ì¹´ë“œ ì˜¤ë¸Œì íŠ¸ í’€ (ì´ˆê¸° 6ê°œ ë°°ì¹˜ + í•„ìš” ì‹œ ë™ì  í™•ì¥)")]
     public List<CardDisplay> cardPool = new List<CardDisplay>();
 
-    [Header("µ¦/¹ö¸² À§Ä¡")]
-    [Tooltip("µå·Î¿ì µ¦ ¿ÀºêÁ§Æ® À§Ä¡ (¾øÀ¸¸é ÇÚµå ÁÂÇÏ´Ü ±âº»°ª)")]
+    [Header("ë±/ë²„ë¦¼ ìœ„ì¹˜")]
+    [Tooltip("ë“œë¡œìš° ë± ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ (ì—†ìœ¼ë©´ í•¸ë“œ ì¢Œí•˜ë‹¨ ê¸°ë³¸ê°’)")]
     public Transform drawDeckTransform;
-    [Tooltip("¹ö¸² µ¦ ¿ÀºêÁ§Æ® À§Ä¡ (¾øÀ¸¸é ÇÚµå ¿ìÇÏ´Ü ±âº»°ª)")]
+    [Tooltip("ë²„ë¦¼ ë± ì˜¤ë¸Œì íŠ¸ ìœ„ì¹˜ (ì—†ìœ¼ë©´ í•¸ë“œ ìš°í•˜ë‹¨ ê¸°ë³¸ê°’)")]
     public Transform discardDeckTransform;
 
-    [Header("¼ÕÆĞ Á¤·Ä ±âÁØÁ¡")]
+    [Header("ì†íŒ¨ ì •ë ¬ ê¸°ì¤€ì ")]
     public Transform handPosition;
-    [Tooltip("¼ÕÆĞ°¡ À§Ä¡ÇÒ ¼ö ÀÖ´Â ÁÂÃø ÃÖ´ë °æ°è")]
+    [Tooltip("ì†íŒ¨ê°€ ìœ„ì¹˜í•  ìˆ˜ ìˆëŠ” ì¢Œì¸¡ ìµœëŒ€ ê²½ê³„")]
     [SerializeField] private Transform leftBoundary;
-    [Tooltip("¼ÕÆĞ°¡ À§Ä¡ÇÒ ¼ö ÀÖ´Â ¿ìÃø ÃÖ´ë °æ°è")]
+    [Tooltip("ì†íŒ¨ê°€ ìœ„ì¹˜í•  ìˆ˜ ìˆëŠ” ìš°ì¸¡ ìµœëŒ€ ê²½ê³„")]
     [SerializeField] private Transform rightBoundary;
 
-    [Tooltip("Ä«µå °£ÀÇ ÃÖ´ë(±âº») °£°İ")]
+    [Tooltip("ì¹´ë“œ ê°„ì˜ ìµœëŒ€(ê¸°ë³¸) ê°„ê²©")]
     [SerializeField] private float cardSpacing = 2.0f;
     [SerializeField] private float arrangeSpeed = 10.0f;
 
-    [Header("µå·Î¿ì / µğ½ºÄ«µå ¿¬Ãâ µô·¹ÀÌ")]
-    public int drawCount = 6;                               // µå·Î¿ì ÇÒ Ä«µå ¼ö
-    [SerializeField] private float drawInterval = 0.5f;     // µå·Î¿ì °£°İ (0.5ÃÊ)
-    [SerializeField] private float discardInterval = 0.5f;  // ¹ö¸®±â °£°İ (0.5ÃÊ)
+    [Header("ë“œë¡œìš° / ë””ìŠ¤ì¹´ë“œ ì—°ì¶œ ë”œë ˆì´")]
+    public int drawCount = 6;                               // ë“œë¡œìš° í•  ì¹´ë“œ ìˆ˜
+    [SerializeField] private float drawInterval = 0.5f;     // ë“œë¡œìš° ê°„ê²© (0.5ì´ˆ)
+    [SerializeField] private float discardInterval = 0.5f;  // ë²„ë¦¬ê¸° ê°„ê²© (0.5ì´ˆ)
 
-    [Header("ÀÓ½Ã º¸³Ê½º µå·Î¿ì")]
-    public int bonusDrawCount = 0; // Ä«µå È¿°ú·Î ´ÙÀ½ ÅÏ¿¡ Ãß°¡·Î »ÌÀ» Àå¼ö
+    [Header("ì„ì‹œ ë³´ë„ˆìŠ¤ ë“œë¡œìš°")]
+    public int bonusDrawCount = 0; // ì¹´ë“œ íš¨ê³¼ë¡œ ë‹¤ìŒ í„´ì— ì¶”ê°€ë¡œ ë½‘ì„ ì¥ìˆ˜
+
+    [Header("ëª¬ìŠ¤í„° ê¸°ë¯¹: ë°©í•´ ì¹´ë“œ ì£¼ì… (InjectCurseCard)")]
+    [Tooltip("ë°©í•´ ì¹´ë“œ SOë¥¼ IDë¡œ ì°¾ì„ ì¹´ë“œ ë°ì´í„°ë² ì´ìŠ¤")]
+    [SerializeField] private CardDatabaseSO cardDatabase;
+    [Tooltip("ì „íˆ¬ ì‹œì‘ ì´í›„ ëª‡ í„´ë§ˆë‹¤ ì£¼ì…í• ì§€ (turnCount % injectCycle == 0)")]
+    [SerializeField] private int injectCycle = 3;
 
     private void Awake()
     {
@@ -71,7 +77,7 @@ public class BattleCardManager : MonoBehaviour
         handCards.Clear();
         discardDeck.Clear();
 
-        // GameManager¿¡ ÀúÀåµÈ ¿µ±¸ º¸À¯ µ¦ÀÌ Á¸ÀçÇÏ¸é °¡Á®¿Í¼­ ÀÎ½ºÅÏ½º º¹Á¦
+        // GameManagerì— ì €ì¥ëœ ì˜êµ¬ ë³´ìœ  ë±ì´ ì¡´ì¬í•˜ë©´ ê°€ì ¸ì™€ì„œ ì¸ìŠ¤í„´ìŠ¤ ë³µì œ
         if (GameManager.Instance != null && GameManager.Instance.deck.Count > 0)
         {
             foreach (var card in GameManager.Instance.deck)
@@ -84,16 +90,21 @@ public class BattleCardManager : MonoBehaviour
         }
         else
         {
-            // ¹èÆ² ¾À ´Üµ¶ Å×½ºÆ® ½Ã ÀÎ½ºÆåÅÍÀÇ SO ¸ñ·ÏÀ¸·Î ÀÓ½Ã ÀÎ½ºÅÏ½º »ı¼º
+            // ë°°í‹€ ì”¬ ë‹¨ë… í…ŒìŠ¤íŠ¸ ì‹œ ì¸ìŠ¤í™í„°ì˜ SO ëª©ë¡ìœ¼ë¡œ ì„ì‹œ ì¸ìŠ¤í„´ìŠ¤ ìƒì„±
             foreach (var so in testInitialDeckSO)
             {
                 if (so != null) drawDeck.Add(new CardInstance(so, 0));
             }
         }
 
-        ShuffleDeck();
+        // ì „íˆ¬ ì‹œì‘ ì‹œ ë°©í•´ ì¹´ë“œ ì£¼ì… (ë‚´ë¶€ì—ì„œ ì…”í”Œ)
+        if (!TryInjectCurseCard(1, true))
+        {
+            ShuffleDeck();
+        }
+
         int finalDraw = drawCount + bonusDrawCount;
-        bonusDrawCount = 0; // µå·Î¿ì ÈÄ Áï½Ã ÃÊ±âÈ­
+        bonusDrawCount = 0; // ë“œë¡œìš° í›„ ì¦‰ì‹œ ì´ˆê¸°í™”
         StartCoroutine(Co_DrawCards(finalDraw));
     }
 
@@ -103,7 +114,7 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ÁöÁ¤µÈ Àå¼ö¸¸Å­ DOTweenManager.CardDraw¸¦ ÅëÇØ ¼øÂ÷ µå·Î¿ì
+    /// ì§€ì •ëœ ì¥ìˆ˜ë§Œí¼ DOTweenManager.CardDrawë¥¼ í†µí•´ ìˆœì°¨ ë“œë¡œìš°
     /// </summary>
     public IEnumerator Co_DrawCards(int count)
     {
@@ -116,12 +127,12 @@ public class BattleCardManager : MonoBehaviour
             CardDisplay drawnDisplay = DrawCardInternal();
             if (drawnDisplay == null) yield break;
 
-            // ¼ÕÆĞ ÃÖÁ¾ ¸ñÇ¥ ÁÂÇ¥ ¹Ì¸® °è»ê
+            // ì†íŒ¨ ìµœì¢… ëª©í‘œ ì¢Œí‘œ ë¯¸ë¦¬ ê³„ì‚°
             int totalCards = handCards.Count;
             float totalWidth = (totalCards - 1) * cardSpacing;
             float startX = -totalWidth / 2f;
 
-            // µå·Î¿ì ¿¬Ãâ ½ÃÀÛ (DOTweenManager È£Ãâ)
+            // ë“œë¡œìš° ì—°ì¶œ ì‹œì‘ (DOTweenManager í˜¸ì¶œ)
             drawnDisplay.isTweening = true;
             Tween drawTween = DOTweenManager.CardDraw(
                 drawnDisplay.transform,
@@ -135,7 +146,7 @@ public class BattleCardManager : MonoBehaviour
 
             BattleUIManager.Instance?.UpdateDeckUI();
 
-            // Æ®À© ¿Ï·á ½Ã Á¤·Ä Âü¿© Çã¿ë
+            // íŠ¸ìœˆ ì™„ë£Œ ì‹œ ì •ë ¬ ì°¸ì—¬ í—ˆìš©
             if (drawTween != null)
             {
                 drawTween.OnComplete(() => drawnDisplay.isTweening = false);
@@ -150,7 +161,7 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ³²¾ÆÀÖ´Â ¸ğµç ¼ÕÆĞ Ä«µå¸¦ ¹ö¸² µ¦À¸·Î ¼øÂ÷ Ãà¼Ò/ÆäÀÌµå¾Æ¿ô ÀÌµ¿
+    /// ë‚¨ì•„ìˆëŠ” ëª¨ë“  ì†íŒ¨ ì¹´ë“œë¥¼ ë²„ë¦¼ ë±ìœ¼ë¡œ ìˆœì°¨ ì¶•ì†Œ/í˜ì´ë“œì•„ì›ƒ ì´ë™
     /// </summary>
     public IEnumerator Co_DiscardAllHandCards()
     {
@@ -166,19 +177,19 @@ public class BattleCardManager : MonoBehaviour
             CardDisplay targetCard = activeHandDisplays[0];
             targetCard.isTweening = true;
 
-            // µ¥ÀÌÅÍ ¸®½ºÆ® ÀÌµ¿
+            // ë°ì´í„° ë¦¬ìŠ¤íŠ¸ ì´ë™
             if (targetCard.cardInstance != null)
             {
                 handCards.Remove(targetCard.cardInstance);
                 discardDeck.Add(targetCard.cardInstance);
             }
             SoundManager.Instance.PlaySFX(SFXType.CardDraw);
-            // DOTweenManager.CardDiscard ½ÇÇà ÈÄ ¿Ï·á ´ë±â
+            // DOTweenManager.CardDiscard ì‹¤í–‰ í›„ ì™„ë£Œ ëŒ€ê¸°
             Tween discardTween = DOTweenManager.CardDiscard(targetCard.gameObject, discardTargetPos, 0.25f, () =>
             {
                 targetCard.ResetPlacement();
                 targetCard.isTweening = false;
-                targetCard.gameObject.SetActive(false); // Ç® ¹İÈ¯À» À§ÇØ ¸í½ÃÀûÀ¸·Î ºñÈ°¼ºÈ­
+                targetCard.gameObject.SetActive(false); // í’€ ë°˜í™˜ì„ ìœ„í•´ ëª…ì‹œì ìœ¼ë¡œ ë¹„í™œì„±í™”
             });
 
             if (discardTween != null)
@@ -190,19 +201,19 @@ public class BattleCardManager : MonoBehaviour
             yield return new WaitForSeconds(discardInterval);
         }
 
-        Debug.Log($"[¼ÕÆĞ Á¤¸® ¿Ï·á] ¸ğµç ÀÜ¿© ¼ÕÆĞ ¹ö¸² µ¦À¸·Î ÀÌµ¿ ¹× Ç® ¹İÈ¯ ¿Ï·á (ÇöÀç Ç® ÃÑ·®: {cardPool.Count})");
+        Debug.Log($"[ì†íŒ¨ ì •ë¦¬ ì™„ë£Œ] ëª¨ë“  ì”ì—¬ ì†íŒ¨ ë²„ë¦¼ ë±ìœ¼ë¡œ ì´ë™ ë° í’€ ë°˜í™˜ ì™„ë£Œ (í˜„ì¬ í’€ ì´ëŸ‰: {cardPool.Count})");
     }
 
     private CardDisplay DrawCardInternal()
     {
-        // µ¦ ¸®»çÀÌÅ¬ È®ÀÎ
+        // ë± ë¦¬ì‚¬ì´í´ í™•ì¸
         if (drawDeck.Count == 0)
         {
             RecycleDiscardToDraw();
             if (drawDeck.Count == 0) return null;
         }
 
-        // µ¿Àû Ç®¿¡¼­ Ä«µå È®º¸ (ºÎÁ· ½Ã »ı¼º)
+        // ë™ì  í’€ì—ì„œ ì¹´ë“œ í™•ë³´ (ë¶€ì¡± ì‹œ ìƒì„±)
         CardDisplay availableDisplay = GetOrCreateCardDisplay();
         if (availableDisplay == null) return null;
 
@@ -218,11 +229,11 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Ç®¿¡¼­ ²¨Á®ÀÖ´Â Ä«µå¸¦ °¡Á®¿À°Å³ª, ¾øÀ¸¸é ÇÁ¸®ÆÕÀ» µ¿ÀûÀ¸·Î »õ·Î »ı¼ºÇÏ¿© Ç®¿¡ Ãß°¡ ÈÄ ¹İÈ¯ÇÕ´Ï´Ù.
+    /// í’€ì—ì„œ êº¼ì ¸ìˆëŠ” ì¹´ë“œë¥¼ ê°€ì ¸ì˜¤ê±°ë‚˜, ì—†ìœ¼ë©´ í”„ë¦¬íŒ¹ì„ ë™ì ìœ¼ë¡œ ìƒˆë¡œ ìƒì„±í•˜ì—¬ í’€ì— ì¶”ê°€ í›„ ë°˜í™˜í•©ë‹ˆë‹¤.
     /// </summary>
     private CardDisplay GetOrCreateCardDisplay()
     {
-        // 1. ±âÁ¸ Ç®¿¡¼­ ºñÈ°¼ºÈ­µÈ ¿ÀºêÁ§Æ® Å½»ö
+        // 1. ê¸°ì¡´ í’€ì—ì„œ ë¹„í™œì„±í™”ëœ ì˜¤ë¸Œì íŠ¸ íƒìƒ‰
         CardDisplay availableDisplay = cardPool.Find(c => c != null && !c.gameObject.activeSelf);
 
         if (availableDisplay != null)
@@ -230,7 +241,7 @@ public class BattleCardManager : MonoBehaviour
             return availableDisplay;
         }
 
-        // 2. ¿©À¯ºĞÀÌ ¾øÀ¸¸é µ¿Àû È®Àå »ı¼º
+        // 2. ì—¬ìœ ë¶„ì´ ì—†ìœ¼ë©´ ë™ì  í™•ì¥ ìƒì„±
         if (cardPrefab != null)
         {
             Transform parentTransform = handPosition != null ? handPosition.parent : transform;
@@ -241,18 +252,18 @@ public class BattleCardManager : MonoBehaviour
             if (newDisplay != null)
             {
                 cardPool.Add(newDisplay);
-                Debug.Log($"[Ä«µå Ç® µ¿Àû È®Àå] ¿©À¯ Ä«µå ºÎÁ·À¸·Î »õ Ä«µå »ı¼º. ÇöÀç Ç® Å©±â: {cardPool.Count}");
+                Debug.Log($"[ì¹´ë“œ í’€ ë™ì  í™•ì¥] ì—¬ìœ  ì¹´ë“œ ë¶€ì¡±ìœ¼ë¡œ ìƒˆ ì¹´ë“œ ìƒì„±. í˜„ì¬ í’€ í¬ê¸°: {cardPool.Count}");
                 return newDisplay;
             }
         }
 
-        Debug.LogError("[CardPool] cardPrefabÀÌ ¿¬°áµÇÁö ¾Ê¾Æ Ä«µå¸¦ µ¿ÀûÀ¸·Î »ı¼ºÇÒ ¼ö ¾ø½À´Ï´Ù.");
+        Debug.LogError("[CardPool] cardPrefabì´ ì—°ê²°ë˜ì§€ ì•Šì•„ ì¹´ë“œë¥¼ ë™ì ìœ¼ë¡œ ìƒì„±í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
         return null;
     }
 
     private void ArrangeHand()
     {
-        // ¹èÄ¡µÇÁö ¾Ê¾Ò°í, µå·¡±× ÁßÀÌ ¾Æ´Ï¸ç, µå·Î¿ì/µğ½ºÄ«µå Æ®À© ¿¬Ãâ ÁßÀÌ ¾Æ´Ñ Ä«µå¸¸ º¸°£ Á¤·Ä
+        // ë°°ì¹˜ë˜ì§€ ì•Šì•˜ê³ , ë“œë˜ê·¸ ì¤‘ì´ ì•„ë‹ˆë©°, ë“œë¡œìš°/ë””ìŠ¤ì¹´ë“œ íŠ¸ìœˆ ì—°ì¶œ ì¤‘ì´ ì•„ë‹Œ ì¹´ë“œë§Œ ë³´ê°„ ì •ë ¬
         List<CardDisplay> activeHandDisplays = cardPool.FindAll(c =>
             c != null &&
             c.gameObject.activeSelf &&
@@ -266,7 +277,7 @@ public class BattleCardManager : MonoBehaviour
 
         int cardCount = activeHandDisplays.Count;
 
-        // Ä«µå°¡ 1ÀåÀÌ¸é ÇÚµå ±âÁØÁ¡ Áß¾Ó¿¡ ¹Ù·Î ¹èÄ¡
+        // ì¹´ë“œê°€ 1ì¥ì´ë©´ í•¸ë“œ ê¸°ì¤€ì  ì¤‘ì•™ì— ë°”ë¡œ ë°°ì¹˜
         if (cardCount == 1)
         {
             Vector3 centerPos = handPosition.position;
@@ -274,26 +285,26 @@ public class BattleCardManager : MonoBehaviour
             return;
         }
 
-        // 1. ÃÖ´ë Çã¿ë ³Êºñ °è»ê (°æ°è Æ®·£½ºÆûÀÌ ÇÒ´çµÇ¾î ÀÖ´Ù¸é ±× °Å¸®, ¾øÀ¸¸é ±âº»°ª)
+        // 1. ìµœëŒ€ í—ˆìš© ë„ˆë¹„ ê³„ì‚° (ê²½ê³„ íŠ¸ëœìŠ¤í¼ì´ í• ë‹¹ë˜ì–´ ìˆë‹¤ë©´ ê·¸ ê±°ë¦¬, ì—†ìœ¼ë©´ ê¸°ë³¸ê°’)
         float maxAvailableWidth = (leftBoundary != null && rightBoundary != null)
             ? Mathf.Abs(rightBoundary.position.x - leftBoundary.position.x)
             : (cardCount - 1) * cardSpacing;
 
-        // 2. µ¿Àû °£°İ(Spacing) °è»ê: ±âº» °£°İÀ¸·Î ¹èÄ¡ÇßÀ» ¶§ °æ°è¸¦ ³ÑÄ¡¸é ºñÀ²¿¡ ¸Â°Ô ÁÙÀÓ
+        // 2. ë™ì  ê°„ê²©(Spacing) ê³„ì‚°: ê¸°ë³¸ ê°„ê²©ìœ¼ë¡œ ë°°ì¹˜í–ˆì„ ë•Œ ê²½ê³„ë¥¼ ë„˜ì¹˜ë©´ ë¹„ìœ¨ì— ë§ê²Œ ì¤„ì„
         float actualSpacing = cardSpacing;
         float defaultTotalWidth = (cardCount - 1) * cardSpacing;
 
         if (defaultTotalWidth > maxAvailableWidth)
         {
-            // °æ°è ÆøÀ» ³Ñ¾î°¡¸é Ä«µå ¼ö¿¡ ¸ÂÃç °£°İÀ» Á¼Èû
+            // ê²½ê³„ í­ì„ ë„˜ì–´ê°€ë©´ ì¹´ë“œ ìˆ˜ì— ë§ì¶° ê°„ê²©ì„ ì¢í˜
             actualSpacing = maxAvailableWidth / (cardCount - 1);
         }
 
-        // 3. Áß¾Ó ±âÁØ ½ÃÀÛ XÁÂÇ¥ °è»ê
+        // 3. ì¤‘ì•™ ê¸°ì¤€ ì‹œì‘ Xì¢Œí‘œ ê³„ì‚°
         float finalTotalWidth = (cardCount - 1) * actualSpacing;
         float startX = -finalTotalWidth / 2f;
 
-        // °æ°èÀÇ Áß½É XÁÂÇ¥ ±âÁØ (°æ°è°¡ ¾øÀ¸¸é handPosition ±âÁØ)
+        // ê²½ê³„ì˜ ì¤‘ì‹¬ Xì¢Œí‘œ ê¸°ì¤€ (ê²½ê³„ê°€ ì—†ìœ¼ë©´ handPosition ê¸°ì¤€)
         float centerX = (leftBoundary != null && rightBoundary != null)
             ? (leftBoundary.position.x + rightBoundary.position.x) / 2f
             : handPosition.position.x;
@@ -302,7 +313,7 @@ public class BattleCardManager : MonoBehaviour
         {
             CardDisplay display = activeHandDisplays[i];
 
-            // Ä«µå°¡ °ãÄ¥ ¶§ ¿ìÃø Ä«µå°¡ ÁÂÃø Ä«µå À§¿¡ ÀÚ¿¬½º·´°Ô ¾ñÈ÷µµ·Ï Z ¿ÀÇÁ¼Â »ìÂ¦ ºÎ¿© (-0.01f¾¿ ¾Õ´ç±è)
+            // ì¹´ë“œê°€ ê²¹ì¹  ë•Œ ìš°ì¸¡ ì¹´ë“œê°€ ì¢Œì¸¡ ì¹´ë“œ ìœ„ì— ìì—°ìŠ¤ëŸ½ê²Œ ì–¹íˆë„ë¡ Z ì˜¤í”„ì…‹ ì‚´ì§ ë¶€ì—¬ (-0.01fì”© ì•ë‹¹ê¹€)
             Vector3 targetPosition = new Vector3(
                 centerX + startX + (i * actualSpacing),
                 handPosition.position.y,
@@ -314,13 +325,13 @@ public class BattleCardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// ³õÀº Ä«µåÀÇ X ÁÂÇ¥¸¦ ±âÁØÀ¸·Î handCards¿Í cardPoolÀÇ ÀÎµ¦½º ¼ø¼­¸¦ º¯°æÇÕ´Ï´Ù.
+    /// ë†“ì€ ì¹´ë“œì˜ X ì¢Œí‘œë¥¼ ê¸°ì¤€ìœ¼ë¡œ handCardsì™€ cardPoolì˜ ì¸ë±ìŠ¤ ìˆœì„œë¥¼ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
     public void ReorderHandIndexOnly(CardDisplay releasedCard)
     {
         if (releasedCard == null || releasedCard.cardInstance == null) return;
 
-        // 1. ÇöÀç ÇÚµå¿¡ ÀÖ´Â Ä«µåµé ¼öÁı (½½·Ô¿¡ ²ÈÈù Ä«µå Á¦¿Ü)
+        // 1. í˜„ì¬ í•¸ë“œì— ìˆëŠ” ì¹´ë“œë“¤ ìˆ˜ì§‘ (ìŠ¬ë¡¯ì— ê½‚íŒ ì¹´ë“œ ì œì™¸)
         List<CardDisplay> activeCards = cardPool.FindAll(c =>
             c != null &&
             c.gameObject.activeSelf &&
@@ -330,13 +341,13 @@ public class BattleCardManager : MonoBehaviour
 
         if (activeCards.Count <= 1) return;
 
-        // 2. ÀÚ½ÅÀ» Á¦¿ÜÇÑ Ä«µåµéÀ» ÇöÀç X ÁÂÇ¥(¿ŞÂÊ -> ¿À¸¥ÂÊ) ¼øÀ¸·Î Á¤·Ä
+        // 2. ìì‹ ì„ ì œì™¸í•œ ì¹´ë“œë“¤ì„ í˜„ì¬ X ì¢Œí‘œ(ì™¼ìª½ -> ì˜¤ë¥¸ìª½) ìˆœìœ¼ë¡œ ì •ë ¬
         List<CardDisplay> otherCards = activeCards.FindAll(c => c != releasedCard);
         otherCards.Sort((a, b) => a.transform.position.x.CompareTo(b.transform.position.x));
 
-        // 3. ³õÀº Ä«µåÀÇ X ÁÂÇ¥¿Í ºñ±³ÇØ µé¾î°¥ ÀÎµ¦½º Ã£±â
+        // 3. ë†“ì€ ì¹´ë“œì˜ X ì¢Œí‘œì™€ ë¹„êµí•´ ë“¤ì–´ê°ˆ ì¸ë±ìŠ¤ ì°¾ê¸°
         float releasedX = releasedCard.transform.position.x;
-        int targetIndex = otherCards.Count; // ±âº»°ªÀº ¸Ç µÚ
+        int targetIndex = otherCards.Count; // ê¸°ë³¸ê°’ì€ ë§¨ ë’¤
 
         for (int i = 0; i < otherCards.Count; i++)
         {
@@ -347,7 +358,7 @@ public class BattleCardManager : MonoBehaviour
             }
         }
 
-        // 4. handCards (µ¥ÀÌÅÍ ¸®½ºÆ®) ¼ø¼­ º¯°æ
+        // 4. handCards (ë°ì´í„° ë¦¬ìŠ¤íŠ¸) ìˆœì„œ ë³€ê²½
         if (handCards.Contains(releasedCard.cardInstance))
         {
             handCards.Remove(releasedCard.cardInstance);
@@ -355,7 +366,7 @@ public class BattleCardManager : MonoBehaviour
             handCards.Insert(targetIndex, releasedCard.cardInstance);
         }
 
-        // 5. cardPool (¿ÀºêÁ§Æ® Ç® ¸®½ºÆ®) ¼ø¼­ µ¿±âÈ­
+        // 5. cardPool (ì˜¤ë¸Œì íŠ¸ í’€ ë¦¬ìŠ¤íŠ¸) ìˆœì„œ ë™ê¸°í™”
         if (cardPool.Contains(releasedCard))
         {
             cardPool.Remove(releasedCard);
@@ -371,7 +382,7 @@ public class BattleCardManager : MonoBehaviour
             ? discardDeckTransform.position
             : (handPosition != null ? handPosition.position + new Vector3(8f, -3f, 0f) : Vector3.zero);
 
-        // ¿¬Ãâ ÇÃ·¡±× ¼³Á¤ (Á¤·Ä ´ë»ó¿¡¼­ Áï½Ã Á¦¿Ü)
+        // ì—°ì¶œ í”Œë˜ê·¸ ì„¤ì • (ì •ë ¬ ëŒ€ìƒì—ì„œ ì¦‰ì‹œ ì œì™¸)
         targetDisplay.isTweening = true;
 
         if (targetDisplay.currentSlot != null)
@@ -382,19 +393,61 @@ public class BattleCardManager : MonoBehaviour
         if (targetDisplay.cardInstance != null)
         {
             handCards.Remove(targetDisplay.cardInstance);
-            discardDeck.Add(targetDisplay.cardInstance);
+
+            // ì†Œë©¸ ì¹´ë“œ(ë°©í•´ ì¹´ë“œ ë“±)ëŠ” ì‹œì „ í›„ ë²„ë¦¼ ë±ìœ¼ë¡œ ê°€ì§€ ì•Šê³  ì´ë²ˆ ì „íˆ¬ì—ì„œ ì œê±°
+            if (targetDisplay.cardInstance.baseData != null && targetDisplay.cardInstance.baseData.isExhaust)
+            {
+                Debug.Log($"[ì†Œë©¸] {targetDisplay.cardInstance.baseData.nameKey} ì´ë²ˆ ì „íˆ¬ì—ì„œ ì œê±°");
+            }
+            else
+            {
+                discardDeck.Add(targetDisplay.cardInstance);
+            }
         }
 
-        // [¼öÁ¤] ResetPlacement()¸¦ Æ®À© ½ÃÀÛ Àü¿¡ È£ÃâÇÏÁö ¾Ê°í, 
-        // Æ®À©ÀÌ ³¡³­ ÈÄ ºñÈ°¼ºÈ­ Á÷Àü¿¡ È£ÃâÇÕ´Ï´Ù.
+        // [ìˆ˜ì •] ResetPlacement()ë¥¼ íŠ¸ìœˆ ì‹œì‘ ì „ì— í˜¸ì¶œí•˜ì§€ ì•Šê³ , 
+        // íŠ¸ìœˆì´ ëë‚œ í›„ ë¹„í™œì„±í™” ì§ì „ì— í˜¸ì¶œí•©ë‹ˆë‹¤.
         Tween discardTween = DOTweenManager.CardDiscard(targetDisplay.gameObject, discardTargetPos, 0.25f, () =>
         {
             targetDisplay.ResetPlacement();
             targetDisplay.isTweening = false;
-            targetDisplay.gameObject.SetActive(false); // Ç® ¹İÈ¯ ºñÈ°¼ºÈ­
+            targetDisplay.gameObject.SetActive(false); // í’€ ë°˜í™˜ ë¹„í™œì„±í™”
         });
 
         BattleUIManager.Instance?.UpdateDeckUI();
+    }
+
+    /// <summary>
+    /// [InjectCurseCard] ì „íˆ¬ ì‹œì‘ ì‹œ, ê·¸ë¦¬ê³  turnCount % injectCycle == 0 ì¸ í„´ë§ˆë‹¤
+    /// ë“œë¡œìš° ë±ì— ë°©í•´ ì¹´ë“œ 1ì¥ì„ ì¶”ê°€í•˜ê³  ì…”í”Œ. ì£¼ì…í–ˆìœ¼ë©´ true
+    /// (ì „íˆ¬ìš© ë“œë¡œìš° ë±ì€ GameManager ì˜êµ¬ ë±ì˜ ë³µì‚¬ë³¸ì´ë¼ ì „íˆ¬ê°€ ëë‚˜ë©´ ìë™ìœ¼ë¡œ ì‚¬ë¼ì§)
+    /// </summary>
+    public bool TryInjectCurseCard(int turnCount, bool isBattleStart)
+    {
+        MonsterSO monster = GameManager.Instance != null ? GameManager.Instance.monster : null;
+        if (monster == null || !monster.TryGetGimmick(GimmickType.InjectCurseCard, out int curseCardId)) return false;
+
+        if (!isBattleStart && (injectCycle <= 0 || turnCount % injectCycle != 0)) return false;
+
+        if (cardDatabase == null)
+        {
+            Debug.LogError("[BattleCardManager] cardDatabaseê°€ ì—°ê²°ë˜ì§€ ì•Šì•„ ë°©í•´ ì¹´ë“œë¥¼ ì£¼ì…í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return false;
+        }
+
+        CardSO curseCard = cardDatabase.GetByKey(curseCardId);
+        if (curseCard == null)
+        {
+            Debug.LogError($"[BattleCardManager] ë°©í•´ ì¹´ë“œ ID {curseCardId} ë¥¼ ì¹´ë“œ ë°ì´í„°ë² ì´ìŠ¤ì—ì„œ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.");
+            return false;
+        }
+
+        drawDeck.Add(new CardInstance(curseCard, 0));
+        ShuffleDeck();
+
+        Debug.Log($"[ëª¬ìŠ¤í„° ê¸°ë¯¹: InjectCurseCard] {(isBattleStart ? "ì „íˆ¬ ì‹œì‘" : $"{turnCount}í„´")} ë°©í•´ ì¹´ë“œ {curseCardId} 1ì¥ ì£¼ì… (ë“œë¡œìš° ë± {drawDeck.Count}ì¥)");
+        BattleUIManager.Instance?.UpdateDeckUI();
+        return true;
     }
 
     private void ShuffleDeck()

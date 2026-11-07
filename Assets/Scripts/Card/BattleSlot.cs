@@ -1,79 +1,194 @@
+ï»¿using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
 public class BattleSlot : MonoBehaviour
 {
     public OwnerType slotOwnerType;
-    public int slotIndex;           // 0 ~ 4 (ÁÂÃøºÎÅÍ ¼ø¼­´ë·Î)
-    public bool isOccupied = false; // Ä«µå°¡ ÀÌ¹Ì ¹èÄ¡µÇ¾î ÀÖ´ÂÁö ¿©ºÎ
-    public CardDisplay currentCard; // ¹èÄ¡µÈ Ä«µå ÂüÁ¶
+    public int slotIndex;           // 0 ~ 4 (ì¢Œì¸¡ë¶€í„° ìˆœì„œëŒ€ë¡œ)
+    public bool isOccupied = false; // ì¹´ë“œê°€ ì´ë¯¸ ë°°ì¹˜ë˜ì–´ ìˆëŠ”ì§€ ì—¬ë¶€
+    public CardDisplay currentCard; // ë°°ì¹˜ëœ ì¹´ë“œ ì°¸ì¡°
 
-    [Header("½½·Ô ±âº» °ø°İ·Â")]
-    public int slotBaseAttack;      // Ä«µå°¡ ¾øÀ» ¶§ ¹ßµ¿ÇÒ °ø°İ·Â
+    [Header("ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©ë ¥")]
+    public int slotBaseAttack;      // ì¹´ë“œê°€ ì—†ì„ ë•Œ ë°œë™í•  ê³µê²©ë ¥
 
-    [Header("UI ¹ÙÀÎµù")]
-    [SerializeField] private TextMeshPro baseAtkText; // ÀÎ½ºÆåÅÍ¿¡¼­ Á÷Á¢ ÇÒ´çÇÒ TMP
+    [Header("UI ë°”ì¸ë”©")]
+    [SerializeField] private TextMeshPro baseAtkText; // ì¸ìŠ¤í™í„°ì—ì„œ ì§ì ‘ í• ë‹¹í•  TMP
 
-    // Ä«µå ¹èÄ¡ Ã³¸®
+    [Header("ëª¬ìŠ¤í„° ê¸°ë¯¹: ë¸”ë¼ì¸ë“œ")]
+    [Tooltip("ë¬¼ìŒí‘œ ë§ˆìŠ¤í¬ (ìŠ¬ë¡¯ë³´ë‹¤ ìœ„, ì¹´ë“œë³´ë‹¤ ì•„ë˜ Sorting Order)")]
+    [SerializeField] private SpriteRenderer blindMask;
+    public bool isBlind { get; private set; }
+
+    [Header("ëª¬ìŠ¤í„° ê¸°ë¯¹: ë°¸ë¥˜ ì™œê³¡")]
+    [Tooltip("ìŠ¬ë¡¯ ë°¸ë¥˜ ë³´ì •ê°’ í‘œì‹œ (+2 / -3)")]
+    [SerializeField] private TextMeshPro valueModifierText;
+    public int valueModifier { get; private set; }   // ì´ ìŠ¬ë¡¯ì— ë†“ì¸ ì¹´ë“œ ë°¸ë¥˜ì— ë”í•´ì§€ëŠ” ê°’ (0ì´ë©´ ì—†ìŒ)
+
+    private static readonly Color PlayerColor = new Color(0.2f, 0.6f, 1f);
+    private static readonly Color EnemyColor = new Color(1f, 0.2f, 0.4f);
+    private static readonly Color BlindColor = new Color(0.45f, 0.45f, 0.5f);
+
+    private SpriteRenderer slotRenderer;
+
+    private void Awake()
+    {
+        slotRenderer = GetComponent<SpriteRenderer>();
+        if (blindMask != null) blindMask.gameObject.SetActive(false);
+        if (valueModifierText != null) valueModifierText.gameObject.SetActive(false);
+    }
+
+    private static Color GetOwnerColor(OwnerType type) => type == OwnerType.Player ? PlayerColor : EnemyColor;
+
+    // ì¹´ë“œ ë°°ì¹˜ ì²˜ë¦¬
     public void PlaceCard(CardDisplay card)
     {
         isOccupied = true;
         currentCard = card;
-        card.transform.position = transform.position; // ½½·Ô À§Ä¡·Î 1È¸ °íÁ¤
+        card.transform.position = transform.position; // ìŠ¬ë¡¯ ìœ„ì¹˜ë¡œ 1íšŒ ê³ ì •
 
-        // Ä«µå°¡ ½½·ÔÀ» µ¤¾úÀ¸¹Ç·Î ½½·Ô ±âº» °ø°İ·Â ÅØ½ºÆ® ¼û±è
+        // ì¹´ë“œê°€ ìŠ¬ë¡¯ì„ ë®ì—ˆìœ¼ë¯€ë¡œ ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©ë ¥ í…ìŠ¤íŠ¸ ìˆ¨ê¹€
         if (baseAtkText != null)
         {
             baseAtkText.gameObject.SetActive(false);
         }
     }
 
-    // Ä«µå È¸¼ö/Á¦°Å ½Ã
+    // ì¹´ë“œ íšŒìˆ˜/ì œê±° ì‹œ
     public void ClearSlot()
     {
         isOccupied = false;
         currentCard = null;
 
-        // Ä«µå°¡ Ä¡¿öÁ³À¸¹Ç·Î ½½·Ô ±âº» °ø°İ·Â ÅØ½ºÆ® ´Ù½Ã ³ëÃâ
+        // ì¹´ë“œê°€ ì¹˜ì›Œì¡Œìœ¼ë¯€ë¡œ ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©ë ¥ í…ìŠ¤íŠ¸ ë‹¤ì‹œ ë…¸ì¶œ (ë¸”ë¼ì¸ë“œ ì¤‘ì—ëŠ” ê³„ì† ìˆ¨ê¹€)
         if (baseAtkText != null)
         {
-            baseAtkText.gameObject.SetActive(true);
+            baseAtkText.gameObject.SetActive(!isBlind);
         }
     }
 
     /// <summary>
-    /// ÅÏ ½ÇÇà ½Ã ÇØ´ç ½½·Ô ¾×¼Ç °İ¹ß ½ÃÁ¡¿¡ ÅØ½ºÆ®¸¦ ºñ¿ò
+    /// í„´ ì‹¤í–‰ ì‹œ í•´ë‹¹ ìŠ¬ë¡¯ ì•¡ì…˜ ê²©ë°œ ì‹œì ì— í…ìŠ¤íŠ¸ë¥¼ ë¹„ì›€
     /// </summary>
     public void ClearAtkText()
     {
         if (baseAtkText != null)
         {
             baseAtkText.text = "";
-            // ¶Ç´Â baseAtkText.gameObject.SetActive(false);
+            // ë˜ëŠ” baseAtkText.gameObject.SetActive(false);
         }
     }
 
     public void SetSlotType(OwnerType newType, int baseAttack)
     {
         slotOwnerType = newType;
-        slotBaseAttack = baseAttack;    // ½½·Ô ±âº» °ø°İ·Â ÇÒ´ç
+        slotBaseAttack = baseAttack;    // ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©ë ¥ í• ë‹¹
         isOccupied = false;
 
-        // ½½·Ô ±âº» °ø°İ·Â ÅØ½ºÆ® ¾÷µ¥ÀÌÆ® ¹× È°¼ºÈ­
+        // ì´ì „ í„´ ê¸°ë¯¹ ìƒíƒœ ì´ˆê¸°í™” (ì´ë²ˆ í„´ ê¸°ë¯¹ì€ BattleSlotManagerê°€ ë°°ì • ì§í›„ ë‹¤ì‹œ ë¶€ì—¬)
+        ResetGimmickState();
+
+        // ìŠ¬ë¡¯ ê¸°ë³¸ ê³µê²©ë ¥ í…ìŠ¤íŠ¸ ì—…ë°ì´íŠ¸ ë° í™œì„±í™”
         if (baseAtkText != null)
         {
             baseAtkText.gameObject.SetActive(true);
             baseAtkText.text = $"{slotBaseAttack}";
 
-            // (¼±ÅÃ) Å¸ÀÔº° ÅØ½ºÆ® »ö»ó ±¸ºĞ: ÇÃ·¹ÀÌ¾î´Â ÇÏ´Ã»ö, ÀûÀº ÁÖÈ«/ºÓÀº»ö
-            baseAtkText.color = (newType == OwnerType.Player) ? new Color(0.2f, 0.6f, 1f) : new Color(1f, 0.2f, 0.4f);
+            // (ì„ íƒ) íƒ€ì…ë³„ í…ìŠ¤íŠ¸ ìƒ‰ìƒ êµ¬ë¶„: í”Œë ˆì´ì–´ëŠ” í•˜ëŠ˜ìƒ‰, ì ì€ ì£¼í™/ë¶‰ì€ìƒ‰
+            baseAtkText.color = GetOwnerColor(newType);
         }
 
-        // ½½·Ô ½Ã°¢ ÇÇµå¹é (¿¹: ÇÃ·¹ÀÌ¾î´Â ÆÄ¶õ»ö/º¸¶ó»ö, ÀûÀº ºÓÀº»ö °è¿­)
-        SpriteRenderer sr = GetComponent<SpriteRenderer>();
-        if (sr != null)
+        // ìŠ¬ë¡¯ ì‹œê° í”¼ë“œë°± (ì˜ˆ: í”Œë ˆì´ì–´ëŠ” íŒŒë€ìƒ‰/ë³´ë¼ìƒ‰, ì ì€ ë¶‰ì€ìƒ‰ ê³„ì—´)
+        if (slotRenderer == null) slotRenderer = GetComponent<SpriteRenderer>();
+        if (slotRenderer != null)
         {
-            sr.color = (newType == OwnerType.Player) ? new Color(0.2f, 0.6f, 1f) : new Color(1f, 0.2f, 0.4f);
+            slotRenderer.DOKill();
+            slotRenderer.color = GetOwnerColor(newType);
         }
     }
+
+    #region ëª¬ìŠ¤í„° ê¸°ë¯¹
+
+    private void ResetGimmickState()
+    {
+        isBlind = false;
+        if (blindMask != null)
+        {
+            blindMask.DOKill();
+            blindMask.gameObject.SetActive(false);
+        }
+
+        SetValueModifier(0);
+    }
+
+    /// <summary>
+    /// [BlindSlot] true: ë¬¼ìŒí‘œ ë§ˆìŠ¤í¬ë¡œ ìŠ¬ë¡¯ ì£¼ì¸/ê¸°ë³¸ ê³µê²©ë ¥/ë°¸ë¥˜ ë³´ì •ì„ ê°€ë¦¼
+    /// false: ë§ˆìŠ¤í¬ë¥¼ í˜ì´ë“œì•„ì›ƒí•˜ë©° ì›ë˜ íƒ€ì… ìƒ‰ìƒ ê³µê°œ
+    /// </summary>
+    public void SetBlind(bool blind, float fadeDuration = 0.35f)
+    {
+        isBlind = blind;
+        if (slotRenderer == null) slotRenderer = GetComponent<SpriteRenderer>();
+
+        if (blind)
+        {
+            if (blindMask != null)
+            {
+                blindMask.DOKill();
+                blindMask.gameObject.SetActive(true);
+                Color c = blindMask.color;
+                blindMask.color = new Color(c.r, c.g, c.b, 1f);
+            }
+
+            if (slotRenderer != null)
+            {
+                slotRenderer.DOKill();
+                slotRenderer.color = BlindColor;
+            }
+
+            if (baseAtkText != null) baseAtkText.gameObject.SetActive(false);
+            RefreshValueModifierText();
+            return;
+        }
+
+        // ê³µê°œ: ë§ˆìŠ¤í¬ í˜ì´ë“œì•„ì›ƒ + ì›ë˜ ìƒ‰ìƒìœ¼ë¡œ ì „í™˜
+        if (blindMask != null && blindMask.gameObject.activeSelf)
+        {
+            blindMask.DOKill();
+            blindMask.DOFade(0f, fadeDuration).OnComplete(() => blindMask.gameObject.SetActive(false));
+        }
+
+        if (slotRenderer != null)
+        {
+            slotRenderer.DOKill();
+            slotRenderer.DOColor(GetOwnerColor(slotOwnerType), fadeDuration);
+        }
+
+        if (baseAtkText != null) baseAtkText.gameObject.SetActive(!isOccupied);
+        RefreshValueModifierText();
+    }
+
+    /// <summary>
+    /// [ScaleSlotValue] ì´ ìŠ¬ë¡¯ì— ë†“ì¸ ì¹´ë“œ ë°¸ë¥˜ì— ë”í•  ê°’ (0ì´ë©´ í•´ì œ)
+    /// </summary>
+    public void SetValueModifier(int modifier)
+    {
+        valueModifier = modifier;
+        RefreshValueModifierText();
+    }
+
+    private void RefreshValueModifierText()
+    {
+        if (valueModifierText == null) return;
+
+        // ë¸”ë¼ì¸ë“œ ì¤‘ì—ëŠ” ë³´ì •ê°’ë„ ë¹„ê³µê°œ
+        bool show = valueModifier != 0 && !isBlind;
+        valueModifierText.gameObject.SetActive(show);
+        if (!show) return;
+
+        valueModifierText.text = valueModifier > 0 ? $"+{valueModifier}" : valueModifier.ToString();
+        valueModifierText.color = valueModifier > 0 ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.35f, 0.3f);
+    }
+
+    #endregion
 }

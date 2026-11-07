@@ -196,8 +196,31 @@ public class BattleManager : MonoBehaviour
     [Header("턴 전환 대기 시간")]
     [SerializeField] private float nextTurnDelay = 2.0f; // 턴 종료 후 다음 드로우까지 대기 시간 (2초)
 
+    [Header("블라인드 슬롯 공개 연출 시간")]
+    [SerializeField] private float blindRevealDuration = 0.4f;
+
     public bool isGameOver = false;
     public bool isTurnExecuting = false;
+
+    [Header("턴 카운트 (전투 시작 턴 = 1)")]
+    public int turnCount = 1;
+
+    /// <summary>
+    /// 이번 전투의 몬스터 (단독 테스트 시 null)
+    /// </summary>
+    public MonsterSO CurrentMonster => GameManager.Instance != null ? GameManager.Instance.monster : null;
+
+    /// <summary>
+    /// [RestrictCardType] 이번 전투에서 해당 카드 타입의 슬롯 배치가 금지되었는지
+    /// gimmickParam = CardType 정수값 (0: Attack, 1: Defense, 2: Heal ...)
+    /// </summary>
+    public bool IsCardTypeRestricted(CardType cardType)
+    {
+        MonsterSO monster = CurrentMonster;
+        return monster != null
+            && monster.TryGetGimmick(GimmickType.RestrictCardType, out int restrictedType)
+            && (int)cardType == restrictedType;
+    }
 
     private Coroutine turnExecutionCoroutine;
 
@@ -285,6 +308,9 @@ public class BattleManager : MonoBehaviour
 
     private IEnumerator Co_ExecuteTurnSlots()
     {
+        // 0-0. [BlindSlot] 가려진 슬롯 공개 (페이드아웃 후 진행)
+        yield return StartCoroutine(Co_RevealBlindSlots());
+
         // 0. 카드 시전 전 재생 -> 중독 정산
         yield return StartCoroutine(Co_ApplyTurnEndStatusEffects());
         if (isGameOver) yield break;
@@ -362,6 +388,27 @@ public class BattleManager : MonoBehaviour
         // 4. 모든 정산 완료 및 새 턴 시작
         OnAllSlotsFinished();
         turnExecutionCoroutine = null;
+    }
+
+    /// <summary>
+    /// [BlindSlot] 턴 종료 직후 블라인드 슬롯을 모두 공개하고 연출이 끝날 때까지 대기
+    /// </summary>
+    private IEnumerator Co_RevealBlindSlots()
+    {
+        bool hasBlindSlot = false;
+
+        foreach (BattleSlot slot in fieldCardSlots)
+        {
+            if (slot == null || !slot.isBlind) continue;
+
+            slot.SetBlind(false, blindRevealDuration);
+            hasBlindSlot = true;
+        }
+
+        if (hasBlindSlot)
+        {
+            yield return new WaitForSeconds(blindRevealDuration);
+        }
     }
 
     /// <summary>
@@ -600,10 +647,14 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void OnAllSlotsFinished()
     {
-        Debug.Log("[새 턴 시작] 다음 턴 슬롯 재배정 및 드로우 시작");
+        turnCount++;
+        Debug.Log($"[새 턴 시작] {turnCount}턴 - 슬롯 재배정 및 드로우 시작");
 
-        // 다음 턴 슬롯 5개 타입(아군/적) 새로 배정
+        // 다음 턴 슬롯 5개 타입(아군/적) 새로 배정 (블라인드/밸류 왜곡 기믹 포함)
         BattleSlotManager.Instance?.GenerateTurnSlotTypes();
+
+        // [InjectCurseCard] 주기 턴이면 드로우 전에 방해 카드 주입
+        BattleCardManager.Instance?.TryInjectCurseCard(turnCount, false);
 
         // 기본 드로우 수 + 카드 효과로 적립된 보너스 드로우 합산 후 0으로 리셋
         if (BattleCardManager.Instance != null)
@@ -693,6 +744,9 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+        // 4-1. [ScaleSlotValue] 보상 적용 직후 슬롯 밸류 보정 (최솟값 0)
+        cardValue = ApplySlotValueModifier(slot, cardValue);
+
         // 5. 기본 1회 시전 + RepeatCast 추가 횟수만큼 반복 실행
         int totalCasts = 1 + repeatExtraCount;
 
@@ -746,6 +800,18 @@ public class BattleManager : MonoBehaviour
     }
 
     /// <param name="isAttack">false면 공격자 모션 없이 피격만 연출 (중독 등)</param>
+    /// <summary>
+    /// [ScaleSlotValue] 슬롯 밸류 보정 적용. 음수로 내려가지 않음 (최솟값 0)
+    /// </summary>
+    private int ApplySlotValueModifier(BattleSlot slot, int cardValue)
+    {
+        if (slot == null || slot.valueModifier == 0) return Mathf.Max(0, cardValue);
+
+        int result = Mathf.Max(0, cardValue + slot.valueModifier);
+        Debug.Log($"[몬스터 기믹: ScaleSlotValue] {slot.slotIndex}번 슬롯 보정 {slot.valueModifier:+0;-0} -> 밸류 {cardValue} -> {result}");
+        return result;
+    }
+
     public void ModifyHealth(CombatEntityStats entity, int amount, bool isAttack = true)
     {
         entity.currentHp = Mathf.Clamp(entity.currentHp + amount, 0, entity.maxHp);
@@ -856,7 +922,8 @@ public class BattleManager : MonoBehaviour
         CombatEntityStats user = isPlayer ? playerStats : monsterStats;
         CombatEntityStats target = isPlayer ? monsterStats : playerStats;
 
-        int finalValue = Mathf.Max(0, cardDisplay.cardInstance.GetValue());
+        // 연계 시전도 대상 카드가 놓인 슬롯의 밸류 보정을 받음
+        int finalValue = ApplySlotValueModifier(targetSlot, cardDisplay.cardInstance.GetValue());
 
         ApplyCardEffect(cardData.cardType, user, target, finalValue);
 

@@ -252,6 +252,12 @@ public class CardDisplay : MonoBehaviour
         {
             BattleSlot targetSlot = hit.collider.GetComponent<BattleSlot>();
 
+            // [RestrictCardType] 배치 금지 타입이면 슬롯 배치 자체를 하지 않고 아래 핸드 복귀 처리로 넘어감
+            if (targetSlot != null && IsPlacementRestricted())
+            {
+                targetSlot = null;
+            }
+
             if (targetSlot != null)
             {
                 // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
@@ -304,6 +310,19 @@ public class CardDisplay : MonoBehaviour
         }
 
         DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => ColliderOnOff(this, true));
+    }
+
+    /// <summary>
+    /// [RestrictCardType] 몬스터 기믹으로 이 카드 타입의 배치가 금지되었는지 (금지 시 피드백 표시)
+    /// </summary>
+    private bool IsPlacementRestricted()
+    {
+        if (cardInstance == null || cardInstance.baseData == null) return false;
+        if (!BattleManager.Instance.IsCardTypeRestricted(cardInstance.baseData.cardType)) return false;
+
+        Debug.Log($"[몬스터 기믹: RestrictCardType] {cardInstance.baseData.cardType} 타입은 이번 전투에서 배치할 수 없습니다.");
+        BattleUIManager.Instance?.ShowStatusText(transform.position, "배치 불가", new Color(1f, 0.3f, 0.3f));
+        return true;
     }
 
     private Color Hex(string hex)
