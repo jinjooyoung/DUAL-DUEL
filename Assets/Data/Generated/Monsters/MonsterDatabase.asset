@@ -9,8 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 0}
+  m_Script: {fileID: 11500000, guid: a0775d4878d2764498a324ec5b45c3d3, type: 3}
   m_Name: MonsterDatabase
   m_EditorClassIdentifier: Assembly-CSharp::MonsterDatabaseSO
   items:
   - {fileID: 11400000, guid: 373cb5ebd5bab9040b7a451ea61f3a72, type: 2}
+  - {fileID: 11400000, guid: 7802f36472df2b441be0873537a7defe, type: 2}
+  - {fileID: 11400000, guid: 7fdeaa1233b52664283767e91e560326, type: 2}
+  - {fileID: 11400000, guid: 97b287c5f0755f94abc66483c616b8a9, type: 2}
+  - {fileID: 11400000, guid: 36c61c3b78eb71741880bcc4da01aa74, type: 2}
+  - {fileID: 11400000, guid: 3982c5812650c0648aef06e8c8b7cec1, type: 2}
