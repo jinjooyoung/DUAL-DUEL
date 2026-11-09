@@ -77,17 +77,6 @@ public class UIViewerCard : MonoBehaviour
             typeLocalizeEvent.RefreshString();
         }
 
-        // 3. 카드 설명 (덱 리스트에서는 툴팁 대신 카드에 바로 표시)
-        if (descText != null && descLocalizeEvent != null)
-        {
-            descLocalizeEvent.StringReference.Arguments = new object[]
-            {
-                new { value = card.GetValue() }
-            };
-            descLocalizeEvent.StringReference.SetReference(tableName, data.descKey);
-            descLocalizeEvent.RefreshString();
-        }
-
         // 4. 이미지 (랭크는 배경색이 아니라 별로 표시하므로 배경색은 기본값 유지)
         if (artworkImage != null && data.artwork != null) artworkImage.sprite = data.artwork;
 

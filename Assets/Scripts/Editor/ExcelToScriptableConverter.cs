@@ -258,7 +258,8 @@ public class ExcelToScriptableConverter : EditorWindow
             cardType = GetCellString(row, "cardType"),
             rank = GetCellInt(row, "rank", 1),
             nameKey = GetCellString(row, "nameKey"),
-            descKey = GetCellString(row, "descKey"),
+            typeDescKey = GetCellString(row, "typeDescKey"),
+            gimmickDescKey = GetCellString(row, "gimmickDescKey"),
 
             baseValue = GetCellInt(row, "baseValue"),
             upgrade_1 = GetCellFloat(row, "upgrade_1"),

@@ -205,6 +205,19 @@ public class BattleManager : MonoBehaviour
     [Header("턴 카운트 (전투 시작 턴 = 1)")]
     public int turnCount = 1;
 
+    [Header("몬스터 기본 공격 (모든 슬롯 시전 후 발동)")]
+    [Tooltip("MonsterSO.baseAttack 기준 ± 범위 (3이면 10 -> 7~13)")]
+    [SerializeField] private int monsterAttackVariance = 3;
+    [Tooltip("몬스터 SO가 없을 때(단독 테스트) 사용할 기본 공격력")]
+    [SerializeField] private int fallbackMonsterAttack = 8;
+    [SerializeField] private float monsterAttackDelay = 0.6f;
+
+    /// <summary>
+    /// 이번 턴 몬스터 기본 공격력 (새 턴 시작 시 결정, 턴 종료 시 발동)
+    /// </summary>
+    public int monsterTurnAttack { get; private set; }
+    public event Action<int> OnMonsterTurnAttackChanged;
+
     /// <summary>
     /// 이번 전투의 몬스터 (단독 테스트 시 null)
     /// </summary>
@@ -236,7 +249,37 @@ public class BattleManager : MonoBehaviour
     // 순서 보장을 위해 초기화 로직 모음
     private void Start()
     {
+        RollMonsterTurnAttack();    // 첫 턴 몬스터 공격력 결정
         BattleUIManager.Instance.UpdateAllUI();
+    }
+
+    /// <summary>
+    /// 이번 턴 몬스터 기본 공격력 = baseAttack ± variance (최솟값 0)
+    /// </summary>
+    private void RollMonsterTurnAttack()
+    {
+        int baseAttack = CurrentMonster != null ? CurrentMonster.baseAttack : fallbackMonsterAttack;
+        int variance = Mathf.Max(0, monsterAttackVariance);
+
+        monsterTurnAttack = Mathf.Max(0, baseAttack + UnityEngine.Random.Range(-variance, variance + 1));
+        Debug.Log($"[몬스터 기본 공격] {turnCount}턴 공격력 {monsterTurnAttack} (기준 {baseAttack} ± {variance})");
+
+        OnMonsterTurnAttackChanged?.Invoke(monsterTurnAttack);
+    }
+
+    /// <summary>
+    /// 모든 슬롯 시전 후 몬스터 기본 공격 (방어도 초기화 전이라 플레이어 방어도로 막을 수 있음)
+    /// 슬롯 기본 공격과 같이 카드가 아니므로 약화는 적용되지 않고, 힘/출혈은 ApplyDamage에서 적용
+    /// </summary>
+    private IEnumerator Co_ExecuteMonsterAttack()
+    {
+        if (isGameOver || monsterTurnAttack <= 0) yield break;
+
+        Debug.Log($"[몬스터 기본 공격] 플레이어에게 {monsterTurnAttack} 공격");
+        ApplyDamage(playerStats, monsterTurnAttack);
+        BattleUIManager.Instance?.UpdateAllUI();
+
+        yield return new WaitForSeconds(monsterAttackDelay);
     }
 
     /// <summary>
@@ -346,6 +389,10 @@ public class BattleManager : MonoBehaviour
             }
         }
 
+        if (isGameOver) yield break;
+
+        // 1-A. 모든 슬롯 시전 후 몬스터 기본 공격 (방어도 초기화 전)
+        yield return StartCoroutine(Co_ExecuteMonsterAttack());
         if (isGameOver) yield break;
 
         // 1-0. 모든 카드 시전 종료 -> 버프/디버프 유지 턴수 일괄 -1 (0이 되면 수치 초기화)
@@ -652,6 +699,9 @@ public class BattleManager : MonoBehaviour
 
         // 다음 턴 슬롯 5개 타입(아군/적) 새로 배정 (블라인드/밸류 왜곡 기믹 포함)
         BattleSlotManager.Instance?.GenerateTurnSlotTypes();
+
+        // 이번 턴 몬스터 기본 공격력 결정 (드로우 전에 보여줘서 배치 판단에 쓰도록)
+        RollMonsterTurnAttack();
 
         // [InjectCurseCard] 주기 턴이면 드로우 전에 방해 카드 주입
         BattleCardManager.Instance?.TryInjectCurseCard(turnCount, false);

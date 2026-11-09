@@ -65,7 +65,8 @@ public class CardData
     public int rank;                // 1~5 (일반 ~ 전설)
 
     public string nameKey;
-    public string descKey;
+    public string typeDescKey;
+    public string gimmickDescKey;
 
     public int baseValue;           // 기본 밸류 (0강)
     public float upgrade_1;         // 1강 시 강화 대상 값 (upgradeTarget 0: 밸류 / 1: 리워드 파람)
@@ -106,7 +107,8 @@ public class CardSO : ScriptableObject
 
     [Header("로컬라이징 키")]
     public string nameKey;
-    public string descKey;
+    public string typeDescKey;
+    public string gimmickDescKey;
 
     [Header("강화 설정")]
     [Tooltip("0: 기본 밸류 강화 카드, 1: 리워드 파람 강화 카드")]
@@ -156,7 +158,8 @@ public class CardSO : ScriptableObject
     {
         cardId = data.cardId;
         nameKey = data.nameKey;
-        descKey = data.descKey;
+        typeDescKey = data.typeDescKey;
+        gimmickDescKey = data.gimmickDescKey;
         isExhaust = data.isExhaust;
         conditionParam = data.conditionParam;
 

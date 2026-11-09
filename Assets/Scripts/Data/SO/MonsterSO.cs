@@ -23,6 +23,7 @@ public class MonsterData
     public string monsterName;      // 로컬라이징 키 (예: MONSTERNAME_2000)
     public string monsterType;      // Normal / Elite / Boss
     public int appearStartStage;    // 등장 시작 스테이지 (챕터 * 100 + 층. 예: 203 = 2챕터 3층)
+    public int baseAttack;
     public int maxHp;
 
     public string gimmickType1;
@@ -44,6 +45,7 @@ public class MonsterSO : ScriptableObject
     public int appearStartStage;
 
     [Header("스탯")]
+    public int baseAttack;
     public int maxHp;
 
     [Header("기믹")]
@@ -91,6 +93,7 @@ public class MonsterSO : ScriptableObject
         monsterID = data.monsterID;
         monsterName = data.monsterName;
         appearStartStage = data.appearStartStage;
+        baseAttack = data.baseAttack;
         maxHp = data.maxHp;
 
         monsterType = ParseEnum(data.monsterType, StageType.Normal, "monsterType");
