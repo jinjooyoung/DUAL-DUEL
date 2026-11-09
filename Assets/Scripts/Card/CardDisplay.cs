@@ -1,8 +1,5 @@
 ﻿using DG.Tweening;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
-using UnityEngine.Localization.Components;
 
 public class CardDisplay : MonoBehaviour
 {
@@ -11,33 +8,8 @@ public class CardDisplay : MonoBehaviour
     public int cardIndex;
     public BattleSlot currentSlot;
 
-    [Header("로컬라이제이션 테이블 정보")]
-    [SerializeField] private string tableName = "Card_Table";
-    [Header("로컬라이제이션 이벤트 컴포넌트")]
-    public LocalizeStringEvent nameLocalizeEvent;
-    public LocalizeStringEvent typeLocalizeEvent;
-
-    [Header("이미지")]
-    public SpriteRenderer background;
-    public SpriteRenderer cardResource;
-    public SpriteRenderer typeIcon;
-    public SpriteRenderer gimmickIcon;
-
-    [Header("랭크 별 아이콘")]
-    public List<SpriteRenderer> rankStarIcons;
-
-    // 랭크 단계 수 (RankType 최댓값 = 5). 등급 개수가 바뀌어도 자동으로 따라감
-    private static readonly int MaxRankStarCount = (int)RankType.Legendary;
-
-    [Header("텍스트")]
-    public TextMeshPro nameText;
-    public TextMeshPro typeText;
-    public TextMeshPro valueText;
-    public TextMeshPro gimmikValueText;
-
-    [Header("타입, 기믹 오브젝트")]
-    public GameObject typeGroup;
-    public GameObject GimmikGroup;
+    [Header("표시 담당 컴포넌트 (비우면 같은 오브젝트에서 자동 탐색)")]
+    [SerializeField] private CardVisual visual;
 
     [Header("상태 플래그")]
     public bool isDragging = false;
@@ -47,7 +19,6 @@ public class CardDisplay : MonoBehaviour
 
     private Vector3 originalPosition;
     private Vector3 originalScale = Vector3.one;
-    private Vector3 originalTypeGroupPos;
 
     [Header("레이어 마스크")]
     public LayerMask slotLayer;
@@ -55,7 +26,7 @@ public class CardDisplay : MonoBehaviour
     private void Awake()
     {
         originalScale = transform.localScale;
-        originalTypeGroupPos = typeGroup.transform.localPosition;
+        if (visual == null) visual = GetComponent<CardVisual>();
     }
 
     void Start()
@@ -63,90 +34,23 @@ public class CardDisplay : MonoBehaviour
         slotLayer = LayerMask.GetMask("Slot");
     }
 
-    // 카드 데이터 설정
+    // 카드 데이터 설정 (외형 갱신은 CardVisual에 위임)
     public void SetupCard(CardInstance instance)
     {
         cardInstance = instance;
         if (cardInstance == null || cardInstance.baseData == null) return;
 
-        CardSO data = cardInstance.baseData;
-
-        // 1. 카드 이름 텍스트 세팅
-        if (nameText != null && nameLocalizeEvent != null)
-        {
-            nameLocalizeEvent.StringReference.SetReference(tableName, data.nameKey);
-            nameLocalizeEvent.RefreshString();
-
-            Debug.Log("카드 이름 텍스트 세팅");
-        }
-
-        // 2. 카드 타입 텍스트 세팅
-        if (typeText != null && typeLocalizeEvent != null)
-        {
-            string typeKey = $"{data.cardType.ToString().ToUpper()}_KEY";
-            typeLocalizeEvent.StringReference.SetReference(tableName, typeKey);
-            typeLocalizeEvent.RefreshString();
-
-            Debug.Log("카드 타입 텍스트 세팅");
-        }
-
-        // 카드 리소스
-        if (cardResource != null && data.artwork != null)
-            cardResource.sprite = data.artwork;
-
-        if (background != null)
-        {
-            background.sprite = data.bgSprite;
-
-            int activeStarCount = (int)data.rank;
-
-            for (int i = 0; i < rankStarIcons.Count; i++)
-            {
-                if (rankStarIcons[i] == null) continue;
-
-                // 랭크 단계 수(현재 5)를 넘는 별 오브젝트는 숨김 (프리팹에 별이 6개 남아있어도 안전)
-                bool isUsedStar = i < MaxRankStarCount;
-                rankStarIcons[i].gameObject.SetActive(isUsedStar);
-                if (!isUsedStar) continue;
-
-                rankStarIcons[i].sprite = i < activeStarCount ? data.FilledStarSprite : data.EmptyStartSprite;
-            }
-        }
-
-        if (typeIcon != null) typeIcon.sprite = data.typeIconSprite;
-
-        if (gimmickIcon != null) gimmickIcon.sprite = data.gimmikIconSprite;
-
-        // 기믹 그룹 노출 여부 (보상이 없는 카드는 타입 그룹을 가운데로)
-        bool hasReward = data.rewardCategory != RewardCategory.None;
-        GimmikGroup.SetActive(hasReward);
-        typeGroup.transform.localPosition = hasReward
-            ? originalTypeGroupPos
-            : new Vector3(0, originalTypeGroupPos.y, originalTypeGroupPos.z);
-
-        // 3. 수치 텍스트 (밸류 + 리워드 파람)
-        RefreshValueTexts();
+        if (visual == null) visual = GetComponent<CardVisual>();
+        if (visual != null) visual.Render(cardInstance);
     }
 
     /// <summary>
-    /// 강화 단계가 반영된 밸류 / 리워드 파람 텍스트 갱신
-    /// 강화 시 리워드 파람도 변할 수 있으므로, 강화 로직에서는 이 함수만 다시 호출하면 됨
+    /// 강화 단계가 반영된 밸류 / 리워드 파람 텍스트 갱신 (강화 로직에서 호출)
     /// </summary>
     public void RefreshValueTexts()
     {
         if (cardInstance == null || cardInstance.baseData == null) return;
-
-        // 카드 기본 밸류
-        if (valueText != null)
-        {
-            valueText.text = cardInstance.GetValue().ToString();
-        }
-
-        // 기믹 보상 수치 (포맷은 CardInstance에서 공용 처리)
-        if (gimmikValueText != null)
-        {
-            gimmikValueText.text = cardInstance.GetRewardDisplayText();
-        }
+        if (visual != null) visual.RefreshValues(cardInstance);
     }
 
     /// <summary>
@@ -204,6 +108,7 @@ public class CardDisplay : MonoBehaviour
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
         isDragging = true;
+        if (TooltipPanel.Instance != null) TooltipPanel.Instance.HideTooltip();   // 드래그 시작 시 카드 툴팁 닫기
         SoundManager.Instance.PlaySFX(SFXType.CardPlay);
 
         foreach (var card in BattleCardManager.Instance.cardPool)
@@ -323,12 +228,6 @@ public class CardDisplay : MonoBehaviour
         Debug.Log($"[몬스터 기믹: RestrictCardType] {cardInstance.baseData.cardType} 타입은 이번 전투에서 배치할 수 없습니다.");
         BattleUIManager.Instance?.ShowStatusText(transform.position, "배치 불가", new Color(1f, 0.3f, 0.3f));
         return true;
-    }
-
-    private Color Hex(string hex)
-    {
-        ColorUtility.TryParseHtmlString(hex, out Color color);
-        return color;
     }
 
     private void ColliderOnOff(CardDisplay obj, bool on)

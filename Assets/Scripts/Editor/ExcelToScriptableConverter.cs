@@ -298,6 +298,7 @@ public class ExcelToScriptableConverter : EditorWindow
             monsterName = GetCellString(row, "monsterName"),
             monsterType = GetCellString(row, "monsterType", "Normal"),   // "Elite " 같은 뒤 공백은 GetCellString에서 Trim
             appearStartStage = GetCellInt(row, "appearStartStage", 101),
+            baseAttack = GetCellInt(row, "baseAttack"),
             maxHp = GetCellInt(row, "maxHp"),
 
             gimmickType1 = GetCellString(row, "gimmickType1", "None"),
