@@ -16,8 +16,7 @@ MonoBehaviour:
     m_Code: en
   m_SharedData: {fileID: 11400000, guid: 0f281b48dd6b04d46b25a002f6b9ac24, type: 2}
   m_Metadata:
-    m_Items:
-    - rid: 1411976596847591549
+    m_Items: []
   m_TableData:
   - m_Id: 53273825280
     m_Localized: Attack
@@ -31,20 +30,8 @@ MonoBehaviour:
     m_Localized: Heal
     m_Metadata:
       m_Items: []
-  - m_Id: 53290602498
-    m_Localized: Buff
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602499
-    m_Localized: Debuff
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602500
-    m_Localized: Special
-    m_Metadata:
-      m_Items: []
   - m_Id: 53290602502
-    m_Localized: Jap
+    m_Localized: Jab
     m_Metadata:
       m_Items: []
   - m_Id: 53290602503
@@ -68,81 +55,158 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 53290602508
-    m_Localized: Counter Guard
+    m_Localized: Breath of Recovery
     m_Metadata:
       m_Items: []
   - m_Id: 53290602509
-    m_Localized: Iron Wall
+    m_Localized: Roar of Madness
     m_Metadata:
       m_Items: []
   - m_Id: 53290602510
+    m_Localized: Venom Fang Curse
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415124385792
     m_Localized: Regeneration
     m_Metadata:
       m_Items: []
-  - m_Id: 53290602512
-    m_Localized: Deal {value} damage to the opponent.
+  - m_Id: 10476415170523136
+    m_Localized: Force
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602513
-    m_Localized: Deal {value} damage to the opponent. +4 if placed in the 1st or
-      5th slot.
+      m_Items: []
+  - m_Id: 10476415170523137
+    m_Localized: Lifesteal
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602514
-    m_Localized: Deal {value} damage to the opponent. Doubled if both adjacent cards
-      are Attack cards.
+      m_Items: []
+  - m_Id: 10476415170523138
+    m_Localized: Poison
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602515
-    m_Localized: Deal {value} damage to the opponent. Cast an additional time if
-      the previous slot is Player-owned.
+      m_Items: []
+  - m_Id: 10476415170523139
+    m_Localized: Bleed
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602516
-    m_Localized: Reduce incoming damage by {value}. Also cast the previous card.
+      m_Items: []
+  - m_Id: 10476415170523140
+    m_Localized: Weaken
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602517
-    m_Localized: Reduce incoming damage by {value}. Draw 1 additional card next turn
-      if the previous slot is Enemy-owned.
+      m_Items: []
+  - m_Id: 10476415174717440
+    m_Localized: <size=125%>Attack</size><br>Deal {0} damage to the opponent.
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602518
-    m_Localized: Restore {value} HP. Cast 2 additional times if placed in the 2nd
+      m_Items: []
+  - m_Id: 10476415174717441
+    m_Localized: <size=125%>Defense</size><br>Gain {0} Guard. Guard is removed at
+      the end of the turn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717442
+    m_Localized: <size=125%>Heal</size><br>Restore {0} HP.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717449
+    m_Localized: <size=125%>Vanguard</size><br>+{0} value if placed in the first
       slot.
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602519
-    m_Localized: Gain {value} buff. +6 if you have 6 or fewer cards in hand.
+      m_Items: []
+  - m_Id: 10476415174717450
+    m_Localized: <size=125%>Pincer</size><br>+{0} value if both adjacent slots are
+      enemy slots holding cards.
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
-  - m_Id: 53290602520
-    m_Localized: Apply {value} debuff.
+      m_Items: []
+  - m_Id: 10476415174717451
+    m_Localized: <size=125%>Escort</size><br>If the previous slot is an ally slot
+      holding a card, cast {0} more time(s).
     m_Metadata:
-      m_Items:
-      - rid: 1411976596847591549
+      m_Items: []
+  - m_Id: 10476415174717452
+    m_Localized: <size=125%>Chain</size><br>If the next slot is an ally slot holding
+      a card, cast that card one extra time.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717455
+    m_Localized: <size=125%>Regeneration</size><br>For {0} turn(s), restore {1} HP
+      at the end of turn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717456
+    m_Localized: <size=125%>Force</size><br>For {0} turn(s), attacks deal {1} more
+      damage.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911744
+    m_Localized: <size=125%>Lifesteal</size><br>For {0} turn(s), heal for {1}% of
+      HP damage dealt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911745
+    m_Localized: <size=125%>Poison</size><br>For {0} turn(s), take {1} damage at
+      the end of turn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911746
+    m_Localized: <size=125%>Bleed</size><br>For {0} turn(s), take {1} additional
+      damage when attacked.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911747
+    m_Localized: <size=125%>Weaken</size><br>For {0} turn(s), card values are reduced
+      by {1}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911748
+    m_Localized: <size=125%>Enemy Attack</size><br>After all cards are cast, the
+      enemy attacks for {0}.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116553506816
+    m_Localized: <size=125%>Regeneration</size><br>Gain {0} Regeneration ({1} turns).
+      At the end of turn, restore HP equal to Regeneration.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644160
+    m_Localized: <size=125%>Force</size><br>Gain {0} Force ({1} turns). Attacks deal
+      additional damage equal to Force.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644161
+    m_Localized: <size=125%>Lifesteal</size><br>Gain {0}% Lifesteal ({1} turns, max
+      100%). Heal for that % of HP damage dealt.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644162
+    m_Localized: <size=125%>Poison</size><br>Apply {0} Poison to the opponent ({1}
+      turns). Takes damage equal to Poison at the end of turn.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644163
+    m_Localized: <size=125%>Bleed</size><br>Apply {0} Bleed to the opponent ({1}
+      turns). Takes additional damage equal to Bleed when attacked.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644164
+    m_Localized: <size=125%>Weaken</size><br>Apply {0} Weaken to the opponent ({1}
+      turns). Card values are reduced by Weaken.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644165
+    m_Localized: <size=125%>Prepare</size><br>+{0} value if the previous slot is
+      an enemy slot holding an Attack card.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644166
+    m_Localized: <size=125%>Follow-up</size><br>Value x{0} if the previous slot is
+      an ally slot holding an Attack card.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644167
+    m_Localized: <size=125%>Preemptive</size><br>+{0} value if the next slot is an
+      enemy slot holding an Attack card.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644168
+    m_Localized: <size=125%>Finisher</size><br>Value x{0} if placed in the last slot.
+    m_Metadata:
+      m_Items: []
   references:
     version: 2
-    RefIds:
-    - rid: 1411976596847591549
-      type: {class: SmartFormatTag, ns: UnityEngine.Localization.Metadata, asm: Unity.Localization}
-      data:
-        m_Entries: 
-        m_SharedEntries:
-        - id: 53290602520
-        - id: 53290602519
-        - id: 53290602518
-        - id: 53290602517
-        - id: 53290602516
-        - id: 53290602515
-        - id: 53290602514
-        - id: 53290602513
-        - id: 53290602512
+    RefIds: []

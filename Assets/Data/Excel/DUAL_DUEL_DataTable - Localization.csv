@@ -1,27 +1,44 @@
-Key,Korean(ko),English(en)
-ATTACK_KEY,공격,Attack
-DEFENSE_KEY,방어,Defense
-HEAL_KEY,회복,Heal
-BUFF_KEY,강화,Buff
-DEBUFF_KEY,약화,Debuff
-SPECIAL_KEY,특수,Special
-,,
-CARDNAME_0,잽,Jap
-CARDNAME_1,스트라이크,Strike
-CARDNAME_2,브루트 포스,Brute Force
-CARDNAME_3,해비 스매시,Heavy Smash
-CARDNAME_4,흘리기,Evade
-CARDNAME_5,가드,Guard
-CARDNAME_6,카운터 가드,Counter Guard
-CARDNAME_7,아이언 월,Iron Wall
-CARDNAME_8,응급 처치,Regeneration
-,,
-CARDDESC_0,상대에게 [Value] 피해를 준다.,Deal [Value] damage to the opponent.
-CARDDESC_1,상대에게 [Value] 피해를 준다. 1또는5번째 배치시 +4,Deal [Value] damage to the opponent. +4 if placed in the 1st or 5th slot.
-CARDDESC_2,상대에게 [Value] 피해를 준다. 앞뒤 모두 Attack카드면 *2,Deal [Value] damage to the opponent. Doubled if both adjacent cards are Attack cards.
-CARDDESC_3,상대에게 [Value] 피해를 준다. 이전 슬롯 Player면 1회 추가 시전,Deal [Value] damage to the opponent. Cast an additional time if the previous slot is Player-owned.
-CARDDESC_4,받는 피해를 [Value] 감소시킨다. 이전 카드도 시전한다.,Reduce incoming damage by [Value]. Also cast the previous card.
-CARDDESC_5,받는 피해를 [Value] 감소시킨다. 이전 슬롯 Enemy면 다음 드로우수 +1,Reduce incoming damage by [Value]. Draw 1 additional card next turn if the previous slot is Enemy-owned.
-CARDDESC_6,HP를 [Value] 회복한다. 2번째 칸에 배치 시 2회 추가 시전,Restore [Value] HP. Cast 2 additional times if placed in the 2nd slot.
-CARDDESC_7,버프 [Value]. 현재 손패 6장 이하라면 +6,Gain [Value] buff. +6 if you have 6 or fewer cards in hand.
-CARDDESC_8,디버프 [Value].,Apply [Value] debuff.
+Key,Korean(ko),English(en),Japanese(ja)
+ATTACK_KEY,공격,Attack,攻撃
+DEFENSE_KEY,방어,Defense,防御
+HEAL_KEY,회복,Heal,回復
+BUFF_REGENERATION_KEY,재생,Regeneration,再生
+BUFF_FORCE_KEY,힘,Force,筋力
+BUFF_LIFESTEAL_KEY,흡혈,Lifesteal,吸血
+DEBUFF_POISON_KEY,중독,Poison,毒
+DEBUFF_BLEED_KEY,출혈,Bleed,出血
+DEBUFF_WEAKEN_KEY,약화,Weaken,弱体
+TYPEDESC_ATTACK,<size=125%>공격</size><br>상대에게 {0}만큼 피해를 줍니다.,<size=125%>Attack</size><br>Deal {0} damage to the opponent.,<size=125%>攻撃</size><br>相手に{0}ダメージを与える。
+TYPEDESC_DEFENSE,<size=125%>방어</size><br>방어도를 {0} 얻습니다. 방어도는 턴이 끝나면 사라집니다.,<size=125%>Defense</size><br>Gain {0} Guard. Guard is removed at the end of the turn.,<size=125%>防御</size><br>ガードを{0}得る。ガードはターン終了時に消える。
+TYPEDESC_HEAL,<size=125%>회복</size><br>체력을 {0} 회복합니다.,<size=125%>Heal</size><br>Restore {0} HP.,<size=125%>回復</size><br>HPを{0}回復する。
+TYPEDESC_BUFF_REGENERATION,<size=125%>재생</size><br>재생을 {0} 얻습니다({1}턴). 턴 종료 시 재생만큼 체력을 회복합니다.,"<size=125%>Regeneration</size><br>Gain {0} Regeneration ({1} turns). At the end of turn, restore HP equal to Regeneration.",<size=125%>再生</size><br>再生を{0}得る({1}ターン)。ターン終了時、再生の値だけHPを回復する。
+TYPEDESC_BUFF_FORCE,<size=125%>힘</size><br>힘을 {0} 얻습니다({1}턴). 공격 피해가 힘만큼 증가합니다.,<size=125%>Force</size><br>Gain {0} Force ({1} turns). Attacks deal additional damage equal to Force.,<size=125%>筋力</size><br>筋力を{0}得る({1}ターン)。攻撃ダメージが筋力の値だけ増加する。
+TYPEDESC_BUFF_LIFESTEAL,"<size=125%>흡혈</size><br>흡혈을 {0}% 얻습니다({1}턴, 최대 100%). 체력에 입힌 피해의 흡혈%만큼 회복합니다.","<size=125%>Lifesteal</size><br>Gain {0}% Lifesteal ({1} turns, max 100%). Heal for that % of HP damage dealt.",<size=125%>吸血</size><br>吸血を{0}%得る({1}ターン、最大100%)。与えたHPダメージのその割合だけ回復する。
+TYPEDESC_DEBUFF_POISON,<size=125%>중독</size><br>상대에게 중독을 {0} 부여합니다({1}턴). 턴 종료 시 중독만큼 피해를 받습니다.,<size=125%>Poison</size><br>Apply {0} Poison to the opponent ({1} turns). Takes damage equal to Poison at the end of turn.,<size=125%>毒</size><br>相手に毒を{0}付与する({1}ターン)。ターン終了時、毒の値だけダメージを受ける。
+TYPEDESC_DEBUFF_BLEED,<size=125%>출혈</size><br>상대에게 출혈을 {0} 부여합니다({1}턴). 공격받을 때 출혈만큼 피해를 더 받습니다.,<size=125%>Bleed</size><br>Apply {0} Bleed to the opponent ({1} turns). Takes additional damage equal to Bleed when attacked.,<size=125%>出血</size><br>相手に出血を{0}付与する({1}ターン)。攻撃を受けるとき、出血の値だけ追加ダメージを受ける。
+TYPEDESC_DEBUFF_WEAKEN,<size=125%>약화</size><br>상대에게 약화를 {0} 부여합니다({1}턴). 카드 밸류가 약화만큼 감소합니다.,<size=125%>Weaken</size><br>Apply {0} Weaken to the opponent ({1} turns). Card values are reduced by Weaken.,<size=125%>弱体</size><br>相手に弱体を{0}付与する({1}ターン)。カードの値が弱体の値だけ減少する。
+GIMMICKDESC_PREPARE,<size=125%>대비</size><br>이전 슬롯이 적 슬롯이고 공격 카드가 놓여 있으면 밸류 +{0}.,<size=125%>Prepare</size><br>+{0} value if the previous slot is an enemy slot holding an Attack card.,<size=125%>備え</size><br>前のスロットが敵のスロットで攻撃カードが置かれていれば、値+{0}。
+GIMMICKDESC_FOLLOWUP,<size=125%>연계</size><br>이전 슬롯이 아군 슬롯이고 공격 카드가 놓여 있으면 밸류 x{0}.,<size=125%>Follow-up</size><br>Value x{0} if the previous slot is an ally slot holding an Attack card.,<size=125%>連携</size><br>前のスロットが味方のスロットで攻撃カードが置かれていれば、値x{0}。
+GIMMICKDESC_ESCORT,<size=125%>호위</size><br>이전 슬롯이 아군 슬롯이고 카드가 놓여 있으면 {0}번 더 시전합니다.,"<size=125%>Escort</size><br>If the previous slot is an ally slot holding a card, cast {0} more time(s).",<size=125%>護衛</size><br>前のスロットが味方のスロットでカードが置かれていれば、{0}回追加で発動する。
+GIMMICKDESC_PREEMPTIVE,<size=125%>선제</size><br>다음 슬롯이 적 슬롯이고 공격 카드가 놓여 있으면 밸류 +{0}.,<size=125%>Preemptive</size><br>+{0} value if the next slot is an enemy slot holding an Attack card.,<size=125%>先制</size><br>次のスロットが敵のスロットで攻撃カードが置かれていれば、値+{0}。
+GIMMICKDESC_CHAIN,"<size=125%>연쇄</size><br>다음 슬롯이 아군 슬롯이고 카드가 놓여 있으면, 그 카드를 한 번 더 시전합니다.","<size=125%>Chain</size><br>If the next slot is an ally slot holding a card, cast that card one extra time.",<size=125%>連鎖</size><br>次のスロットが味方のスロットでカードが置かれていれば、そのカードをもう一度発動する。
+GIMMICKDESC_PINCER,<size=125%>협공</size><br>양옆 슬롯이 모두 적 슬롯이고 카드가 놓여 있으면 밸류 +{0}.,<size=125%>Pincer</size><br>+{0} value if both adjacent slots are enemy slots holding cards.,<size=125%>挟撃</size><br>両隣のスロットがどちらも敵のスロットでカードが置かれていれば、値+{0}。
+GIMMICKDESC_VANGUARD,<size=125%>선봉</size><br>첫 번째 슬롯에 놓이면 밸류 +{0}.,<size=125%>Vanguard</size><br>+{0} value if placed in the first slot.,<size=125%>先鋒</size><br>最初のスロットに置くと、値+{0}。
+GIMMICKDESC_FINISHER,<size=125%>종결</size><br>마지막 슬롯에 놓이면 밸류 x{0}.,<size=125%>Finisher</size><br>Value x{0} if placed in the last slot.,<size=125%>終結</size><br>最後のスロットに置くと、値x{0}。
+BUFFDESC_REGENERATION,<size=125%>재생</size><br>{0}턴 동안 턴 종료 시 {1}만큼 회복합니다.,"<size=125%>Regeneration</size><br>For {0} turn(s), restore {1} HP at the end of turn.",<size=125%>再生</size><br>{0}ターンの間、ターン終了時に{1}回復する。
+BUFFDESC_FORCE,<size=125%>힘</size><br>{0}턴 동안 공격 피해량이 {1} 증가합니다.,"<size=125%>Force</size><br>For {0} turn(s), attacks deal {1} more damage.",<size=125%>筋力</size><br>{0}ターンの間、攻撃ダメージが{1}増加する。
+BUFFDESC_LIFESTEAL,<size=125%>흡혈</size><br>{0}턴 동안 체력에 입힌 피해의 {1}%만큼 회복합니다.,"<size=125%>Lifesteal</size><br>For {0} turn(s), heal for {1}% of HP damage dealt.",<size=125%>吸血</size><br>{0}ターンの間、与えたHPダメージの{1}%を回復する。
+DEBUFFDESC_POISON,<size=125%>중독</size><br>{0}턴 동안 턴 종료 시 {1}만큼 피해를 받습니다.,"<size=125%>Poison</size><br>For {0} turn(s), take {1} damage at the end of turn.",<size=125%>毒</size><br>{0}ターンの間、ターン終了時に{1}ダメージを受ける。
+DEBUFFDESC_BLEED,<size=125%>출혈</size><br>{0}턴 동안 공격받을 때 {1}만큼 피해를 더 받습니다.,"<size=125%>Bleed</size><br>For {0} turn(s), take {1} additional damage when attacked.",<size=125%>出血</size><br>{0}ターンの間、攻撃を受けると{1}追加ダメージを受ける。
+DEBUFFDESC_WEAKEN,<size=125%>약화</size><br>{0}턴 동안 카드 밸류가 {1}만큼 감소합니다.,"<size=125%>Weaken</size><br>For {0} turn(s), card values are reduced by {1}.",<size=125%>弱体</size><br>{0}ターンの間、カードの値が{1}減少する。
+MONSTER_ATTACK_DESC,<size=125%>적의 공격</size><br>모든 카드 시전이 끝나면 적이 {0}만큼 공격합니다.,"<size=125%>Enemy Attack</size><br>After all cards are cast, the enemy attacks for {0}.",<size=125%>敵の攻撃</size><br>すべてのカードの発動後、敵が{0}の攻撃を行う。
+,,,
+CARDNAME_0,잽,Jab,ジャブ
+CARDNAME_1,스트라이크,Strike,ストライク
+CARDNAME_2,브루트 포스,Brute Force,ブルートフォース
+CARDNAME_3,헤비 스매시,Heavy Smash,ヘビースマッシュ
+CARDNAME_4,흘리기,Evade,受け流し
+CARDNAME_5,가드,Guard,ガード
+CARDNAME_6,회복의 숨결,Breath of Recovery,回復の息吹
+CARDNAME_7,광기의 포효,Roar of Madness,狂気の咆哮
+CARDNAME_8,독니의 저주,Venom Fang Curse,毒牙の呪い

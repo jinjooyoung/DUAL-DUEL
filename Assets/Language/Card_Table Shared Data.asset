@@ -27,16 +27,128 @@ MonoBehaviour:
     m_Key: HEAL_KEY
     m_Metadata:
       m_Items: []
-  - m_Id: 53290602498
-    m_Key: BUFF_KEY
+  - m_Id: 10476415124385792
+    m_Key: BUFF_REGENERATION_KEY
     m_Metadata:
       m_Items: []
-  - m_Id: 53290602499
-    m_Key: DEBUFF_KEY
+  - m_Id: 10476415170523136
+    m_Key: BUFF_FORCE_KEY
     m_Metadata:
       m_Items: []
-  - m_Id: 53290602500
-    m_Key: SPECIAL_KEY
+  - m_Id: 10476415170523137
+    m_Key: BUFF_LIFESTEAL_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415170523138
+    m_Key: DEBUFF_POISON_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415170523139
+    m_Key: DEBUFF_BLEED_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415170523140
+    m_Key: DEBUFF_WEAKEN_KEY
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717440
+    m_Key: TYPEDESC_ATTACK
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717441
+    m_Key: TYPEDESC_DEFENSE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717442
+    m_Key: TYPEDESC_HEAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116553506816
+    m_Key: TYPEDESC_BUFF_REGENERATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644160
+    m_Key: TYPEDESC_BUFF_FORCE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644161
+    m_Key: TYPEDESC_BUFF_LIFESTEAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644162
+    m_Key: TYPEDESC_DEBUFF_POISON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644163
+    m_Key: TYPEDESC_DEBUFF_BLEED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644164
+    m_Key: TYPEDESC_DEBUFF_WEAKEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644165
+    m_Key: GIMMICKDESC_PREPARE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644166
+    m_Key: GIMMICKDESC_FOLLOWUP
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717451
+    m_Key: GIMMICKDESC_ESCORT
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644167
+    m_Key: GIMMICKDESC_PREEMPTIVE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717452
+    m_Key: GIMMICKDESC_CHAIN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717450
+    m_Key: GIMMICKDESC_PINCER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717449
+    m_Key: GIMMICKDESC_VANGUARD
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644168
+    m_Key: GIMMICKDESC_FINISHER
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717455
+    m_Key: BUFFDESC_REGENERATION
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415174717456
+    m_Key: BUFFDESC_FORCE
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911744
+    m_Key: BUFFDESC_LIFESTEAL
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911745
+    m_Key: DEBUFFDESC_POISON
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911746
+    m_Key: DEBUFFDESC_BLEED
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911747
+    m_Key: DEBUFFDESC_WEAKEN
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10476415178911748
+    m_Key: MONSTER_ATTACK_DESC
+    m_Metadata:
+      m_Items: []
+  - m_Id: 10493116599644169
+    m_Key: New Entry
     m_Metadata:
       m_Items: []
   - m_Id: 53290602502
@@ -73,42 +185,6 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 53290602510
     m_Key: CARDNAME_8
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602512
-    m_Key: CARDDESC_0
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602513
-    m_Key: CARDDESC_1
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602514
-    m_Key: CARDDESC_2
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602515
-    m_Key: CARDDESC_3
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602516
-    m_Key: CARDDESC_4
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602517
-    m_Key: CARDDESC_5
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602518
-    m_Key: CARDDESC_6
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602519
-    m_Key: CARDDESC_7
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602520
-    m_Key: CARDDESC_8
     m_Metadata:
       m_Items: []
   m_Metadata:
