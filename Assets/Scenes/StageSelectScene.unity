@@ -1155,6 +1155,7 @@ MonoBehaviour:
     canGo: 0
     isVisited: 0
   generator: {fileID: 1628518555}
+  monsterDatabase: {fileID: 11400000, guid: 78e9f8a6bb3d8b4429485e4d028a98b2, type: 2}
 --- !u!1 &1792129253
 GameObject:
   m_ObjectHideFlags: 0
