@@ -285,6 +285,7 @@ MonoBehaviour:
     upgradeLevel: 0
   character: {fileID: 11400000, guid: 3824bad56fec45d41a49f774bbc954dc, type: 2}
   monster: {fileID: 11400000, guid: 373cb5ebd5bab9040b7a451ea61f3a72, type: 2}
+  currentHP: 0
 --- !u!4 &419783045
 Transform:
   m_ObjectHideFlags: 0
@@ -1593,7 +1594,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4240881564139501144, guid: a52b343517c433e4fa75ea4e1e41e88f, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

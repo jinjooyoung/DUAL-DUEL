@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 6106752217416643590}
   - component: {fileID: 2633532515144847099}
   m_Layer: 5
-  m_Name: Star_1
+  m_Name: 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -34,7 +34,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -28, y: 0}
+  m_AnchoredPosition: {x: -24, y: 2.1}
   m_SizeDelta: {x: 7, y: 7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &6106752217416643590
@@ -164,7 +164,7 @@ GameObject:
   - component: {fileID: 6274720434479913358}
   - component: {fileID: 7687464467002146026}
   m_Layer: 5
-  m_Name: GimmikValueText
+  m_Name: ValueText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -301,7 +301,7 @@ GameObject:
   - component: {fileID: 5268105886239233163}
   - component: {fileID: 7853571542397765856}
   m_Layer: 5
-  m_Name: Star_2
+  m_Name: 2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -323,7 +323,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -14, y: 0}
+  m_AnchoredPosition: {x: -12, y: 2.1}
   m_SizeDelta: {x: 7, y: 7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5268105886239233163
@@ -551,7 +551,7 @@ GameObject:
   - component: {fileID: 5380296915214653336}
   - component: {fileID: 1859961346243236030}
   m_Layer: 5
-  m_Name: NameText
+  m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -598,7 +598,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 5856695703261131753}
   - component: {fileID: 3361055177642762314}
   m_Layer: 5
-  m_Name: Star_3
+  m_Name: 3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -825,7 +825,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 2.1}
   m_SizeDelta: {x: 7, y: 7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5856695703261131753
@@ -878,7 +878,7 @@ GameObject:
   - component: {fileID: 162941717060925596}
   - component: {fileID: 1819688313544954345}
   m_Layer: 5
-  m_Name: Star_4
+  m_Name: 4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -900,7 +900,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 14, y: 0}
+  m_AnchoredPosition: {x: 12, y: 2.1}
   m_SizeDelta: {x: 7, y: 7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &162941717060925596
@@ -953,7 +953,7 @@ GameObject:
   - component: {fileID: 1271029560024972619}
   - component: {fileID: 8064571199500888762}
   m_Layer: 5
-  m_Name: Artwork
+  m_Name: cardResource
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -973,11 +973,11 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 3877384657127248813}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0.5, y: 1}
-  m_AnchorMax: {x: 0.5, y: 1}
-  m_AnchoredPosition: {x: 0, y: -26}
-  m_SizeDelta: {x: 144, y: 82}
-  m_Pivot: {x: 0.5, y: 1}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 53}
+  m_SizeDelta: {x: 109.375, y: 109.375}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1271029560024972619
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1000,7 +1000,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1008,7 +1008,7 @@ MonoBehaviour:
       m_Calls: []
   m_Sprite: {fileID: 21300000, guid: b500158f77bd024478302d72be775685, type: 3}
   m_Type: 0
-  m_PreserveAspect: 0
+  m_PreserveAspect: 1
   m_FillCenter: 1
   m_FillMethod: 4
   m_FillAmount: 1
@@ -1028,7 +1028,7 @@ GameObject:
   - component: {fileID: 2304118211034788684}
   - component: {fileID: 2845305374678403544}
   m_Layer: 5
-  m_Name: TypeIcon
+  m_Name: typeIcon
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1103,7 +1103,7 @@ GameObject:
   - component: {fileID: 5904292291172622343}
   - component: {fileID: 8501487934028206752}
   m_Layer: 5
-  m_Name: Star_5
+  m_Name: 5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1125,7 +1125,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 28, y: 0}
+  m_AnchoredPosition: {x: 24, y: 2.1}
   m_SizeDelta: {x: 7, y: 7}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &5904292291172622343
@@ -1226,7 +1226,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
   m_Material: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_RaycastTarget: 1
+  m_RaycastTarget: 0
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
@@ -1355,6 +1355,7 @@ GameObject:
   - component: {fileID: 3877384657127248813}
   - component: {fileID: 3135394150829066832}
   - component: {fileID: 7255070463390544183}
+  - component: {fileID: 2431008639077372733}
   - component: {fileID: 8314894137438144019}
   m_Layer: 5
   m_Name: UI_ViewerCard
@@ -1376,9 +1377,9 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4312337851013939995}
-  - {fileID: 8980317795236290852}
-  - {fileID: 9193403548584493027}
   - {fileID: 7465103276383770524}
+  - {fileID: 9193403548584493027}
+  - {fileID: 8980317795236290852}
   - {fileID: 2934768064998431887}
   - {fileID: 4197359799706222766}
   m_Father: {fileID: 0}
@@ -1408,8 +1409,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c80892833ad25e946a79c3a4faca4ec8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIViewerCard
-  artworkImage: {fileID: 8064571199500888762}
+  tableName: Card_Table
+  nameLocalizeEvent: {fileID: 1859961346243236030}
+  typeLocalizeEvent: {fileID: 3239307011541513134}
   background: {fileID: 8314894137438144019}
+  cardResource: {fileID: 8064571199500888762}
   typeIcon: {fileID: 2845305374678403544}
   gimmickIcon: {fileID: 6698658009041374095}
   rankStarIcons:
@@ -1420,15 +1424,10 @@ MonoBehaviour:
   - {fileID: 8501487934028206752}
   nameText: {fileID: 5380296915214653336}
   typeText: {fileID: 2959866003841754555}
-  descText: {fileID: 0}
   valueText: {fileID: 543024946789389116}
   gimmikValueText: {fileID: 7687464467002146026}
   typeGroup: {fileID: 2934768064998431887}
   gimmikGroup: {fileID: 666308633313118101}
-  tableName: Card_Table
-  nameLocalizeEvent: {fileID: 1859961346243236030}
-  typeLocalizeEvent: {fileID: 3239307011541513134}
-  descLocalizeEvent: {fileID: 0}
 --- !u!114 &8314894137438144019
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1459,3 +1458,19 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+
+--- !u!114 &2431008639077372733
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8599237739513694671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4c8e40470aaff9e408bb83277a1a80b9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TooltipTrigger
+  tooltipText: 
+  isCard: 0
+  cardTableName: Card_Table
