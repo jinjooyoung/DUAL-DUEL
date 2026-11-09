@@ -1526,6 +1526,7 @@ GameObject:
   - component: {fileID: 6914398124216096834}
   - component: {fileID: 5464503843193004001}
   - component: {fileID: 8631466672114983559}
+  - component: {fileID: 1549249168271747189}
   - component: {fileID: 1707895618601584260}
   - component: {fileID: 6527346215548770171}
   - component: {fileID: 2794881952506452298}
@@ -1634,6 +1635,26 @@ MonoBehaviour:
     upgradeLevel: 0
   cardIndex: 0
   currentSlot: {fileID: 0}
+  visual: {fileID: 0}
+  isDragging: 0
+  isPlaced: 0
+  isSnapFixed: 0
+  isTweening: 0
+  slotLayer:
+    serializedVersion: 2
+    m_Bits: 8
+--- !u!114 &1549249168271747189
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7328028137241284672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf30e808a02552c4a8745a4d6e7a0bd6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CardVisual
   tableName: Card_Table
   nameLocalizeEvent: {fileID: 3774976871235676448}
   typeLocalizeEvent: {fileID: 3700500966841545367}
@@ -1647,20 +1668,12 @@ MonoBehaviour:
   - {fileID: 6892103919960680851}
   - {fileID: 3809408436541853712}
   - {fileID: 5403403325483671439}
-  - {fileID: 0}
   nameText: {fileID: 7065318448404453018}
   typeText: {fileID: 8386421444745756568}
   valueText: {fileID: 6957019746556280763}
   gimmikValueText: {fileID: 2291843798079013465}
   typeGroup: {fileID: 448307387905962249}
-  GimmikGroup: {fileID: 5891646481189557864}
-  isDragging: 0
-  isPlaced: 0
-  isSnapFixed: 0
-  isTweening: 0
-  slotLayer:
-    serializedVersion: 2
-    m_Bits: 8
+  gimmikGroup: {fileID: 5891646481189557864}
 --- !u!61 &1707895618601584260
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1733,6 +1746,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TooltipTrigger
   tooltipText: "\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4\uCE74\uB4DC\uD234\uD301\uC124\uBA85\uC785\uB2C8\uB2E4"
+  isCard: 0
+  cardTableName: Card_Table
 --- !u!1 &7487023002979895624
 GameObject:
   m_ObjectHideFlags: 0
