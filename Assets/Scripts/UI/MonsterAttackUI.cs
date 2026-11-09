@@ -39,6 +39,6 @@ public class MonsterAttackUI : MonoBehaviour, ITooltipTextProvider
     {
         int attack = BattleManager.Instance != null ? BattleManager.Instance.monsterTurnAttack : 0;
         return LocalizedTextUtil.Get(tableName, "MONSTER_ATTACK_DESC",
-            "<size=20>적의 공격</size>모든 카드 시전이 끝나면 적이 {0}만큼 공격합니다.", attack);
+            "<size=20>적의 공격</size>\n모든 카드 시전이 끝나면 적이 {0}만큼 공격합니다.", attack);
     }
 }
