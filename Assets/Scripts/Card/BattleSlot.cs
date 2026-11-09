@@ -25,9 +25,15 @@ public class BattleSlot : MonoBehaviour
     [SerializeField] private TextMeshPro valueModifierText;
     public int valueModifier { get; private set; }   // 이 슬롯에 놓인 카드 밸류에 더해지는 값 (0이면 없음)
 
-    private static readonly Color PlayerColor = new Color(0.2f, 0.6f, 1f);
-    private static readonly Color EnemyColor = new Color(1f, 0.2f, 0.4f);
-    private static readonly Color BlindColor = new Color(0.45f, 0.45f, 0.5f);
+    // 단색 초록 화면에서는 색이 아니라 밝기로 구분해야 하므로 반전 구성
+    // 플레이어 슬롯: 밝은 바탕 + 어두운 숫자 / 적 슬롯: 어두운 바탕 + 밝은 숫자 / 블라인드: 중간 밝기 + ?
+    private static readonly Color PlayerColor = new Color(0.45f, 0.95f, 0.55f);
+    private static readonly Color EnemyColor = new Color(0.07f, 0.24f, 0.11f);
+    private static readonly Color BlindColor = new Color(0.2f, 0.42f, 0.25f);
+    private static readonly Color PlayerTextColor = new Color(0.03f, 0.12f, 0.05f);
+    private static readonly Color EnemyTextColor = new Color(0.65f, 1f, 0.7f);
+    private static readonly Color ModifierPlusColor = new Color(0.75f, 1f, 0.8f);
+    private static readonly Color ModifierMinusColor = new Color(0.35f, 0.6f, 0.4f);
 
     private SpriteRenderer slotRenderer;
 
@@ -39,6 +45,7 @@ public class BattleSlot : MonoBehaviour
     }
 
     private static Color GetOwnerColor(OwnerType type) => type == OwnerType.Player ? PlayerColor : EnemyColor;
+    private static Color GetOwnerTextColor(OwnerType type) => type == OwnerType.Player ? PlayerTextColor : EnemyTextColor;
 
     // 카드 배치 처리
     public void PlaceCard(CardDisplay card)
@@ -95,7 +102,7 @@ public class BattleSlot : MonoBehaviour
             baseAtkText.text = $"{slotBaseAttack}";
 
             // (선택) 타입별 텍스트 색상 구분: 플레이어는 하늘색, 적은 주홍/붉은색
-            baseAtkText.color = GetOwnerColor(newType);
+            baseAtkText.color = GetOwnerTextColor(newType);
         }
 
         // 슬롯 시각 피드백 (예: 플레이어는 파란색/보라색, 적은 붉은색 계열)
@@ -187,7 +194,7 @@ public class BattleSlot : MonoBehaviour
         if (!show) return;
 
         valueModifierText.text = valueModifier > 0 ? $"+{valueModifier}" : valueModifier.ToString();
-        valueModifierText.color = valueModifier > 0 ? new Color(0.3f, 1f, 0.4f) : new Color(1f, 0.35f, 0.3f);
+        valueModifierText.color = valueModifier > 0 ? ModifierPlusColor : ModifierMinusColor;
     }
 
     #endregion
