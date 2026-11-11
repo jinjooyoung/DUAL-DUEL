@@ -15,10 +15,10 @@ MonoBehaviour:
   cardId: 21
   cardType: 5
   rank: 5
-  artwork: {fileID: 0}
+  artwork: {fileID: 21300000, guid: a361aaac122e8d54f86c495137a401d5, type: 3}
   bgSprite: {fileID: 21300000, guid: bf0515b8257f0724bb80830a1cf7f1fe, type: 3}
-  typeIconSprite: {fileID: 0}
-  gimmikIconSprite: {fileID: 21300000, guid: 11179d7c6da5d23459377785ddeb9c00, type: 3}
+  typeIconSprite: {fileID: 21300000, guid: bd83d952b3229334897cf1ea58fc0fde, type: 3}
+  gimmikIconSprite: {fileID: 21300000, guid: 3029e44968f4d374588761105c9484d7, type: 3}
   FilledStarSprite: {fileID: 21300000, guid: d61195ed859fc2e429209c9fb840f6bf, type: 3}
   EmptyStartSprite: {fileID: 21300000, guid: 6db9619954b81cc4e84835c24ce09ca0, type: 3}
   nameKey: CARDNAME_21

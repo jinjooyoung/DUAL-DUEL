@@ -320,6 +320,10 @@ MonoBehaviour:
     m_Y: 0
     m_Width: 34
     m_Height: 39
+  - m_X: 36
+    m_Y: 39
+    m_Width: 26
+    m_Height: 33
   m_FreeGlyphRects:
   - m_X: 0
     m_Y: 154
@@ -334,8 +338,12 @@ MonoBehaviour:
     m_Width: 1977
     m_Height: 2047
   - m_X: 36
-    m_Y: 39
+    m_Y: 72
     m_Width: 2011
+    m_Height: 4
+  - m_X: 62
+    m_Y: 39
+    m_Width: 1985
     m_Height: 37
   m_FontFeatureTable:
     m_MultipleSubstitutionRecords: []
