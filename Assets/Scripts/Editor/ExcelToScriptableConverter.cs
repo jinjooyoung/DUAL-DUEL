@@ -79,7 +79,7 @@ public class ExcelToScriptableConverter : EditorWindow
 
                     cardSO.bgSprite = LoadResourceSprite("Cards/Public/Card_BG");
                     cardSO.typeIconSprite = LoadResourceSprite($"Cards/Public/{cardSO.cardType}");
-                    cardSO.gimmikIconSprite = LoadResourceSprite("Cards/Public/GimmikIcon_Test");
+                    cardSO.gimmikIconSprite = LoadResourceSprite($"Cards/Public/{cardSO.gimmickDescKey}");
                     cardSO.FilledStarSprite = LoadResourceSprite("Cards/Public/FilledStar");
                     cardSO.EmptyStartSprite = LoadResourceSprite("Cards/Public/EmptyStar");
 

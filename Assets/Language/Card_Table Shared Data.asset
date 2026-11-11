@@ -147,10 +147,6 @@ MonoBehaviour:
     m_Key: MONSTER_ATTACK_DESC
     m_Metadata:
       m_Items: []
-  - m_Id: 10493116599644169
-    m_Key: New Entry
-    m_Metadata:
-      m_Items: []
   - m_Id: 53290602502
     m_Key: CARDNAME_0
     m_Metadata:
