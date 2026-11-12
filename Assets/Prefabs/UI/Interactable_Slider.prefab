@@ -101,8 +101,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -3014748121592047622, guid: 4bfacbb5fc137ce4a98024113a2d9d1e, type: 3}
-  m_Type: 3
+  m_Sprite: {fileID: 21300000, guid: b94cd0674a6f24a49ad7a60203e4a75f, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 0
@@ -110,7 +110,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 6.85
 --- !u!1 &6624282044671317824
 GameObject:
   m_ObjectHideFlags: 0
@@ -169,15 +169,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 6796164672518535661, guid: 92fe0281b5672eb4d8792b91bd3e7d6e, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: eb191d6673619b24f9007c22b9a18b21, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -220,7 +220,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0.25}
   m_AnchorMax: {x: 1, y: 0.75}
   m_AnchoredPosition: {x: -5, y: 0}
-  m_SizeDelta: {x: -20, y: 0}
+  m_SizeDelta: {x: -20, y: -4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &7404725901356977630
 GameObject:
@@ -287,8 +287,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 1102378827788902996, guid: 6d85622855d947f498cda93c3ce38e39, type: 3}
-  m_Type: 0
+  m_Sprite: {fileID: 21300000, guid: eb191d6673619b24f9007c22b9a18b21, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -296,7 +296,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 1
+  m_PixelsPerUnitMultiplier: 7
 --- !u!1 &9116957386485354031
 GameObject:
   m_ObjectHideFlags: 0
