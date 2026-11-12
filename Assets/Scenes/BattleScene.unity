@@ -1155,18 +1155,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: TooltipCanvas
       objectReference: {fileID: 0}
-    - target: {fileID: 5703152820664218590, guid: a52b343517c433e4fa75ea4e1e41e88f, type: 3}
-      propertyPath: m_fontAsset
-      value: 
-      objectReference: {fileID: 11400000, guid: c2092a44201c75c468b3b8ba08ccbf75, type: 2}
-    - target: {fileID: 5703152820664218590, guid: a52b343517c433e4fa75ea4e1e41e88f, type: 3}
-      propertyPath: m_sharedMaterial
-      value: 
-      objectReference: {fileID: 8870530502105284316, guid: c2092a44201c75c468b3b8ba08ccbf75, type: 2}
-    - target: {fileID: 5703152820664218590, guid: a52b343517c433e4fa75ea4e1e41e88f, type: 3}
-      propertyPath: m_hasFontAssetChanged
-      value: 0
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

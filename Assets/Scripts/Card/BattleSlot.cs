@@ -27,13 +27,18 @@ public class BattleSlot : MonoBehaviour
 
     // 단색 초록 화면에서는 색이 아니라 밝기로 구분해야 하므로 반전 구성
     // 플레이어 슬롯: 밝은 바탕 + 어두운 숫자 / 적 슬롯: 어두운 바탕 + 밝은 숫자 / 블라인드: 중간 밝기 + ?
-    private static readonly Color PlayerColor = new Color(0.45f, 0.95f, 0.55f);
-    private static readonly Color EnemyColor = new Color(0.07f, 0.24f, 0.11f);
-    private static readonly Color BlindColor = new Color(0.2f, 0.42f, 0.25f);
-    private static readonly Color PlayerTextColor = new Color(0.03f, 0.12f, 0.05f);
-    private static readonly Color EnemyTextColor = new Color(0.65f, 1f, 0.7f);
-    private static readonly Color ModifierPlusColor = new Color(0.75f, 1f, 0.8f);
-    private static readonly Color ModifierMinusColor = new Color(0.35f, 0.6f, 0.4f);
+    public static readonly Color ColorF2 = new Color32(242, 242, 242, 255); // #F2F2F2
+    public static readonly Color ColorB4 = new Color32(180, 180, 180, 255); // #B4B4B4
+    public static readonly Color Color58 = new Color32(88, 88, 88, 255);    // #585858
+    public static readonly Color Color21 = new Color32(33, 33, 33, 255);    // #212121
+
+    private static readonly Color PlayerColor = Color.white;
+    private static readonly Color EnemyColor = Color58;
+    private static readonly Color BlindColor = ColorB4;
+    private static readonly Color PlayerTextColor = Color.white;
+    private static readonly Color EnemyTextColor = ColorB4;
+    private static readonly Color ModifierPlusColor = Color.white;
+    private static readonly Color ModifierMinusColor = Color58;
 
     private SpriteRenderer slotRenderer;
 
