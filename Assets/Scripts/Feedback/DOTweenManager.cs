@@ -1,4 +1,4 @@
-using DG.Tweening;
+ï»¿using DG.Tweening;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -6,28 +6,28 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// ¹ü¿ë Á¤Àû Æ®À© ¸Å´ÏÀú
-/// 3D ¿ÀºêÁ§Æ®(Ä«µå, ½½·Ô)¿Í Canvas UIµî ¸ğµç ¿ÀºêÁ§Æ® Ç¥ÁØ ÇÇµå¹é ¿¬Ãâ
+/// ë²”ìš© ì •ì  íŠ¸ìœˆ ë§¤ë‹ˆì €
+/// 3D ì˜¤ë¸Œì íŠ¸(ì¹´ë“œ, ìŠ¬ë¡¯)ì™€ Canvas UIë“± ëª¨ë“  ì˜¤ë¸Œì íŠ¸ í‘œì¤€ í”¼ë“œë°± ì—°ì¶œ
 /// </summary>
 public static class DOTweenManager
 {
     private static readonly int ColorPropID = Shader.PropertyToID("_Color");
     private static readonly int BaseColorPropID = Shader.PropertyToID("_BaseColor");
 
-    // Tween ID Á¢¹Ì»ç »ó¼ö (Æ®À© Ã¤³Î Ãæµ¹ ¹æÁö)
+    // Tween ID ì ‘ë¯¸ì‚¬ ìƒìˆ˜ (íŠ¸ìœˆ ì±„ë„ ì¶©ëŒ ë°©ì§€)
     private const string ID_TRANSFORM = "_tr";
     private const string ID_COLOR = "_col";
     private const string ID_CARD_STATE = "_card";
 
-    #region 1. ±âº» Transform È¿°ú (Transform Core)
+    #region 1. ê¸°ë³¸ Transform íš¨ê³¼ (Transform Core)
 
     /// <summary>
-    /// ´ë»óÀÇ ScaleÀ» ÁöÁ¤µÈ ºñÀ²(¶Ç´Â Àı´ë°ª)·Î º¯°æÇÕ´Ï´Ù.
+    /// ëŒ€ìƒì˜ Scaleì„ ì§€ì •ëœ ë¹„ìœ¨(ë˜ëŠ” ì ˆëŒ€ê°’)ë¡œ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="targetScale">¸ñÇ¥ Scale (Àı´ë Å©±â)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="targetScale">ëª©í‘œ Scale (ì ˆëŒ€ í¬ê¸°)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween Scale(Transform target, Vector3 targetScale, float duration = 0.15f, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -38,12 +38,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ ÇöÀç Scale¿¡ ¹èÀ²(Multiplier)À» °öÇÏ¿© ½ºÄÉÀÏÀ» º¯°æÇÕ´Ï´Ù.
+    /// ëŒ€ìƒì˜ í˜„ì¬ Scaleì— ë°°ìœ¨(Multiplier)ì„ ê³±í•˜ì—¬ ìŠ¤ì¼€ì¼ì„ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="multiplier">Å©±â ¹èÀ² (¿¹: 1.2f = 120% È®´ë)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="multiplier">í¬ê¸° ë°°ìœ¨ (ì˜ˆ: 1.2f = 120% í™•ëŒ€)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween ScaleMultiplier(Transform target, float multiplier, float duration = 0.15f, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -51,13 +51,13 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ Å©±â¸¦ ÀÏ½ÃÀûÀ¸·Î Æ¨±âµí Å°¿ü´Ù°¡ ¿ø·¡ Å©±â·Î µÇµ¹¸³´Ï´Ù.
+    /// ëŒ€ìƒì˜ í¬ê¸°ë¥¼ ì¼ì‹œì ìœ¼ë¡œ íŠ•ê¸°ë“¯ í‚¤ì› ë‹¤ê°€ ì›ë˜ í¬ê¸°ë¡œ ë˜ëŒë¦½ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="punchStrength">Æ¨±æ º¯Çü °­µµ</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="vibrato">Áøµ¿ È½¼ö</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="punchStrength">íŠ•ê¸¸ ë³€í˜• ê°•ë„</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="vibrato">ì§„ë™ íšŸìˆ˜</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween PunchScale(Transform target, float punchStrength = 0.15f, float duration = 0.2f, int vibrato = 5, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -68,12 +68,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀ» ÁöÁ¤ÇÑ ¿ùµå ÁÂÇ¥·Î ÀÌµ¿½ÃÅµ´Ï´Ù.
+    /// ëŒ€ìƒì„ ì§€ì •í•œ ì›”ë“œ ì¢Œí‘œë¡œ ì´ë™ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    ///<param name="target">´ë»ó Transform</param>
-    /// <param name="targetPosition">¸ñÇ¥ ¿ùµå ÁÂÇ¥</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    ///<param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="targetPosition">ëª©í‘œ ì›”ë“œ ì¢Œí‘œ</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween Move(Transform target, Vector3 targetPosition, float duration = 0.2f, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -84,12 +84,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ÇöÀç À§Ä¡¸¦ ±âÁØÀ¸·Î »ó´ëÀû(¿ÀÇÁ¼Â) ¹æÇâÀ¸·Î ÀÌµ¿½ÃÅµ´Ï´Ù.
+    /// í˜„ì¬ ìœ„ì¹˜ë¥¼ ê¸°ì¤€ìœ¼ë¡œ ìƒëŒ€ì (ì˜¤í”„ì…‹) ë°©í–¥ìœ¼ë¡œ ì´ë™ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="deltaOffset">ÇöÀç À§Ä¡¿¡¼­ÀÇ »ó´ëÀû ÀÌµ¿ offset º¤ÅÍ</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="deltaOffset">í˜„ì¬ ìœ„ì¹˜ì—ì„œì˜ ìƒëŒ€ì  ì´ë™ offset ë²¡í„°</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween MoveRelative(Transform target, Vector3 deltaOffset, float duration = 0.2f, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -100,12 +100,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ È¸Àü°ªÀ» ¿ÀÀÏ·¯ °¢µµ ±âÁØÀ¸·Î ºÎµå·´°Ô º¯°æÇÕ´Ï´Ù.
+    /// ëŒ€ìƒì˜ íšŒì „ê°’ì„ ì˜¤ì¼ëŸ¬ ê°ë„ ê¸°ì¤€ìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="targetEulerAngles">¸ñÇ¥ È¸Àü °¢µµ (Euler Vector3)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="targetEulerAngles">ëª©í‘œ íšŒì „ ê°ë„ (Euler Vector3)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween Rotate(Transform target, Vector3 targetEulerAngles, float duration = 0.2f, Ease ease = Ease.OutQuad)
     {
         if (target == null) return null;
@@ -116,12 +116,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ È¸ÀüÃàÀ» ¼ø°£ÀûÀ¸·Î Æ¨±âµí Èçµì´Ï´Ù. (Àß¸øµÈ ½½·Ô ¹èÄ¡³ª ÇÇ°İ ¿¬Ãâ µî)
+    /// ëŒ€ìƒì˜ íšŒì „ì¶•ì„ ìˆœê°„ì ìœ¼ë¡œ íŠ•ê¸°ë“¯ í”ë“­ë‹ˆë‹¤. (ì˜ëª»ëœ ìŠ¬ë¡¯ ë°°ì¹˜ë‚˜ í”¼ê²© ì—°ì¶œ ë“±)
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="punchStrength">°¢ Ãàº° È¸Àü °­µµ</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="vibrato">Áøµ¿ È½¼ö</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="punchStrength">ê° ì¶•ë³„ íšŒì „ ê°•ë„</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="vibrato">ì§„ë™ íšŸìˆ˜</param>
     public static Tween PunchRotation(Transform target, Vector3 punchStrength, float duration = 0.25f, int vibrato = 6)
     {
         if (target == null) return null;
@@ -132,13 +132,13 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ À§Ä¡¸¦ Âª°Ô Áøµ¿½ÃÅµ´Ï´Ù.
+    /// ëŒ€ìƒì˜ ìœ„ì¹˜ë¥¼ ì§§ê²Œ ì§„ë™ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="strength">Áøµ¿ °­µµ</param>
-    /// <param name="vibrato">Áøµ¿ È½¼ö</param>
-    /// <param name="randomness">Áøµ¿ÀÇ ¹«ÀÛÀ§µµ (°¢µµ ¹üÀ§)</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="strength">ì§„ë™ ê°•ë„</param>
+    /// <param name="vibrato">ì§„ë™ íšŸìˆ˜</param>
+    /// <param name="randomness">ì§„ë™ì˜ ë¬´ì‘ìœ„ë„ (ê°ë„ ë²”ìœ„)</param>
     public static Tween ShakePosition(Transform target, float duration = 0.25f, float strength = 0.15f, int vibrato = 10, float randomness = 90f)
     {
         if (target == null) return null;
@@ -149,12 +149,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ´ë»óÀÇ È¸Àü°ªÀ» Âª°Ô Áøµ¿½ÃÅµ´Ï´Ù.
+    /// ëŒ€ìƒì˜ íšŒì „ê°’ì„ ì§§ê²Œ ì§„ë™ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="strength">È¸Àü Áøµ¿ °­µµ</param>
-    /// <param name="vibrato">Áøµ¿ È½¼ö</param>
+    /// <param name="target">ëŒ€ìƒ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="strength">íšŒì „ ì§„ë™ ê°•ë„</param>
+    /// <param name="vibrato">ì§„ë™ íšŸìˆ˜</param>
     public static Tween ShakeRotation(Transform target, float duration = 0.25f, float strength = 10f, int vibrato = 10)
     {
         if (target == null) return null;
@@ -166,40 +166,40 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 2. Fade / Alpha / Flash È¿°ú
+    #region 2. Fade / Alpha / Flash íš¨ê³¼
 
     /// <summary>
-    /// CanvasGroup, Graphic(UI), SpriteRenderer, MeshRenderer¸¦ ÀÚµ¿À¸·Î ÆÇº°ÇÏ¿© ¾ËÆÄ¸¦ º¯°æÇÕ´Ï´Ù.
+    /// CanvasGroup, Graphic(UI), SpriteRenderer, MeshRendererë¥¼ ìë™ìœ¼ë¡œ íŒë³„í•˜ì—¬ ì•ŒíŒŒë¥¼ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó GameObject</param>
-    /// <param name="targetAlpha">¸ñÇ¥ ¾ËÆÄ°ª (0.0 ~ 1.0)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="target">ëŒ€ìƒ GameObject</param>
+    /// <param name="targetAlpha">ëª©í‘œ ì•ŒíŒŒê°’ (0.0 ~ 1.0)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween Fade(GameObject target, float targetAlpha, float duration = 0.2f, Ease ease = Ease.Linear)
     {
         if (target == null) return null;
         string tweenId = target.GetInstanceID() + ID_COLOR;
         DOTween.Kill(tweenId);
 
-        // 1. CanvasGroup °Ë»ç
+        // 1. CanvasGroup ê²€ì‚¬
         if (target.TryGetComponent<CanvasGroup>(out var canvasGroup))
         {
             return canvasGroup.DOFade(targetAlpha, duration).SetEase(ease).SetId(tweenId);
         }
 
-        // 2. 2D UI Graphic °Ë»ç (Image, TMP_Text µî)
+        // 2. 2D UI Graphic ê²€ì‚¬ (Image, TMP_Text ë“±)
         if (target.TryGetComponent<Graphic>(out var graphic))
         {
             return graphic.DOFade(targetAlpha, duration).SetEase(ease).SetId(tweenId);
         }
 
-        // 3. 2D/3D Quad SpriteRenderer °Ë»ç
+        // 3. 2D/3D Quad SpriteRenderer ê²€ì‚¬
         if (target.TryGetComponent<SpriteRenderer>(out var spriteRenderer))
         {
             return spriteRenderer.DOFade(targetAlpha, duration).SetEase(ease).SetId(tweenId);
         }
 
-        // 4. 3D MeshRenderer (MaterialPropertyBlock È°¿ëÀ¸·Î ·±Å¸ÀÓ ¸ÓÆ¼¸®¾ó º¹Á¦ ¹æÁö)
+        // 4. 3D MeshRenderer (MaterialPropertyBlock í™œìš©ìœ¼ë¡œ ëŸ°íƒ€ì„ ë¨¸í‹°ë¦¬ì–¼ ë³µì œ ë°©ì§€)
         if (target.TryGetComponent<Renderer>(out var meshRenderer))
         {
             var mpb = new MaterialPropertyBlock();
@@ -224,12 +224,12 @@ public static class DOTweenManager
     public static Tween FadeOut(GameObject target, float duration = 0.2f, Ease ease = Ease.InQuad) => Fade(target, 0f, duration, ease);
 
     /// <summary>
-    /// ´ë»óÀÇ »ö»óÀ» Àá½Ã Æ¯Á¤ »öÀ¸·Î ¹øÂ½ÀÎ µÚ ¿ø·¡ »ö»óÀ¸·Î µÇµ¹¸³´Ï´Ù.
+    /// ëŒ€ìƒì˜ ìƒ‰ìƒì„ ì ì‹œ íŠ¹ì • ìƒ‰ìœ¼ë¡œ ë²ˆì©ì¸ ë’¤ ì›ë˜ ìƒ‰ìƒìœ¼ë¡œ ë˜ëŒë¦½ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="target">´ë»ó GameObject</param>
-    /// <param name="flashColor">¹øÂ½ÀÏ ¸ñÇ¥ »ö»ó</param>
-    /// <param name="duration">ÀüÃ¼ ÇÃ·¡½Ã ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="flashCount">¹İº¹ ±ôºıÀÓ È½¼ö</param>
+    /// <param name="target">ëŒ€ìƒ GameObject</param>
+    /// <param name="flashColor">ë²ˆì©ì¼ ëª©í‘œ ìƒ‰ìƒ</param>
+    /// <param name="duration">ì „ì²´ í”Œë˜ì‹œ ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="flashCount">ë°˜ë³µ ê¹œë¹¡ì„ íšŸìˆ˜</param>
     public static Sequence Flash(GameObject target, Color flashColor, float duration = 0.2f, int flashCount = 1)
     {
         if (target == null) return null;
@@ -285,19 +285,19 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 3. Card Àü¿ë È¿°ú (Card Lifecycle)
+    #region 3. Card ì „ìš© íš¨ê³¼ (Card Lifecycle)
 
     /// <summary>
-    /// Ä«µå À§¿¡ ¸¶¿ì½º¸¦ ¿Ã·ÈÀ» ¶§: È®´ë ¹× »ó½Â ÈÄ ±× À§Ä¡ ±âÁØÀ¸·Î ºÎµå·´°Ô À§¾Æ·¡·Î µÕ½Ç°Å¸³´Ï´Ù.
+    /// ì¹´ë“œ ìœ„ì— ë§ˆìš°ìŠ¤ë¥¼ ì˜¬ë ¸ì„ ë•Œ: í™•ëŒ€ ë° ìƒìŠ¹ í›„ ê·¸ ìœ„ì¹˜ ê¸°ì¤€ìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ ìœ„ì•„ë˜ë¡œ ë‘¥ì‹¤ê±°ë¦½ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="originPos">Ä«µå ¿øº» À§Ä¡</param>
-    /// <param name="originScale">Ä«µå ¿øº» Å©±â</param>
-    /// <param name="scaleMultiplier">È®´ë ¹èÀ²</param>
-    /// <param name="moveY">ÃÖÃÊ »ó½Â ³ôÀÌ</param>
-    /// <param name="duration">ÁøÀÔ ½Ã°£ (ÃÊ)</param>
-    /// <param name="floatDistance">°øÁß¿¡¼­ µÕ½Ç°Å¸± À§¾Æ·¡ ¿Õº¹ ÁøÆø</param>
-    /// <param name="floatCycleTime">µÕ½Ç°Å¸®´Â 1ÁÖ±â ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="originPos">ì¹´ë“œ ì›ë³¸ ìœ„ì¹˜</param>
+    /// <param name="originScale">ì¹´ë“œ ì›ë³¸ í¬ê¸°</param>
+    /// <param name="scaleMultiplier">í™•ëŒ€ ë°°ìœ¨</param>
+    /// <param name="moveY">ìµœì´ˆ ìƒìŠ¹ ë†’ì´</param>
+    /// <param name="duration">ì§„ì… ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="floatDistance">ê³µì¤‘ì—ì„œ ë‘¥ì‹¤ê±°ë¦´ ìœ„ì•„ë˜ ì™•ë³µ ì§„í­</param>
+    /// <param name="floatCycleTime">ë‘¥ì‹¤ê±°ë¦¬ëŠ” 1ì£¼ê¸° ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CardHover(
         Transform card,
         Vector3 originPos,
@@ -318,11 +318,11 @@ public static class DOTweenManager
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
 
-        // 1´Ü°è: ¸¶¿ì½º ÁøÀÔ ½Ã ¸ñÇ¥ °øÁß À§Ä¡¿Í ¸ñÇ¥ Å©±â·Î ºü¸£°Ô ¾ÈÂø
+        // 1ë‹¨ê³„: ë§ˆìš°ìŠ¤ ì§„ì… ì‹œ ëª©í‘œ ê³µì¤‘ ìœ„ì¹˜ì™€ ëª©í‘œ í¬ê¸°ë¡œ ë¹ ë¥´ê²Œ ì•ˆì°©
         seq.Append(card.DOMove(hoverBasePos, duration).SetEase(Ease.OutQuad));
         seq.Join(card.DOScale(originScale * scaleMultiplier, duration).SetEase(Ease.OutQuad));
 
-        // 2´Ü°è: ¾ÈÂøµÈ °øÁß À§Ä¡¿¡¼­ ¹«ÇÑ ·çÇÁ·Î µÕ½Ç°Å¸®±â (InOutSineÀ¸·Î ºÎµå·¯¿î ¹°°á ´À³¦)
+        // 2ë‹¨ê³„: ì•ˆì°©ëœ ê³µì¤‘ ìœ„ì¹˜ì—ì„œ ë¬´í•œ ë£¨í”„ë¡œ ë‘¥ì‹¤ê±°ë¦¬ê¸° (InOutSineìœ¼ë¡œ ë¶€ë“œëŸ¬ìš´ ë¬¼ê²° ëŠë‚Œ)
         seq.Append(card.DOMove(hoverTopPos, floatCycleTime * 0.5f)
             .SetEase(Ease.InOutSine)
             .SetLoops(-1, LoopType.Yoyo));
@@ -331,13 +331,13 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå Hover Á¾·á: ÆİÄ¡³ª Èçµé¸² ¾øÀÌ ¿øº» À§Ä¡, ½ºÄÉÀÏ, È¸Àü°ªÀ¸·Î ºÎµå·´°Ô º¹±Í½ÃÅµ´Ï´Ù.
+    /// ì¹´ë“œ Hover ì¢…ë£Œ: í€ì¹˜ë‚˜ í”ë“¤ë¦¼ ì—†ì´ ì›ë³¸ ìœ„ì¹˜, ìŠ¤ì¼€ì¼, íšŒì „ê°’ìœ¼ë¡œ ë¶€ë“œëŸ½ê²Œ ë³µê·€ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="originPos">º¹±ÍÇÒ ¿øº» À§Ä¡</param>
-    /// <param name="originScale">º¹±ÍÇÒ ¿øº» ½ºÄÉÀÏ</param>
-    /// <param name="originEuler">º¹±ÍÇÒ ¿øº» È¸Àü°ª (Euler)</param>
-    /// <param name="duration">º¹±Í ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="originPos">ë³µê·€í•  ì›ë³¸ ìœ„ì¹˜</param>
+    /// <param name="originScale">ë³µê·€í•  ì›ë³¸ ìŠ¤ì¼€ì¼</param>
+    /// <param name="originEuler">ë³µê·€í•  ì›ë³¸ íšŒì „ê°’ (Euler)</param>
+    /// <param name="duration">ë³µê·€ ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CardHoverExit(
         Transform card,
         Vector3 originPos,
@@ -348,7 +348,7 @@ public static class DOTweenManager
         if (card == null) return null;
 
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
-        // Hover¿¡¼­ µ¹°í ÀÖ´ø ¹«ÇÑ ·çÇÁ TweenÀ» Áï½Ã Áß´Ü
+        // Hoverì—ì„œ ëŒê³  ìˆë˜ ë¬´í•œ ë£¨í”„ Tweenì„ ì¦‰ì‹œ ì¤‘ë‹¨
         DOTween.Kill(tweenId);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
@@ -360,14 +360,14 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå¸¦ Å¬¸¯ÇÏ¿© ¼±ÅÃÇßÀ» ¶§ È®½ÇÈ÷ ºÎ°¢½ÃÅ°´Â ¿¬ÃâÀÔ´Ï´Ù.
+    /// ì¹´ë“œë¥¼ í´ë¦­í•˜ì—¬ ì„ íƒí–ˆì„ ë•Œ í™•ì‹¤íˆ ë¶€ê°ì‹œí‚¤ëŠ” ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="originPos">Ä«µå ±âÁØ ¿øº» À§Ä¡</param>
-    /// <param name="originScale">Ä«µå ±âÁØ ¿øº» ½ºÄÉÀÏ</param>
-    /// <param name="scaleMult">¼±ÅÃ ½Ã È®´ë ¹èÀ²</param>
-    /// <param name="liftY">¼±ÅÃ ½Ã YÃà µ¹Ãâ ³ôÀÌ</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="originPos">ì¹´ë“œ ê¸°ì¤€ ì›ë³¸ ìœ„ì¹˜</param>
+    /// <param name="originScale">ì¹´ë“œ ê¸°ì¤€ ì›ë³¸ ìŠ¤ì¼€ì¼</param>
+    /// <param name="scaleMult">ì„ íƒ ì‹œ í™•ëŒ€ ë°°ìœ¨</param>
+    /// <param name="liftY">ì„ íƒ ì‹œ Yì¶• ëŒì¶œ ë†’ì´</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CardSelect(Transform card, Vector3 originPos, Vector3 originScale, float scaleMult = 1.15f, float liftY = 0.12f, float duration = 0.15f)
     {
         if (card == null) return null;
@@ -381,11 +381,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå µå·¡±× ½ÃÀÛ ÇÇµå¹é (¼Õ°¡¶ô/¸¶¿ì½º¿¡ µû¶ó¿À±â Àü »ìÂ¦ ºÎÀ¯).
+    /// ì¹´ë“œ ë“œë˜ê·¸ ì‹œì‘ í”¼ë“œë°± (ì†ê°€ë½/ë§ˆìš°ìŠ¤ì— ë”°ë¼ì˜¤ê¸° ì „ ì‚´ì§ ë¶€ìœ ).
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="dragScale">µå·¡±× Áß Àû¿ëÇÒ ½ºÄÉÀÏ Vector3</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="dragScale">ë“œë˜ê·¸ ì¤‘ ì ìš©í•  ìŠ¤ì¼€ì¼ Vector3</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween CardDragStart(Transform card, Vector3 dragScale, float duration = 0.1f)
     {
         if (card == null) return null;
@@ -396,11 +396,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå µå·¡±× Á¾·á ÈÄ ¿øÀ§Ä¡ ¶Ç´Â ½½·Ô ¾ÈÂø Àü ½ºÄÉÀÏ º¹±Í.
+    /// ì¹´ë“œ ë“œë˜ê·¸ ì¢…ë£Œ í›„ ì›ìœ„ì¹˜ ë˜ëŠ” ìŠ¬ë¡¯ ì•ˆì°© ì „ ìŠ¤ì¼€ì¼ ë³µê·€.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="targetScale">º¹±ÍÇÒ ¸ñÇ¥ ½ºÄÉÀÏ Vector3</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="targetScale">ë³µê·€í•  ëª©í‘œ ìŠ¤ì¼€ì¼ Vector3</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CardDragEnd(Transform card, Vector3 targetScale, float duration = 0.1f, Action onComplete = null)
     {
         if (card == null) return null;
@@ -414,14 +414,14 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå°¡ ½½·Ô¿¡ ÀåÂøµÉ ¶§ÀÇ ¿¬ÃâÀÔ´Ï´Ù. ½½·ÔÀ¸·Î ÀÚ¼®Ã³·³ ÀÌµ¿ ÈÄ ÀÓÆÑÆ® ÆİÄ¡¸¦ Áİ´Ï´Ù.
+    /// ì¹´ë“œê°€ ìŠ¬ë¡¯ì— ì¥ì°©ë  ë•Œì˜ ì—°ì¶œì…ë‹ˆë‹¤. ìŠ¬ë¡¯ìœ¼ë¡œ ìì„ì²˜ëŸ¼ ì´ë™ í›„ ì„íŒ©íŠ¸ í€ì¹˜ë¥¼ ì¤ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="slotPosition">½½·Ô ¾ÈÂø ¿ùµå À§Ä¡</param>
-    /// <param name="slotRotation">½½·Ô ¾ÈÂø ¿ÀÀÏ·¯ È¸Àü°ª</param>
-    /// <param name="targetScale">½½·Ô ¾ÈÂø ¸ñÇ¥ ½ºÄÉÀÏ</param>
-    /// <param name="duration">ÀÌµ¿ ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="onComplete">ÀåÂø ¿Ï·á ½Ã ½ÇÇàÇÒ Äİ¹é ¸Ş¼­µå</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="slotPosition">ìŠ¬ë¡¯ ì•ˆì°© ì›”ë“œ ìœ„ì¹˜</param>
+    /// <param name="slotRotation">ìŠ¬ë¡¯ ì•ˆì°© ì˜¤ì¼ëŸ¬ íšŒì „ê°’</param>
+    /// <param name="targetScale">ìŠ¬ë¡¯ ì•ˆì°© ëª©í‘œ ìŠ¤ì¼€ì¼</param>
+    /// <param name="duration">ì´ë™ ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onComplete">ì¥ì°© ì™„ë£Œ ì‹œ ì‹¤í–‰í•  ì½œë°± ë©”ì„œë“œ</param>
     public static Sequence CardPlace(Transform card, Vector3 slotPosition, Vector3 slotRotation, Vector3 targetScale, float duration = 0.18f, Action onComplete = null)
     {
         if (card == null) return null;
@@ -438,39 +438,58 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ½½·Ô¿¡ ¹èÄ¡µÈ Ä«µå°¡ È¿°ú¸¦ ½ÇÇàÇÒ ¶§ ¾ÕÀ¸·Î µ¹ÃâµÇ¾ú´Ù°¡ º¹±ÍÇÏ´Â ¿¬ÃâÀÔ´Ï´Ù.
+    /// ìŠ¬ë¡¯ì— ë°°ì¹˜ëœ ì¹´ë“œê°€ íš¨ê³¼ë¥¼ ì‹¤í–‰í•  ë•Œ ì•ìœ¼ë¡œ ëŒì¶œë˜ì—ˆë‹¤ê°€ ë³µê·€í•˜ëŠ” ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="forwardDir">ÀüÁø µ¹ÃâÇÒ ¹æÇâ º¤ÅÍ</param>
-    /// <param name="advanceDist">ÀüÁø µ¹Ãâ °Å¸®</param>
-    /// <param name="duration">ÀüÃ¼ ¿¬Ãâ Áö¼Ó ½Ã°£ (ÃÊ)</param>
-    /// <param name="onHitMoment">ÀüÁø ÃÖ´ë ÁöÁ¡(Å¸°İ ½ÃÁ¡)¿¡ È£ÃâµÉ Äİ¹é</param>
-    public static Sequence CardExecute(Transform card, Vector3 forwardDir, float advanceDist = 0.2f, float duration = 0.22f, Action onHitMoment = null)
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="forwardDir">ì „ì§„ ëŒì¶œí•  ë°©í–¥ ë²¡í„°</param>
+    /// <param name="advanceDist">ì „ì§„ ëŒì¶œ ê±°ë¦¬</param>
+    /// <param name="duration">ì „ì²´ ì—°ì¶œ ì§€ì† ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onHitMoment">ì „ì§„ ìµœëŒ€ ì§€ì (íƒ€ê²© ì‹œì )ì— í˜¸ì¶œë  ì½œë°±</param>
+    /// <param name="onLaunch">ì –í˜ì´ ëë‚˜ê³  ëŒì§„ì„ ì‹œì‘í•  ë•Œ í˜¸ì¶œ (ì¸ì: ëŒì§„ ì‹œê°„). ë¹›ì¤„ê¸°ë¥¼ ì´ ì‹œê°„ì— ë§ì¶° ë‚ ë¦¼</param>
+    public static Sequence CardExecute(Transform card, Vector3 forwardDir, float advanceDist = 0.25f, float duration = 0.4f, Action onHitMoment = null, Action<float> onLaunch = null)
     {
-        if (card == null) return null;
+        // ì¹´ë“œê°€ ì—†ì–´ë„ íš¨ê³¼ëŠ” ë°˜ë“œì‹œ ì ìš©ë˜ê³ , í˜¸ì¶œë¶€ì˜ WaitForCompletion ì´ í„°ì§€ì§€ ì•Šë„ë¡ ë¹ˆ ì‹œí€€ìŠ¤ ë°˜í™˜
+        if (card == null) { onHitMoment?.Invoke(); return DOTween.Sequence(); }
+
         string tweenId = card.GetInstanceID() + ID_CARD_STATE;
-        DOTween.Kill(tweenId);
+        DOTween.Kill(tweenId, true);
 
         Vector3 originalPos = card.position;
-        Vector3 targetForwardPos = originalPos + (forwardDir.normalized * advanceDist);
+        Vector3 originalScale = card.localScale;
+        Vector3 dir = forwardDir.normalized;
+        float windup = duration * 0.25f, dash = duration * 0.3f, back = duration * 0.45f;
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
-        // 1. ½ºÄÉÀÏ ÆİÄ¡
-        seq.Append(card.DOPunchScale(Vector3.one * 0.15f, duration * 0.4f, 5));
-        // 2. º¹±Í
-        seq.Append(card.DOMove(originalPos, duration * 0.6f).SetEase(Ease.InOutQuad));
+        // 1. ì˜ˆê³ : ë’¤ë¡œ ì –íˆë©° ì‚´ì§ ì»¤ì§
+        seq.Append(card.DOMove(originalPos - dir * advanceDist * 0.4f, windup).SetEase(Ease.OutQuad));
+        seq.Join(card.DOScale(originalScale * 1.08f, windup).SetEase(Ease.OutQuad));
+        // 2. ëŒì§„ (ëì—ì„œ ê°€ì†í•´ ê½‚í˜)
+        seq.AppendCallback(() => onLaunch?.Invoke(dash));
+        seq.Append(card.DOMove(originalPos + dir * advanceDist, dash).SetEase(Ease.InCubic));
+        // 3. íƒ€ê²© ìˆœê°„: í”¼í•´/ì´í™íŠ¸/í”ë“¤ë¦¼ì€ ì—¬ê¸°ì„œ. ì¹´ë“œëŠ” í•œ ë²ˆ ë” ë¶€í’€ì—ˆë‹¤ê°€
+        seq.AppendCallback(() => onHitMoment?.Invoke());
+        seq.Append(card.DOScale(originalScale * 1.18f, 0.04f));
+        // 4. ë³µê·€
+        seq.Append(card.DOScale(originalScale, back).SetEase(Ease.OutBack));
+        seq.Join(card.DOMove(originalPos, back).SetEase(Ease.OutCubic));
+        seq.OnKill(() =>
+        {
+            if (card == null) return;
+            card.position = originalPos;
+            card.localScale = originalScale;
+        });
         return seq;
     }
 
     /// <summary>
-    /// µ¦¿¡¼­ ¼ÕÆĞ·Î Ä«µå°¡ ³¯¾Æ¿Í ¾ÈÂøÇÏ´Â µå·Î¿ì ¿¬ÃâÀÔ´Ï´Ù.
+    /// ë±ì—ì„œ ì†íŒ¨ë¡œ ì¹´ë“œê°€ ë‚ ì•„ì™€ ì•ˆì°©í•˜ëŠ” ë“œë¡œìš° ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="card">´ë»ó Ä«µå Transform</param>
-    /// <param name="startPos">µå·Î¿ì ½ÃÀÛ À§Ä¡ (µ¦ À§Ä¡)</param>
-    /// <param name="targetPos">¼ÕÆĞ ¾ÈÂø ¸ñÇ¥ À§Ä¡</param>
-    /// <param name="targetScale">¼ÕÆĞ ¾ÈÂø ¸ñÇ¥ ½ºÄÉÀÏ</param>
-    /// <param name="duration">ÀÌµ¿ ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="delay">µå·Î¿ì ½ÃÀÛ Àü Áö¿¬ ½Ã°£ (ÃÊ)</param>
+    /// <param name="card">ëŒ€ìƒ ì¹´ë“œ Transform</param>
+    /// <param name="startPos">ë“œë¡œìš° ì‹œì‘ ìœ„ì¹˜ (ë± ìœ„ì¹˜)</param>
+    /// <param name="targetPos">ì†íŒ¨ ì•ˆì°© ëª©í‘œ ìœ„ì¹˜</param>
+    /// <param name="targetScale">ì†íŒ¨ ì•ˆì°© ëª©í‘œ ìŠ¤ì¼€ì¼</param>
+    /// <param name="duration">ì´ë™ ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="delay">ë“œë¡œìš° ì‹œì‘ ì „ ì§€ì—° ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CardDraw(Transform card, Vector3 startPos, Vector3 targetPos, Vector3 targetScale, float duration = 0.3f, float delay = 0f)
     {
         if (card == null) return null;
@@ -480,7 +499,7 @@ public static class DOTweenManager
         card.position = startPos;
         card.localScale = targetScale * 0.5f;
         
-        // Ä«µå ¹ö¸±¶§ Fade ÇØ¼­ Åõ¸íÇØÁø°Å º¹±¸
+        // ì¹´ë“œ ë²„ë¦´ë•Œ Fade í•´ì„œ íˆ¬ëª…í•´ì§„ê±° ë³µêµ¬
         //Fade(card.gameObject, 1f, 0.25f);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId).SetDelay(delay);
@@ -490,12 +509,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå°¡ ¹¦Áö³ª ¼Ò¸ê ½½·ÔÀ¸·Î »ç¶óÁú ¶§ Ãà¼ÒµÇ¸ç ÆäÀÌµå¾Æ¿ôµÇ´Â ¿¬ÃâÀÔ´Ï´Ù.
+    /// ì¹´ë“œê°€ ë¬˜ì§€ë‚˜ ì†Œë©¸ ìŠ¬ë¡¯ìœ¼ë¡œ ì‚¬ë¼ì§ˆ ë•Œ ì¶•ì†Œë˜ë©° í˜ì´ë“œì•„ì›ƒë˜ëŠ” ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="cardObj">´ë»ó Ä«µå GameObject</param>
-    /// <param name="discardPos">¹ö·ÁÁú ¸ñÇ¥ À§Ä¡ (¹¦Áö µî)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="onComplete">¼Ò¸ê ¿¬Ãâ ¿Ï·á ÈÄ ½ÇÇàÇÒ Äİ¹é</param>
+    /// <param name="cardObj">ëŒ€ìƒ ì¹´ë“œ GameObject</param>
+    /// <param name="discardPos">ë²„ë ¤ì§ˆ ëª©í‘œ ìœ„ì¹˜ (ë¬˜ì§€ ë“±)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onComplete">ì†Œë©¸ ì—°ì¶œ ì™„ë£Œ í›„ ì‹¤í–‰í•  ì½œë°±</param>
     public static Sequence CardDiscard(GameObject cardObj, Vector3 discardPos, float duration = 0.25f, Action onComplete = null)
     {
         if (cardObj == null) return null;
@@ -516,14 +535,14 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 4. Slot Àü¿ë È¿°ú (Slot Feedback)
+    #region 4. Slot ì „ìš© íš¨ê³¼ (Slot Feedback)
 
     /// <summary>
-    /// ¸¶¿ì½º°¡ ½½·Ô¿¡ ÁøÀÔÇßÀ» ¶§ÀÇ °¡º­¿î ÇÏÀÌ¶óÀÌÆ® ½ºÄÉÀÏ.
+    /// ë§ˆìš°ìŠ¤ê°€ ìŠ¬ë¡¯ì— ì§„ì…í–ˆì„ ë•Œì˜ ê°€ë²¼ìš´ í•˜ì´ë¼ì´íŠ¸ ìŠ¤ì¼€ì¼.
     /// </summary>
-    /// <param name="slot">´ë»ó ½½·Ô Transform</param>
-    /// <param name="scaleMultiplier">ÇÏÀÌ¶óÀÌÆ® ½ºÄÉÀÏ ¹èÀ²</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="slot">ëŒ€ìƒ ìŠ¬ë¡¯ Transform</param>
+    /// <param name="scaleMultiplier">í•˜ì´ë¼ì´íŠ¸ ìŠ¤ì¼€ì¼ ë°°ìœ¨</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween SlotHover(Transform slot, Vector3 originScale, float scaleMultiplier = 1.05f, float duration = 0.1f)
     {
         if (slot == null) return null;
@@ -531,11 +550,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ½½·Ô È£¹ö Á¾·á ½Ã ¿øº» Å©±â·Î º¹±Í
+    /// ìŠ¬ë¡¯ í˜¸ë²„ ì¢…ë£Œ ì‹œ ì›ë³¸ í¬ê¸°ë¡œ ë³µê·€
     /// </summary>
-    /// <param name="slot">´ë»ó ½½·Ô Transform</param>
-    /// <param name="scaleMultiplier">ÇÏÀÌ¶óÀÌÆ® ½ºÄÉÀÏ ¹èÀ²</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="slot">ëŒ€ìƒ ìŠ¬ë¡¯ Transform</param>
+    /// <param name="scaleMultiplier">í•˜ì´ë¼ì´íŠ¸ ìŠ¤ì¼€ì¼ ë°°ìœ¨</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween SlotHoverExit(Transform slot, Vector3 originScale, float duration = 0.1f)
     {
         if (slot == null) return null;
@@ -543,20 +562,20 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå ¹èÄ¡°¡ À¯È¿ÇÑ ½½·ÔÀÓÀ» ÃÊ·Ï»ö/¹àÀº ÇÃ·¡½Ã·Î ¾Ë¸³´Ï´Ù.
+    /// ì¹´ë“œ ë°°ì¹˜ê°€ ìœ íš¨í•œ ìŠ¬ë¡¯ì„ì„ ì´ˆë¡ìƒ‰/ë°ì€ í”Œë˜ì‹œë¡œ ì•Œë¦½ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="slot">´ë»ó ½½·Ô GameObject</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="slot">ëŒ€ìƒ ìŠ¬ë¡¯ GameObject</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence SlotValid(GameObject slot, float duration = 0.2f)
     {
         return Flash(slot, new Color(0.2f, 1f, 0.3f, 1f), duration, 1);
     }
 
     /// <summary>
-    /// Ä«µå¸¦ ³õÀ» ¼ö ¾ø´Â »óÅÂÀÓÀ» ºÓÀº»ö ÇÃ·¡½Ã ¹× Èçµé¸²À¸·Î ¾Ë¸³´Ï´Ù.
+    /// ì¹´ë“œë¥¼ ë†“ì„ ìˆ˜ ì—†ëŠ” ìƒíƒœì„ì„ ë¶‰ì€ìƒ‰ í”Œë˜ì‹œ ë° í”ë“¤ë¦¼ìœ¼ë¡œ ì•Œë¦½ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="slot">´ë»ó ½½·Ô GameObject</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="slot">ëŒ€ìƒ ìŠ¬ë¡¯ GameObject</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence SlotInvalid(GameObject slot, float duration = 0.25f)
     {
         if (slot == null) return null;
@@ -567,10 +586,10 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ½½·Ô¿¡ Ä«µå°¡ ÀåÂøµÇ¾úÀ» ¶§ ½½·Ô ÀÚÃ¼ÀÇ ¹İÀÀ ÆİÄ¡.
+    /// ìŠ¬ë¡¯ì— ì¹´ë“œê°€ ì¥ì°©ë˜ì—ˆì„ ë•Œ ìŠ¬ë¡¯ ìì²´ì˜ ë°˜ì‘ í€ì¹˜.
     /// </summary>
-    /// <param name="slot">´ë»ó ½½·Ô Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="slot">ëŒ€ìƒ ìŠ¬ë¡¯ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween SlotCardPlaced(Transform slot, float duration = 0.15f)
     {
         return PunchScale(slot, 0.08f, duration, 5);
@@ -578,20 +597,22 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 5. Combat / Floating Numbers (ÀüÅõ ÇÇµå¹é)
+    #region 5. Combat / Floating Numbers (ì „íˆ¬ í”¼ë“œë°±)
 
     /// <summary>
-    /// ÇÃ·ÎÆÃ ÅØ½ºÆ®(µ¥¹ÌÁö, Èú, ¹öÇÁ µî)ÀÇ °øÅë ¿¬Ãâ ÄÚ¾îÀÔ´Ï´Ù.
-    /// ¼ıÀÚ°¡ ÆÅ Æ¢¾î³ª¿À¸ç À§·Î ¶°¿À¸£°í ÆäÀÌµå¾Æ¿ôµË´Ï´Ù.
+    /// í”Œë¡œíŒ… í…ìŠ¤íŠ¸(ë°ë¯¸ì§€, í, ë²„í”„ ë“±)ì˜ ê³µí†µ ì—°ì¶œ ì½”ì–´ì…ë‹ˆë‹¤.
+    /// ìˆ«ìê°€ íŒ íŠ€ì–´ë‚˜ì˜¤ë©° ìœ„ë¡œ ë– ì˜¤ë¥´ê³  í˜ì´ë“œì•„ì›ƒë©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="textComponent">Ç¥½ÃÇÒ TextMeshPro ÄÄÆ÷³ÍÆ®</param>
-    /// <param name="content">Ãâ·ÂÇÒ ¹®ÀÚ¿­ ³»¿ë</param>
-    /// <param name="textColor">ÅØ½ºÆ® »ö»ó</param>
-    /// <param name="direction">¶°¿À¸¦ ÀÌµ¿ ¹æÇâ º¤ÅÍ</param>
-    /// <param name="distance">ÀÌµ¿ °Å¸®</param>
-    /// <param name="duration">ÀüÃ¼ ¿¬Ãâ Áö¼Ó ½Ã°£ (ÃÊ)</param>
-    /// <param name="startScale">½ÃÀÛ ½ºÄÉÀÏ Å©±â (ÆË¾÷ ÀÓÆÑÆ®¿ë)</param>
-    public static Sequence FloatingText(TMP_Text textComponent, string content, Color textColor, Vector3 direction, float distance = 0.5f, float duration = 0.6f, float startScale = 1.3f)
+    /// <param name="textComponent">í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸</param>
+    /// <param name="content">ì¶œë ¥í•  ë¬¸ìì—´ ë‚´ìš©</param>
+    /// <param name="textColor">í…ìŠ¤íŠ¸ ìƒ‰ìƒ</param>
+    /// <param name="direction">ë– ì˜¤ë¥¼ ì´ë™ ë°©í–¥ ë²¡í„°</param>
+    /// <param name="distance">ì´ë™ ê±°ë¦¬</param>
+    /// <param name="duration">ì „ì²´ ì—°ì¶œ ì§€ì† ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="startScale">ì‹œì‘ ìŠ¤ì¼€ì¼ í¬ê¸° (íŒì—… ì„íŒ©íŠ¸ìš©)</param>
+    /// <param name="endScale">ìµœì¢… í¬ê¸° (í”¼í•´ëŸ‰ì— ë¹„ë¡€ì‹œí‚¤ëŠ” ìš©ë„)</param>
+    /// <param name="whiteTime">ì²˜ìŒ ì´ ì‹œê°„ ë™ì•ˆ í°ìƒ‰ (CRT í™”ë©´ì—ì„œ ê°€ì¥ ë°ê²Œ ë²ˆì©ì„)</param>
+    public static Sequence FloatingText(TMP_Text textComponent, string content, Color textColor, Vector3 direction, float distance = 0.5f, float duration = 0.6f, float startScale = 1.3f, float endScale = 1f, float whiteTime = 0f)
     {
         if (textComponent == null) return null;
         Transform tr = textComponent.transform;
@@ -599,50 +620,55 @@ public static class DOTweenManager
         DOTween.Kill(tweenId);
 
         textComponent.text = content;
-        textComponent.color = textColor;
-        tr.localScale = Vector3.one * startScale;
+        textComponent.color = whiteTime > 0f ? Color.white : textColor;
+        tr.localScale = Vector3.one * (startScale * endScale);
 
         Vector3 startPos = tr.position;
         Vector3 targetPos = startPos + (direction.normalized * distance);
 
         Sequence seq = DOTween.Sequence().SetId(tweenId);
-        // 1. ½ºÄÉÀÏ Ãà¼Ò ¹× À§Ä¡ »ó½Â (µ¿½Ã ÁøÇà)
-        seq.Append(tr.DOScale(Vector3.one, duration * 0.25f).SetEase(Ease.OutBack));
+        // 1. ìŠ¤ì¼€ì¼ ì¶•ì†Œ ë° ìœ„ì¹˜ ìƒìŠ¹ (ë™ì‹œ ì§„í–‰)
+        seq.Append(tr.DOScale(Vector3.one * endScale, duration * 0.25f).SetEase(Ease.OutBack));
         seq.Join(tr.DOMove(targetPos, duration).SetEase(Ease.OutCubic));
-        // 2. ÈÄ¹İ ÆäÀÌµå ¾Æ¿ô
+        if (whiteTime > 0f) seq.InsertCallback(whiteTime, () => { if (textComponent != null) textComponent.color = textColor; });
+        // 2. í›„ë°˜ í˜ì´ë“œ ì•„ì›ƒ
         seq.Insert(duration * 0.5f, textComponent.DOFade(0f, duration * 0.5f).SetEase(Ease.InQuad));
         return seq;
     }
 
     /// <summary>
-    /// »¡°£»ö ÇÃ·ÎÆÃ ÅØ½ºÆ® (FloatingText¿Í µ¿ÀÏ)
+    /// ë¹¨ê°„ìƒ‰ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (FloatingTextì™€ ë™ì¼)
     /// </summary>
-    public static Sequence DamageNumber(TMP_Text textComp, int damage, float duration = 0.6f)
-        => FloatingText(textComp, $"-{damage}", new Color(1f, 0.25f, 0.2f), Vector3.up, 0.4f, duration, 1.4f);
+    /// CRT í›„ì²˜ë¦¬ê°€ ìƒ‰ì„ ë°ê¸°ë¡œ ë°”ê¾¸ë¯€ë¡œ ë¹¨ê°•(ë°ê¸° 47%)ì€ ì–´ë‘¡ê²Œ ë³´ì„ -> ë°ì€ ìƒ‰ + í°ìƒ‰ ë²ˆì©ì„ + í”¼í•´ëŸ‰ ë¹„ë¡€ í¬ê¸°
+    public static Sequence DamageNumber(TMP_Text textComp, int damage, float duration = 0.7f)
+    {
+        float k = Mathf.Clamp01(damage / 10f);
+        return FloatingText(textComp, $"-{damage}", new Color(1f, 0.85f, 0.8f), Vector3.up, 0.4f, duration, 1.8f, Mathf.Lerp(0.9f, 1.5f, k), 0.06f);
+    }
 
     /// <summary>
-    /// ÃÊ·Ï»ö ÇÃ·ÎÆÃ ÅØ½ºÆ® (FloatingText¿Í µ¿ÀÏ)
+    /// ì´ˆë¡ìƒ‰ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (FloatingTextì™€ ë™ì¼)
     /// </summary>
     public static Sequence HealNumber(TMP_Text textComp, int heal, float duration = 0.6f)
-        => FloatingText(textComp, $"+{heal}", new Color(0.2f, 1f, 0.35f), Vector3.up, 0.35f, duration, 1.2f);
+        => FloatingText(textComp, $"+{heal}", new Color(0.2f, 1f, 0.35f), Vector3.up, 0.35f, duration, 1.4f, 1f, 0.05f);
 
     /// <summary>
-    /// ³ë¶õ»ö ÇÃ·ÎÆÃ ÅØ½ºÆ® (FloatingText¿Í µ¿ÀÏ)
+    /// ë…¸ë€ìƒ‰ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (FloatingTextì™€ ë™ì¼)
     /// </summary>
     public static Sequence BuffNumber(TMP_Text textComp, string buffName, float duration = 0.7f)
         => FloatingText(textComp, buffName, new Color(1f, 0.9f, 0f), Vector3.up, 0.3f, duration, 1.1f);
 
     /// <summary>
-    /// º¸¶ó»ö ÇÃ·ÎÆÃ ÅØ½ºÆ® (FloatingText¿Í µ¿ÀÏ)
+    /// ë³´ë¼ìƒ‰ í”Œë¡œíŒ… í…ìŠ¤íŠ¸ (FloatingTextì™€ ë™ì¼)
     /// </summary>
     public static Sequence DebuffNumber(TMP_Text textComp, string debuffName, float duration = 0.7f)
         => FloatingText(textComp, debuffName, new Color(0.85f, 0.4f, 1f), Vector3.down, 0.3f, duration, 1.1f);
 
     /// <summary>
-    /// ±âº» ÇÇ°İ ¿¬Ãâ: ´ë»óÀÇ ½ºÄÉÀÏ ÆİÄ¡ + Èçµé¸² + ¹é»ö ÇÃ·¡½Ã.
+    /// ê¸°ë³¸ í”¼ê²© ì—°ì¶œ: ëŒ€ìƒì˜ ìŠ¤ì¼€ì¼ í€ì¹˜ + í”ë“¤ë¦¼ + ë°±ìƒ‰ í”Œë˜ì‹œ.
     /// </summary>
-    /// <param name="target">ÇÇ°İ ´ë»ó GameObject</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="target">í”¼ê²© ëŒ€ìƒ GameObject</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence Hit(GameObject target, float duration = 0.2f)
     {
         if (target == null) return null;
@@ -654,11 +680,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// °­·ÂÇÑ ÇÇ°İ ¿¬Ãâ: °­ÇÑ Èçµé¸² ¹× ºÓÀº ÇÃ·¡½Ã + ¼±ÅÃÀû Ä«¸Ş¶ó Èçµé¸².
+    /// ê°•ë ¥í•œ í”¼ê²© ì—°ì¶œ: ê°•í•œ í”ë“¤ë¦¼ ë° ë¶‰ì€ í”Œë˜ì‹œ + ì„ íƒì  ì¹´ë©”ë¼ í”ë“¤ë¦¼.
     /// </summary>
-    /// <param name="target">ÇÇ°İ ´ë»ó GameObject</param>
-    /// <param name="camTransform">Èçµé¸± ¸ŞÀÎ Ä«¸Ş¶ó Transform (¼±ÅÃ »çÇ×)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="target">í”¼ê²© ëŒ€ìƒ GameObject</param>
+    /// <param name="camTransform">í”ë“¤ë¦´ ë©”ì¸ ì¹´ë©”ë¼ Transform (ì„ íƒ ì‚¬í•­)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence StrongHit(GameObject target, Transform camTransform = null, float duration = 0.3f)
     {
         if (target == null) return null;
@@ -675,24 +701,25 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ¹ŞÀº ÇÇÇØ·®¿¡ µû¶ó Ä«¸Ş¶ó¿Í UI¸¦ ÇÔ²² Èçµì´Ï´Ù.
+    /// ë°›ì€ í”¼í•´ëŸ‰ì— ë”°ë¼ ì¹´ë©”ë¼ì™€ UIë¥¼ í•¨ê»˜ í”ë“­ë‹ˆë‹¤.
     /// </summary>
     public static void ShakeByDamage(int damage, RectTransform uiRoot, Transform camTransform = null)
     {
         float duration, camStrength, uiStrength;
         int vibrato;
 
-        if (damage >= 20)       // Á¤¸» Å©°Ô
+        // ì¹´ë“œ ë°¸ë¥˜(ëŒ€ëµ 1~10)ì— ë§ì¶˜ ë‹¨ê³„. ì˜ˆì „ ê¸°ì¤€(10/20)ìœ¼ë¡œëŠ” í•­ìƒ ê°€ì¥ ì•½í•œ ë‹¨ê³„ë§Œ ë‚˜ì™”ìŒ
+        if (damage >= 10)       // í¬ê²Œ
         {
-            duration = 0.3f; camStrength = 0.3f; uiStrength = 40f; vibrato = 18;
+            duration = 0.3f; camStrength = 0.25f; uiStrength = 30f; vibrato = 18;
         }
-        else if (damage >= 10)  // Å©°Ô
+        else if (damage >= 6)   // ì¤‘ê°„
         {
-            duration = 0.2f; camStrength = 0.15f; uiStrength = 22f; vibrato = 15;
+            duration = 0.22f; camStrength = 0.15f; uiStrength = 20f; vibrato = 15;
         }
-        else                    // ÀÛ°Ô
+        else                    // ì‘ê²Œ
         {
-            duration = 0.12f; camStrength = 0.05f; uiStrength = 8f; vibrato = 12;
+            duration = 0.16f; camStrength = 0.08f; uiStrength = 12f; vibrato = 12;
         }
 
         if (camTransform == null && Camera.main != null)
@@ -703,14 +730,14 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// UI ·çÆ®(RectTransform)¸¦ Èçµå´Â È¿°úÀÔ´Ï´Ù. ´ÜÀ§´Â ÇÈ¼¿ÀÔ´Ï´Ù.
+    /// UI ë£¨íŠ¸(RectTransform)ë¥¼ í”ë“œëŠ” íš¨ê³¼ì…ë‹ˆë‹¤. ë‹¨ìœ„ëŠ” í”½ì…€ì…ë‹ˆë‹¤.
     /// </summary>
     public static Tween UIShake(RectTransform uiRoot, float duration = 0.15f, float strength = 15f, int vibrato = 12)
     {
         if (uiRoot == null) return null;
         string tweenId = uiRoot.GetInstanceID() + ID_TRANSFORM;
 
-        // ÁøÇà ÁßÀÎ ½¦ÀÌÅ©¸¦ Á×ÀÌ°í ¿øÀ§Ä¡·Î º¹±¸
+        // ì§„í–‰ ì¤‘ì¸ ì‰ì´í¬ë¥¼ ì£½ì´ê³  ì›ìœ„ì¹˜ë¡œ ë³µêµ¬
         DOTween.Kill(tweenId);
         uiRoot.anchoredPosition = Vector2.zero;
 
@@ -721,15 +748,15 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 6. HP / Slider / Value ¿¬Ãâ
+    #region 6. HP / Slider / Value ì—°ì¶œ
 
     /// <summary>
-    /// Image.fillAmount¸¦ ºÎµå·´°Ô °¨¼â/Áõ°¡½ÃÅµ´Ï´Ù.
+    /// Image.fillAmountë¥¼ ë¶€ë“œëŸ½ê²Œ ê°ì‡„/ì¦ê°€ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="hpBarImage">´ë»ó UI Image (Filled Å¸ÀÔ)</param>
-    /// <param name="targetFill">¸ñÇ¥ Fill ¼öÄ¡ (0.0 ~ 1.0)</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="hpBarImage">ëŒ€ìƒ UI Image (Filled íƒ€ì…)</param>
+    /// <param name="targetFill">ëª©í‘œ Fill ìˆ˜ì¹˜ (0.0 ~ 1.0)</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween HPBarTo(Image hpBarImage, float targetFill, float duration = 0.3f, Ease ease = Ease.OutQuad)
     {
         if (hpBarImage == null) return null;
@@ -740,12 +767,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Slider.value¸¦ ºÎµå·´°Ô º¯°æÇÕ´Ï´Ù.
+    /// Slider.valueë¥¼ ë¶€ë“œëŸ½ê²Œ ë³€ê²½í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="hpSlider">´ë»ó UI Slider</param>
-    /// <param name="targetValue">¸ñÇ¥ Slider Value ¼öÄ¡</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="hpSlider">ëŒ€ìƒ UI Slider</param>
+    /// <param name="targetValue">ëª©í‘œ Slider Value ìˆ˜ì¹˜</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween HPBarTo(Slider hpSlider, float targetValue, float duration = 0.3f, Ease ease = Ease.OutQuad)
     {
         if (hpSlider == null) return null;
@@ -756,12 +783,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Á¤¼ö ÅØ½ºÆ®°¡ ¸ñÇ¥Ä¡±îÁö 1¾¿ Â÷°¨/Áõ°¡ÇÏ¸ç Á¤¹ĞÇÏ°Ô Ä«¿îÆÃµÇµµ·Ï ¿¬ÃâÇÕ´Ï´Ù.
+    /// ì •ìˆ˜ í…ìŠ¤íŠ¸ê°€ ëª©í‘œì¹˜ê¹Œì§€ 1ì”© ì°¨ê°/ì¦ê°€í•˜ë©° ì •ë°€í•˜ê²Œ ì¹´ìš´íŒ…ë˜ë„ë¡ ì—°ì¶œí•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="textComp">Ç¥½ÃÇÒ TextMeshPro ÄÄÆ÷³ÍÆ®</param>
-    /// <param name="fromValue">½ÃÀÛ Á¤¼ö °ª</param>
-    /// <param name="toValue">¸ñÇ¥ Á¤¼ö °ª</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="textComp">í‘œì‹œí•  TextMeshPro ì»´í¬ë„ŒíŠ¸</param>
+    /// <param name="fromValue">ì‹œì‘ ì •ìˆ˜ ê°’</param>
+    /// <param name="toValue">ëª©í‘œ ì •ìˆ˜ ê°’</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween HPTextTo(TMP_Text textComp, int fromValue, int toValue, float duration = 0.3f)
     {
         if (textComp == null) return null;
@@ -777,14 +804,14 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ã¼·Â ¹Ù °ÔÀÌÁö¿Í Ã¼·Â ÅØ½ºÆ®¸¦ µ¿½Ã¿¡ ¾Ö´Ï¸ŞÀÌ¼ÇÀ¸·Î ±ğ¾Æ³»´Â º¹ÇÕ ÇÇµå¹éÀÔ´Ï´Ù.
+    /// ì²´ë ¥ ë°” ê²Œì´ì§€ì™€ ì²´ë ¥ í…ìŠ¤íŠ¸ë¥¼ ë™ì‹œì— ì• ë‹ˆë©”ì´ì…˜ìœ¼ë¡œ ê¹ì•„ë‚´ëŠ” ë³µí•© í”¼ë“œë°±ì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="hpBar">Ã¼·Â °ÔÀÌÁö UI Image</param>
-    /// <param name="hpText">Ã¼·Â ¼ıÀÚ UI Text</param>
-    /// <param name="targetFill">¸ñÇ¥ Fill ºñÀ² (0.0 ~ 1.0)</param>
-    /// <param name="fromHp">½ÃÀÛ HP ¼öÄ¡</param>
-    /// <param name="toHp">¸ñÇ¥ HP ¼öÄ¡</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="hpBar">ì²´ë ¥ ê²Œì´ì§€ UI Image</param>
+    /// <param name="hpText">ì²´ë ¥ ìˆ«ì UI Text</param>
+    /// <param name="targetFill">ëª©í‘œ Fill ë¹„ìœ¨ (0.0 ~ 1.0)</param>
+    /// <param name="fromHp">ì‹œì‘ HP ìˆ˜ì¹˜</param>
+    /// <param name="toHp">ëª©í‘œ HP ìˆ˜ì¹˜</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence HPDamage(Image hpBar, TMP_Text hpText, float targetFill, int fromHp, int toHp, float duration = 0.35f)
     {
         Sequence seq = DOTween.Sequence();
@@ -794,14 +821,14 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ã¼·Â ¹Ù °ÔÀÌÁö¿Í Ã¼·Â ÅØ½ºÆ®¸¦ µ¿½Ã¿¡ È¸º¹½ÃÅ°´Â º¹ÇÕ ÇÇµå¹éÀÔ´Ï´Ù.
+    /// ì²´ë ¥ ë°” ê²Œì´ì§€ì™€ ì²´ë ¥ í…ìŠ¤íŠ¸ë¥¼ ë™ì‹œì— íšŒë³µì‹œí‚¤ëŠ” ë³µí•© í”¼ë“œë°±ì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="hpBar">Ã¼·Â °ÔÀÌÁö UI Image</param>
-    /// <param name="hpText">Ã¼·Â ¼ıÀÚ UI Text</param>
-    /// <param name="targetFill">¸ñÇ¥ Fill ºñÀ² (0.0 ~ 1.0)</param>
-    /// <param name="fromHp">½ÃÀÛ HP ¼öÄ¡</param>
-    /// <param name="toHp">¸ñÇ¥ HP ¼öÄ¡</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="hpBar">ì²´ë ¥ ê²Œì´ì§€ UI Image</param>
+    /// <param name="hpText">ì²´ë ¥ ìˆ«ì UI Text</param>
+    /// <param name="targetFill">ëª©í‘œ Fill ë¹„ìœ¨ (0.0 ~ 1.0)</param>
+    /// <param name="fromHp">ì‹œì‘ HP ìˆ˜ì¹˜</param>
+    /// <param name="toHp">ëª©í‘œ HP ìˆ˜ì¹˜</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence HPHeal(Image hpBar, TMP_Text hpText, float targetFill, int fromHp, int toHp, float duration = 0.35f)
     {
         return HPDamage(hpBar, hpText, targetFill, fromHp, toHp, duration);
@@ -809,22 +836,22 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 7. UI ±âº» È¿°ú (Buttons, Panels, Scales)
+    #region 7. UI ê¸°ë³¸ íš¨ê³¼ (Buttons, Panels, Scales)
 
     /// <summary>
-    /// ¹öÆ°¿¡ ¸¶¿ì½º¸¦ ¿Ã·ÈÀ» ¶§ È®´ëµÇ´Â È£¹ö ¿¬ÃâÀÔ´Ï´Ù.
+    /// ë²„íŠ¼ì— ë§ˆìš°ìŠ¤ë¥¼ ì˜¬ë ¸ì„ ë•Œ í™•ëŒ€ë˜ëŠ” í˜¸ë²„ ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="buttonTr">¹öÆ° Transform</param>
-    /// <param name="scaleMultiplier">È®´ë ¹èÀ²</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="buttonTr">ë²„íŠ¼ Transform</param>
+    /// <param name="scaleMultiplier">í™•ëŒ€ ë°°ìœ¨</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween ButtonHover(Transform buttonTr, float scaleMultiplier = 1.05f, float duration = 0.1f)
         => ScaleMultiplier(buttonTr, scaleMultiplier, duration, Ease.OutQuad);
 
     /// <summary>
-    /// ¹öÆ°¿¡¼­ ¸¶¿ì½º°¡ ÀÌÅ»ÇÒ ¶§ ¿øº» Å©±â·Î º¹±ÍÇÏ´Â ¿¬ÃâÀÔ´Ï´Ù.
+    /// ë²„íŠ¼ì—ì„œ ë§ˆìš°ìŠ¤ê°€ ì´íƒˆí•  ë•Œ ì›ë³¸ í¬ê¸°ë¡œ ë³µê·€í•˜ëŠ” ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="buttonTr">¹öÆ° Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="buttonTr">ë²„íŠ¼ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween ButtonHoverExit(Transform buttonTr, Vector3 originScale, float duration = 0.1f)
     {
         if (buttonTr == null) return null;
@@ -832,12 +859,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ¹öÆ° Å¬¸¯ ½Ã »ìÂ¦ ´­·È´Ù°¡ Æ¨°Ü ³ª¿À´Â ÇÇµå¹é ¿¬ÃâÀÔ´Ï´Ù.
+    /// ë²„íŠ¼ í´ë¦­ ì‹œ ì‚´ì§ ëˆŒë ¸ë‹¤ê°€ íŠ•ê²¨ ë‚˜ì˜¤ëŠ” í”¼ë“œë°± ì—°ì¶œì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="buttonTr">¹öÆ° Transform</param>
-    /// <param name="pressDownMult">´­·ÈÀ» ¶§ÀÇ Ãà¼Ò ¹èÀ²</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="onClickAction">Å¬¸¯ ¼ø°£(¼öÃà Á÷ÈÄ) ½ÇÇàµÉ Äİ¹é</param>
+    /// <param name="buttonTr">ë²„íŠ¼ Transform</param>
+    /// <param name="pressDownMult">ëˆŒë ¸ì„ ë•Œì˜ ì¶•ì†Œ ë°°ìœ¨</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onClickAction">í´ë¦­ ìˆœê°„(ìˆ˜ì¶• ì§í›„) ì‹¤í–‰ë  ì½œë°±</param>
     public static Sequence ButtonPress(Transform buttonTr, Vector3 originScale, float pressDownMult = 0.94f, float duration = 0.12f, Action onClickAction = null)
     {
         if (buttonTr == null) return null;
@@ -852,20 +879,20 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// UI ¿ä¼Ò¸¦ ÀÏ½ÃÀûÀ¸·Î ÅëÅë Æ¢°Ô ¸¸µå´Â ÆË È¿°úÀÔ´Ï´Ù.
+    /// UI ìš”ì†Œë¥¼ ì¼ì‹œì ìœ¼ë¡œ í†µí†µ íŠ€ê²Œ ë§Œë“œëŠ” íŒ íš¨ê³¼ì…ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="uiTransform">´ë»ó UI Transform</param>
-    /// <param name="punchScale">ÆË¾÷ °­µµ</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="uiTransform">ëŒ€ìƒ UI Transform</param>
+    /// <param name="punchScale">íŒì—… ê°•ë„</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Tween UIPop(Transform uiTransform, float punchScale = 0.1f, float duration = 0.15f)
         => PunchScale(uiTransform, punchScale, duration, 5);
 
     /// <summary>
-    /// ÆË¾÷Ã¢, ¸Ş´ºÃ¢ÀÌ ¿­¸± ¶§ ¾ËÆÄ ÆäÀÌµåÀÎ°ú ÇÔ²² »ìÂ¦ Ä¿Áö¸ç µîÀåÇÕ´Ï´Ù.
+    /// íŒì—…ì°½, ë©”ë‰´ì°½ì´ ì—´ë¦´ ë•Œ ì•ŒíŒŒ í˜ì´ë“œì¸ê³¼ í•¨ê»˜ ì‚´ì§ ì»¤ì§€ë©° ë“±ì¥í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="panelObj">¿­ ÆĞ³Î GameObject</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="onComplete">¿­±â ¿¬Ãâ ¿Ï·á ½Ã Äİ¹é</param>
+    /// <param name="panelObj">ì—´ íŒ¨ë„ GameObject</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onComplete">ì—´ê¸° ì—°ì¶œ ì™„ë£Œ ì‹œ ì½œë°±</param>
     public static Sequence PanelOpen(GameObject panelObj, float duration = 0.2f, Action onComplete = null)
     {
         if (panelObj == null) return null;
@@ -873,7 +900,7 @@ public static class DOTweenManager
 
         Transform tr = panelObj.transform;
         tr.localScale = Vector3.one * 0.92f;
-        Fade(panelObj, 0f, 0f); // Áï½Ã 0À¸·Î ÃÊ±âÈ­
+        Fade(panelObj, 0f, 0f); // ì¦‰ì‹œ 0ìœ¼ë¡œ ì´ˆê¸°í™”
 
         Sequence seq = DOTween.Sequence();
         seq.Join(FadeIn(panelObj, duration, Ease.OutQuad));
@@ -883,11 +910,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ÆË¾÷Ã¢, ¸Ş´ºÃ¢ÀÌ ´İÈú ¶§ ¾ËÆÄ ÆäÀÌµå¾Æ¿ô°ú ÇÔ²² Ãà¼ÒµÈ ÈÄ ºñÈ°¼ºÈ­ÇÕ´Ï´Ù.
+    /// íŒì—…ì°½, ë©”ë‰´ì°½ì´ ë‹«í ë•Œ ì•ŒíŒŒ í˜ì´ë“œì•„ì›ƒê³¼ í•¨ê»˜ ì¶•ì†Œëœ í›„ ë¹„í™œì„±í™”í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="panelObj">´İÀ» ÆĞ³Î GameObject</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="onComplete">ºñÈ°¼ºÈ­ ÈÄ ½ÇÇàÇÒ Äİ¹é</param>
+    /// <param name="panelObj">ë‹«ì„ íŒ¨ë„ GameObject</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onComplete">ë¹„í™œì„±í™” í›„ ì‹¤í–‰í•  ì½œë°±</param>
     public static Sequence PanelClose(GameObject panelObj, float duration = 0.15f, Action onComplete = null)
     {
         if (panelObj == null) return null;
@@ -904,13 +931,13 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// RectTransformÀÇ AnchoredPositionÀ» »ç¿ëÇÏ¿© UI¸¦ ºÎµå·´°Ô È­¸é ¹Û¿¡¼­ ¾ÈÀ¸·Î ½½¶óÀÌµåÇÕ´Ï´Ù.
+    /// RectTransformì˜ AnchoredPositionì„ ì‚¬ìš©í•˜ì—¬ UIë¥¼ ë¶€ë“œëŸ½ê²Œ í™”ë©´ ë°–ì—ì„œ ì•ˆìœ¼ë¡œ ìŠ¬ë¼ì´ë“œí•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="rectTr">´ë»ó UI RectTransform</param>
-    /// <param name="fromAnchoredPos">½ÃÀÛ ¾ŞÄ¿ À§Ä¡</param>
-    /// <param name="toAnchoredPos">¸ñÇ¥ ¾ŞÄ¿ À§Ä¡</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="rectTr">ëŒ€ìƒ UI RectTransform</param>
+    /// <param name="fromAnchoredPos">ì‹œì‘ ì•µì»¤ ìœ„ì¹˜</param>
+    /// <param name="toAnchoredPos">ëª©í‘œ ì•µì»¤ ìœ„ì¹˜</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween UISlideIn(RectTransform rectTr, Vector2 fromAnchoredPos, Vector2 toAnchoredPos, float duration = 0.25f, Ease ease = Ease.OutQuad)
     {
         if (rectTr == null) return null;
@@ -919,12 +946,12 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// UI¸¦ È­¸é ¹Û ÁöÁ¤µÈ À§Ä¡·Î ½½¶óÀÌµåÇÏ¿© ÅğÀå½ÃÅµ´Ï´Ù.
+    /// UIë¥¼ í™”ë©´ ë°– ì§€ì •ëœ ìœ„ì¹˜ë¡œ ìŠ¬ë¼ì´ë“œí•˜ì—¬ í‡´ì¥ì‹œí‚µë‹ˆë‹¤.
     /// </summary>
-    /// <param name="rectTr">´ë»ó UI RectTransform</param>
-    /// <param name="toAnchoredPos">ÅğÀåÇÒ ¸ñÇ¥ ¾ŞÄ¿ À§Ä¡</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
-    /// <param name="ease">ÀÌÂ¡ °î¼±</param>
+    /// <param name="rectTr">ëŒ€ìƒ UI RectTransform</param>
+    /// <param name="toAnchoredPos">í‡´ì¥í•  ëª©í‘œ ì•µì»¤ ìœ„ì¹˜</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="ease">ì´ì§• ê³¡ì„ </param>
     public static Tween UISlideOut(RectTransform rectTr, Vector2 toAnchoredPos, float duration = 0.2f, Ease ease = Ease.InQuad)
     {
         if (rectTr == null) return null;
@@ -933,16 +960,16 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 8. Turn / Battle System ¿¬Ãâ
+    #region 8. Turn / Battle System ì—°ì¶œ
 
     /// <summary>
-    /// ÅÏ ÀüÈ¯ ÅØ½ºÆ® ¾È³» ("TURN 1", "ENEMY TURN") ¿¬Ãâ:
-    /// µîÀå(Scale Up + Fade In) -> Àá½Ã ¸ØÃã -> ÅğÀå(Fade Out).
+    /// í„´ ì „í™˜ í…ìŠ¤íŠ¸ ì•ˆë‚´ ("TURN 1", "ENEMY TURN") ì—°ì¶œ:
+    /// ë“±ì¥(Scale Up + Fade In) -> ì ì‹œ ë©ˆì¶¤ -> í‡´ì¥(Fade Out).
     /// </summary>
-    /// <param name="bannerObj">ÅÏ ¹è³Ê UI GameObject</param>
-    /// <param name="stayDuration">Áß¾Ó¿¡¼­ ´ë±âÇÏ´Â ½Ã°£ (ÃÊ)</param>
-    /// <param name="transitionDuration">µîÀå/ÅğÀå ¾Ö´Ï¸ŞÀÌ¼Ç ½Ã°£ (ÃÊ)</param>
-    /// <param name="onComplete">¹è³Ê ÅğÀå ¿Ï·á ½Ã ½ÇÇàÇÒ Äİ¹é</param>
+    /// <param name="bannerObj">í„´ ë°°ë„ˆ UI GameObject</param>
+    /// <param name="stayDuration">ì¤‘ì•™ì—ì„œ ëŒ€ê¸°í•˜ëŠ” ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="transitionDuration">ë“±ì¥/í‡´ì¥ ì• ë‹ˆë©”ì´ì…˜ ì‹œê°„ (ì´ˆ)</param>
+    /// <param name="onComplete">ë°°ë„ˆ í‡´ì¥ ì™„ë£Œ ì‹œ ì‹¤í–‰í•  ì½œë°±</param>
     public static Sequence TurnStart(GameObject bannerObj, float stayDuration = 0.5f, float transitionDuration = 0.2f, Action onComplete = null)
     {
         if (bannerObj == null) return null;
@@ -953,12 +980,12 @@ public static class DOTweenManager
         Fade(bannerObj, 0f, 0f);
 
         Sequence seq = DOTween.Sequence();
-        // 1. ÁøÀÔ
+        // 1. ì§„ì…
         seq.Append(tr.DOScale(Vector3.one, transitionDuration).SetEase(Ease.OutBack));
         seq.Join(FadeIn(bannerObj, transitionDuration));
-        // 2. À¯Áö
+        // 2. ìœ ì§€
         seq.AppendInterval(stayDuration);
-        // 3. ÅğÀå
+        // 3. í‡´ì¥
         seq.Append(FadeOut(bannerObj, transitionDuration));
         seq.Join(tr.DOScale(Vector3.one * 1.1f, transitionDuration).SetEase(Ease.InQuad));
         seq.OnComplete(() =>
@@ -970,25 +997,25 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// Ä«µå ¼øÂ÷ ½ÇÇà ´Ü°è¿¡¼­ ÇöÀç Çàµ¿ ÁßÀÎ Ä«µå¸¦ ÇÏÀÌ¶óÀÌÆ®ÇÏ°í,
-    /// ³ª¸ÓÁö Ä«µåµéÀ» Èå¸®°Ô(Dim) ¸¸µé¾î ½Ã¼±ÀÇ ºĞ»êÀ» ¸·½À´Ï´Ù.
+    /// ì¹´ë“œ ìˆœì°¨ ì‹¤í–‰ ë‹¨ê³„ì—ì„œ í˜„ì¬ í–‰ë™ ì¤‘ì¸ ì¹´ë“œë¥¼ í•˜ì´ë¼ì´íŠ¸í•˜ê³ ,
+    /// ë‚˜ë¨¸ì§€ ì¹´ë“œë“¤ì„ íë¦¬ê²Œ(Dim) ë§Œë“¤ì–´ ì‹œì„ ì˜ ë¶„ì‚°ì„ ë§‰ìŠµë‹ˆë‹¤.
     /// </summary>
-    /// <param name="currentCard">ÇÏÀÌ¶óÀÌÆ®ÇÒ ÇöÀç ½ÇÇà Ä«µå Transform</param>
-    /// <param name="otherCards">Dim(¾îµÓ°Ô/Èå¸®°Ô) Ã³¸®ÇÒ ³ª¸ÓÁö Ä«µå ¸®½ºÆ®</param>
-    /// <param name="highlightScale">ÇöÀç Ä«µåÀÇ È®´ë ¹èÀ²</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="currentCard">í•˜ì´ë¼ì´íŠ¸í•  í˜„ì¬ ì‹¤í–‰ ì¹´ë“œ Transform</param>
+    /// <param name="otherCards">Dim(ì–´ë‘¡ê²Œ/íë¦¬ê²Œ) ì²˜ë¦¬í•  ë‚˜ë¨¸ì§€ ì¹´ë“œ ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="highlightScale">í˜„ì¬ ì¹´ë“œì˜ í™•ëŒ€ ë°°ìœ¨</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence CurrentExecutionHighlight(Transform currentCard, Vector3 currentCardOriginScale, List<Transform> otherCards, Dictionary<Transform, Vector3> otherOriginScales = null, float highlightScale = 1.15f, float duration = 0.15f)
     {
         Sequence seq = DOTween.Sequence();
 
-        // 1. ÇöÀç Ä«µå ºÎ°¢ (¿øº» ½ºÄÉÀÏ ±â¹İ)
+        // 1. í˜„ì¬ ì¹´ë“œ ë¶€ê° (ì›ë³¸ ìŠ¤ì¼€ì¼ ê¸°ë°˜)
         if (currentCard != null)
         {
             seq.Join(Scale(currentCard, currentCardOriginScale * highlightScale, duration, Ease.OutBack));
             seq.Join(Flash(currentCard.gameObject, Color.yellow, duration, 1));
         }
 
-        // 2. ³ª¸ÓÁö Ä«µå °¨¼â (Dim)
+        // 2. ë‚˜ë¨¸ì§€ ì¹´ë“œ ê°ì‡„ (Dim)
         if (otherCards != null)
         {
             foreach (var other in otherCards)
@@ -1008,10 +1035,10 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ½ÇÇà ¿Ï·á ÈÄ Ä«µåµéÀÇ Èå¸²(Dim) »óÅÂ ¹× ½ºÄÉÀÏÀ» ¿ø·¡´ë·Î º¹¿øÇÕ´Ï´Ù.
+    /// ì‹¤í–‰ ì™„ë£Œ í›„ ì¹´ë“œë“¤ì˜ íë¦¼(Dim) ìƒíƒœ ë° ìŠ¤ì¼€ì¼ì„ ì›ë˜ëŒ€ë¡œ ë³µì›í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="allCards">º¹¿øÇÒ ¸ğµç Ä«µå Transform ¸®½ºÆ®</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="allCards">ë³µì›í•  ëª¨ë“  ì¹´ë“œ Transform ë¦¬ìŠ¤íŠ¸</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence ResetExecutionHighlight(List<Transform> allCards, Dictionary<Transform, Vector3> originScales = null, float duration = 0.15f)
     {
         Sequence seq = DOTween.Sequence();
@@ -1033,14 +1060,14 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 9. Battle Result (½Â¸® / ÆĞ¹è ¿¬Ãâ)
+    #region 9. Battle Result (ìŠ¹ë¦¬ / íŒ¨ë°° ì—°ì¶œ)
 
     /// <summary>
-    /// ÀüÅõ ½Â¸® ÆĞ³Î ¿¬Ãâ: ¹è°æ ¾ÏÀü -> ½Â¸® ÅØ½ºÆ® ½ºÄÉÀÏ ÆİÄ¡.
+    /// ì „íˆ¬ ìŠ¹ë¦¬ íŒ¨ë„ ì—°ì¶œ: ë°°ê²½ ì•”ì „ -> ìŠ¹ë¦¬ í…ìŠ¤íŠ¸ ìŠ¤ì¼€ì¼ í€ì¹˜.
     /// </summary>
-    /// <param name="victoryPanel">½Â¸® ÀüÃ¼ ÆĞ³Î GameObject</param>
-    /// <param name="bannerTr">½Â¸® ÅØ½ºÆ®/¹è³Ê ÀÌ¹ÌÁö Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="victoryPanel">ìŠ¹ë¦¬ ì „ì²´ íŒ¨ë„ GameObject</param>
+    /// <param name="bannerTr">ìŠ¹ë¦¬ í…ìŠ¤íŠ¸/ë°°ë„ˆ ì´ë¯¸ì§€ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence Victory(GameObject victoryPanel, Transform bannerTr, float duration = 0.4f)
     {
         if (victoryPanel == null) return null;
@@ -1059,11 +1086,11 @@ public static class DOTweenManager
     }
 
     /// <summary>
-    /// ÀüÅõ ÆĞ¹è ÆĞ³Î ¿¬Ãâ: ºÓÀº Åæ ÆäÀÌµåÀÎ -> µĞÅ¹ÇÑ ÇÏÇâ ¾ÈÂø.
+    /// ì „íˆ¬ íŒ¨ë°° íŒ¨ë„ ì—°ì¶œ: ë¶‰ì€ í†¤ í˜ì´ë“œì¸ -> ë‘”íƒí•œ í•˜í–¥ ì•ˆì°©.
     /// </summary>
-    /// <param name="defeatPanel">ÆĞ¹è ÀüÃ¼ ÆĞ³Î GameObject</param>
-    /// <param name="bannerTr">ÆĞ¹è ÅØ½ºÆ®/¹è³Ê ÀÌ¹ÌÁö Transform</param>
-    /// <param name="duration">ÁøÇà ½Ã°£ (ÃÊ)</param>
+    /// <param name="defeatPanel">íŒ¨ë°° ì „ì²´ íŒ¨ë„ GameObject</param>
+    /// <param name="bannerTr">íŒ¨ë°° í…ìŠ¤íŠ¸/ë°°ë„ˆ ì´ë¯¸ì§€ Transform</param>
+    /// <param name="duration">ì§„í–‰ ì‹œê°„ (ì´ˆ)</param>
     public static Sequence Defeat(GameObject defeatPanel, Transform bannerTr, float duration = 0.4f)
     {
         if (defeatPanel == null) return null;
@@ -1084,15 +1111,15 @@ public static class DOTweenManager
 
     #endregion
 
-    #region 10. Camera È¿°ú
+    #region 10. Camera íš¨ê³¼
 
     /// <summary>
-    /// Ä«µå°ÔÀÓ¿ë Ä«¸Ş¶ó Áøµ¿ È¿°úÀÔ´Ï´Ù. Áö³ªÄ£ ¾îÁö·¯¿òÀ» ¸·±â À§ÇØ Á¤¹ĞÇÏ°Ô Á¦ÇÑµÈ ÁøÆøÀ» »ç¿ëÇÕ´Ï´Ù.
+    /// ì¹´ë“œê²Œì„ìš© ì¹´ë©”ë¼ ì§„ë™ íš¨ê³¼ì…ë‹ˆë‹¤. ì§€ë‚˜ì¹œ ì–´ì§€ëŸ¬ì›€ì„ ë§‰ê¸° ìœ„í•´ ì •ë°€í•˜ê²Œ ì œí•œëœ ì§„í­ì„ ì‚¬ìš©í•©ë‹ˆë‹¤.
     /// </summary>
-    /// <param name="camTransform">Ä«¸Ş¶ó Transform</param>
-    /// <param name="duration">Áö¼Ó ½Ã°£ (0.1 ~ 0.25ÃÊ ±ÇÀå)</param>
-    /// <param name="strength">Áøµ¿ °­µµ (¾àÇÑ Å¸°İ: 0.05f, °­ÇÑ Å¸°İ: 0.15f)</param>
-    /// <param name="vibrato">ÃÊ´ç Áøµ¿ È½¼ö</param>
+    /// <param name="camTransform">ì¹´ë©”ë¼ Transform</param>
+    /// <param name="duration">ì§€ì† ì‹œê°„ (0.1 ~ 0.25ì´ˆ ê¶Œì¥)</param>
+    /// <param name="strength">ì§„ë™ ê°•ë„ (ì•½í•œ íƒ€ê²©: 0.05f, ê°•í•œ íƒ€ê²©: 0.15f)</param>
+    /// <param name="vibrato">ì´ˆë‹¹ ì§„ë™ íšŸìˆ˜</param>
     public static Tween CameraShake(Transform camTransform, float duration = 0.15f, float strength = 0.08f, int vibrato = 12)
     {
         if (camTransform == null) return null;

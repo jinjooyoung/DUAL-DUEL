@@ -488,17 +488,14 @@ public class BattleManager : MonoBehaviour
 
         Debug.Log($"[빈 슬롯 기본 공격] {(isPlayerSlot ? "플레이어" : "적")} {slot.slotIndex}번 슬롯이 비어있어 기본 피해 {finalDamage}(원래: {rawAtk}) 시전!");
 
-        // 슬롯 펀치/돌진 연출
-        Sequence sequence = DOTweenManager.CardExecute(
-            slot.transform,
-            isPlayerSlot ? Vector3.right : Vector3.left
-        );
+        // 슬롯 돌진 연출: 타격 순간에 피해 적용
+        Sequence sequence = PlayCast(slot.transform, isPlayerSlot, target, false, () =>
+        {
+            ApplyDamage(target, finalDamage);
+            BattleUIManager.Instance?.UpdateAllUI();
+        });
 
         yield return sequence.WaitForCompletion();
-
-        // 피해 적용
-        ApplyDamage(target, finalDamage);
-        BattleUIManager.Instance?.UpdateAllUI();
     }
 
     /// <summary>
@@ -682,6 +679,32 @@ public class BattleManager : MonoBehaviour
         BattleUIManager.Instance?.UpdateAllUI();
     }
 
+    // ---------- [타격 연출] ----------
+
+    /// <summary>
+    /// 카드(또는 빈 슬롯) 시전 연출: 화면 예고 -> 젖힘 -> 돌진하며 빛줄기 -> 타격 순간 onHit
+    /// onHit 안에서 효과 적용과 UI 갱신을 해야 "찌르는 순간 맞는" 인과가 생김
+    /// </summary>
+    private Sequence PlayCast(Transform caster, bool isPlayerSlot, CombatEntityStats beamTarget, bool positive, Action onHit)
+    {
+        HitFeedback.Instance?.Anticipate();
+        Transform targetTr = GetEntityTransform(beamTarget);
+        return DOTweenManager.CardExecute(
+            caster,
+            isPlayerSlot ? Vector3.right : Vector3.left,
+            onHitMoment: onHit,
+            onLaunch: dash =>
+            {
+                if (caster != null && targetTr != null)
+                    HitFeedback.Instance?.Beam(caster.position, targetTr.position, dash, positive);
+            });
+    }
+
+    /// <summary>시전자 본인에게 적용되는 카드 (빛줄기가 자기 초상화로 감)</summary>
+    private static bool IsSelfTargetCard(CardType type) =>
+        type == CardType.Defense || type == CardType.Heal ||
+        type == CardType.Buff_Regeneration || type == CardType.Buff_Force || type == CardType.Buff_Lifesteal;
+
     private IEnumerator ExecuteSlotAction(BattleSlot slot)
     {
         if (isGameOver) yield break;
@@ -767,16 +790,16 @@ public class BattleManager : MonoBehaviour
         {
             // 실제 효과 발동 (약화 차감은 ApplyCardEffect에서 처리)
             int finalValue = Mathf.Max(0, cardValue);
-            ApplyCardEffect(cardData.cardType, user, target, finalValue);
+            bool selfTarget = IsSelfTargetCard(cardData.cardType);
 
-            // 사용 연출 (슬롯에 카드가 유지된 채로 찌르기)
-            Sequence sequence = DOTweenManager.CardExecute(
-                cardDisplay.transform,
-                isPlayerSlot ? Vector3.right : Vector3.left
-            );
+            // 사용 연출: 젖힘 -> 돌진 -> 타격 순간에 효과 적용 + UI 갱신
+            Sequence sequence = PlayCast(cardDisplay.transform, isPlayerSlot, selfTarget ? user : target, selfTarget, () =>
+            {
+                ApplyCardEffect(cardData.cardType, user, target, finalValue);
+                BattleUIManager.Instance?.UpdateAllUI();
+            });
 
             yield return sequence.WaitForCompletion();
-            BattleUIManager.Instance?.UpdateAllUI();
 
             // 연타 시전 사이 짧은 연출 대기
             if (i < totalCasts - 1)
@@ -837,6 +860,7 @@ public class BattleManager : MonoBehaviour
         {
             BattleUIManager.Instance?.ShowHealText(spawnPos, amount);
             SoundManager.Instance.PlaySFX(SFXType.Heal);
+            HitFeedback.Instance?.Impact(HitKind.Buff, amount);
             BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Heal);
             return;
         }
@@ -845,6 +869,7 @@ public class BattleManager : MonoBehaviour
             BattleUIManager.Instance?.ShowDamageText(spawnPos, -amount);
             BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Hit);
             DOTweenManager.ShakeByDamage(-amount, uiShakeRoot, cameraTransform);
+            HitFeedback.Instance?.Impact(HitKind.Damage, -amount);
         }
 
         // 플레이어라면
@@ -889,6 +914,7 @@ public class BattleManager : MonoBehaviour
             case CardType.Defense:
                 ModifyGuard(user, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Defense);
+                HitFeedback.Instance?.Impact(HitKind.Buff, finalValue);
                 break;
 
             case CardType.Heal:
@@ -902,32 +928,38 @@ public class BattleManager : MonoBehaviour
             case CardType.Buff_Regeneration:
                 ApplyStatusEffect(user, user, StatusEffectType.Regeneration, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Regeneration);
+                HitFeedback.Instance?.Impact(HitKind.Buff, finalValue);
                 break;
 
             case CardType.Buff_Force:
                 ApplyStatusEffect(user, user, StatusEffectType.Force, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Force);
+                HitFeedback.Instance?.Impact(HitKind.Buff, finalValue);
                 break;
 
             case CardType.Buff_Lifesteal:
                 ApplyStatusEffect(user, user, StatusEffectType.Lifesteal, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Lifesteal);
+                HitFeedback.Instance?.Impact(HitKind.Buff, finalValue);
                 break;
 
             // 디버프: 시전자의 상대에게
             case CardType.Debuff_Poison:
                 ApplyStatusEffect(user, target, StatusEffectType.Poison, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Poison);
+                HitFeedback.Instance?.Impact(HitKind.Debuff, finalValue);
                 break;
 
             case CardType.Debuff_Bleed:
                 ApplyStatusEffect(user, target, StatusEffectType.Bleed, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Bleed);
+                HitFeedback.Instance?.Impact(HitKind.Debuff, finalValue);
                 break;
 
             case CardType.Debuff_Weaken:
                 ApplyStatusEffect(user, target, StatusEffectType.Weaken, finalValue);
                 BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Weaken);
+                HitFeedback.Instance?.Impact(HitKind.Debuff, finalValue);
                 break;
         }
     }
@@ -949,15 +981,14 @@ public class BattleManager : MonoBehaviour
         // 연계 시전도 대상 카드가 놓인 슬롯의 밸류 보정을 받음
         int finalValue = ApplySlotValueModifier(targetSlot, cardDisplay.cardInstance.GetValue());
 
-        ApplyCardEffect(cardData.cardType, user, target, finalValue);
-
-        Sequence seq = DOTweenManager.CardExecute(
-            cardDisplay.transform,
-            isPlayer ? Vector3.right : Vector3.left
-        );
+        bool selfTarget = IsSelfTargetCard(cardData.cardType);
+        Sequence seq = PlayCast(cardDisplay.transform, isPlayer, selfTarget ? user : target, selfTarget, () =>
+        {
+            ApplyCardEffect(cardData.cardType, user, target, finalValue);
+            BattleUIManager.Instance?.UpdateAllUI();
+        });
 
         yield return seq.WaitForCompletion();
-        BattleUIManager.Instance?.UpdateAllUI();
     }
 
     /// <summary>
@@ -984,6 +1015,7 @@ public class BattleManager : MonoBehaviour
             target.guard -= damage;
             SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
             BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defensed);
+            HitFeedback.Instance?.Impact(HitKind.Block, damage);
             return;
         }
 

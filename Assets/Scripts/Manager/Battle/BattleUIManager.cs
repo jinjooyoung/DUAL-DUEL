@@ -18,7 +18,6 @@ public class BattleUIManager : MonoBehaviour
     [Header("플레이어 스탯 UI")]
     [SerializeField] private TextMeshProUGUI playerStatText;
     [SerializeField] private Slider playerHpSlider;
-    [SerializeField] private Slider playerShieldSlider;
 
     [Header("플레이어 표정")]
     [SerializeField] private CharacterExpression playerExpression;
@@ -26,7 +25,6 @@ public class BattleUIManager : MonoBehaviour
     [Header("몬스터 스탯 UI")]
     [SerializeField] private TextMeshProUGUI monsterStatText;
     [SerializeField] private Slider monsterHpSlider;
-    [SerializeField] private Slider monsterShieldSlider;
 
     [Header("몬스터 표정")]
     [SerializeField] private CharacterExpression monsterExpression;
@@ -89,13 +87,11 @@ public class BattleUIManager : MonoBehaviour
         if (BattleManager.Instance.playerStats != null)
         {
             if (playerHpSlider != null) playerHpSlider.maxValue = GameManager.Instance.character.maxHp;
-            if (playerShieldSlider != null) playerShieldSlider.maxValue = GameManager.Instance.character.maxHp;
         }
 
         if (BattleManager.Instance.monsterStats != null)
         {
             if (monsterHpSlider != null) monsterHpSlider.maxValue = BattleManager.Instance.monsterStats.currentHp;
-            if (monsterShieldSlider != null) monsterShieldSlider.maxValue = BattleManager.Instance.monsterStats.currentHp;
         }
 
         UpdateCombatStatsUI();
@@ -233,9 +229,6 @@ public class BattleUIManager : MonoBehaviour
             if (playerHpSlider != null)
                 playerHpSlider.value = stats.currentHp;
 
-            if (playerShieldSlider != null)
-                playerShieldSlider.value = stats.guard;
-
             UpdateBuffIcons(stats, playerBuffIcons);
         }
 
@@ -252,9 +245,6 @@ public class BattleUIManager : MonoBehaviour
 
             if (monsterHpSlider != null)
                 monsterHpSlider.value = stats.currentHp;
-
-            if (monsterShieldSlider != null)
-                monsterShieldSlider.value = stats.guard;
 
             UpdateBuffIcons(stats, monsterBuffIcons);
         }
