@@ -1760,42 +1760,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0f2d98f01ae0a6244b4b7ae2b00f472b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HitFeedback
-  bigHit: 10
+  bigHit: 6
   useAnticipation: 1
   anticipation:
-    exposure: -0.3
+    exposure: -0.15
     chroma: 0
     bloom: 0
     lens: 0
-    vignette: 0.42
+    vignette: 0.32
     attack: 0.1
     release: 0.25
     flicker: 0
-  anticipationHold: 0.25
+  anticipationHold: 0.12
   useVolumePunch: 1
   damage:
-    exposure: 1.1
-    chroma: 0.85
-    bloom: 2.4
-    lens: -0.28
+    exposure: 1.6
+    chroma: 0
+    bloom: 3.5
+    lens: -0.4
     vignette: 0
     attack: 0
-    release: 0.22
+    release: 0.35
     flicker: 0
   block:
-    exposure: 0.9
+    exposure: 1.2
     chroma: 0.3
     bloom: 2.2
-    lens: 0.16
+    lens: 0.25
     vignette: 0
     attack: 0
-    release: 0.2
+    release: 0.3
     flicker: 0
   buff:
     exposure: 0.6
     chroma: 0
     bloom: 1.8
-    lens: 0
+    lens: 0.15
     vignette: 0
     attack: 0.06
     release: 0.35
@@ -1804,18 +1804,18 @@ MonoBehaviour:
     exposure: -0.5
     chroma: 1
     bloom: 0
-    lens: -0.1
+    lens: -0.15
     vignette: 0
     attack: 0
     release: 0.3
     flicker: 1
   volumePriority: 100
   useHitStop: 1
-  hitStopMin: 0.03
-  hitStopMax: 0.09
+  hitStopMin: 0.05
+  hitStopMax: 0.12
   hitStopTimeScale: 0.02
   useBeam: 1
-  beamWidth: 0.06
+  beamWidth: 0.1
   beamTail: 0.35
   beamColor: {r: 1.4, g: 2.2, b: 1.5, a: 1}
   beamSortingOrder: 149

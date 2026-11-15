@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.Rendering.Universal;
 
-public enum HitKind { Damage, Block, Buff, Debuff }
+public enum HitKind { Damage, Block, Positive, Buff, Debuff }
 
 /// <summary>
 /// DUAL DUEL 타격 연출 보강. 기존 DOTweenManager / BattleVFXPlayer / ShakeByDamage 가 하지 않는 것만 담당.
