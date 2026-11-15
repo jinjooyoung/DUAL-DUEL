@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.EventSystems.EventTrigger;
 
 /// <summary>
 /// 버프 / 디버프 종류. 정수값 = UI 아이콘 리스트 인덱스 (BattleUIManager의 BuffIcons 순서와 동일하게 유지)
@@ -836,6 +837,7 @@ public class BattleManager : MonoBehaviour
         {
             BattleUIManager.Instance?.ShowHealText(spawnPos, amount);
             SoundManager.Instance.PlaySFX(SFXType.Heal);
+            BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Heal);
             return;
         }
         else
@@ -886,36 +888,46 @@ public class BattleManager : MonoBehaviour
 
             case CardType.Defense:
                 ModifyGuard(user, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Defense);
                 break;
 
             case CardType.Heal:
-                if (finalValue > 0) ModifyHealth(user, finalValue);   // 0 회복은 ModifyHealth에서 피격 연출로 처리되므로 생략
+                if (finalValue > 0)
+                {
+                    ModifyHealth(user, finalValue);   // 0 회복은 ModifyHealth에서 피격 연출로 처리되므로 생략
+                }
                 break;
 
             // 버프: 시전자 본인에게
             case CardType.Buff_Regeneration:
                 ApplyStatusEffect(user, user, StatusEffectType.Regeneration, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Regeneration);
                 break;
 
             case CardType.Buff_Force:
                 ApplyStatusEffect(user, user, StatusEffectType.Force, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Force);
                 break;
 
             case CardType.Buff_Lifesteal:
                 ApplyStatusEffect(user, user, StatusEffectType.Lifesteal, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(user), VFXType.Buff_Lifesteal);
                 break;
 
             // 디버프: 시전자의 상대에게
             case CardType.Debuff_Poison:
                 ApplyStatusEffect(user, target, StatusEffectType.Poison, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Poison);
                 break;
 
             case CardType.Debuff_Bleed:
                 ApplyStatusEffect(user, target, StatusEffectType.Bleed, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Bleed);
                 break;
 
             case CardType.Debuff_Weaken:
                 ApplyStatusEffect(user, target, StatusEffectType.Weaken, finalValue);
+                BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Debuff_Weaken);
                 break;
         }
     }
@@ -971,7 +983,7 @@ public class BattleManager : MonoBehaviour
         {
             target.guard -= damage;
             SoundManager.Instance.PlaySFX(SFXType.Shield_Block);
-            BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defense);
+            BattleVFXPlayer.Instance?.Play(GetEntityTransform(target), VFXType.Defensed);
             return;
         }
 
@@ -1007,7 +1019,6 @@ public class BattleManager : MonoBehaviour
 
         Vector3 spawnPos = GetEntityWorldPosition(entity);
         BattleUIManager.Instance?.ShowShieldText(spawnPos, amount);
-        BattleVFXPlayer.Instance?.Play(GetEntityTransform(entity), VFXType.Defense);
         SoundManager.Instance.PlaySFX(SFXType.Shield_Taking);
 
         if (entity == playerStats)
@@ -1041,7 +1052,6 @@ public class BattleManager : MonoBehaviour
         Color color = isBuff ? new Color(1f, 0.85f, 0.2f) : new Color(0.75f, 0.35f, 1f);
         BattleUIManager.Instance?.ShowStatusText(GetEntityWorldPosition(receiver), $"{GetStatusName(type)} +{added}{suffix}", color);
 
-        if (isBuff) BattleVFXPlayer.Instance?.Play(GetEntityTransform(receiver), VFXType.Buff);
         SoundManager.Instance.PlaySFX(SFXType.Buff);
 
         // 시전자 모션

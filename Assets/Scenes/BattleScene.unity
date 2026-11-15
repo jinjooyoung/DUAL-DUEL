@@ -4184,15 +4184,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BattleVFXPlayer
   vfxPrefabs:
-  - {fileID: 5669246471909640947, guid: bfd016bff164dfc4aac33a0563922772, type: 3}
-  - {fileID: 3022102558446658867, guid: cd3d579a2d65b3241a1812f639db37ec, type: 3}
-  - {fileID: 4371574358465749826, guid: a4e76a0f922f92041afcc2d890f6a4cc, type: 3}
+  - {fileID: 657883746903990000, guid: a2c41c3bd43093e3847cb5faa8bc7fb5, type: 3}
+  - {fileID: 749855957692956080, guid: 79c4945c9d565933862af95117ec776e, type: 3}
+  - {fileID: 28570566253290652, guid: 3a73a0bc3b75470a2c2bcaf4a7dfdeb2, type: 3}
+  - {fileID: 985436744150221538, guid: ea7b1844a382816b91513ebc9816bdc1, type: 3}
+  - {fileID: 1033991255389308768, guid: aa6f32d71968dbf8ac3c2a3073ae0097, type: 3}
+  - {fileID: 331783033221693693, guid: 2438225bb9ca5ae65d32390e7c45eed4, type: 3}
+  - {fileID: 884118940219253035, guid: 4d2382f7d30e523cb88483d2902f8afe, type: 3}
+  - {fileID: 1017061893039235778, guid: 0436e772c15a24cd6ff63fa9bed3bdb8, type: 3}
+  - {fileID: 26555323555758223, guid: 85f579ee56838a625a9962d2354fac80, type: 3}
+  - {fileID: 11081345085510504, guid: 69b5a4677a9281b678486b0da1cef10c, type: 3}
   spawnOffset: {x: 0, y: 0, z: -10}
   followTarget: 0
   maxLifetime: 3
   overrideSorting: 1
   sortingLayerName: Default
-  sortingOrderOffset: 100
+  sortingOrderOffset: 201
 --- !u!1 &1539861177
 GameObject:
   m_ObjectHideFlags: 0

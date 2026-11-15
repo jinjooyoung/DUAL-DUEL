@@ -3,13 +3,20 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// vfxPrefabs 리스트의 인덱스와 순서를 맞춰주세요. (0: 피격, 1: 버프, 2: 방어)
+/// vfxPrefabs 리스트의 인덱스와 순서를 맞춰주세요.
 /// </summary>
 public enum VFXType
 {
     Hit = 0,
-    Buff = 1,
-    Defense = 2
+    Defense = 1,
+    Defensed = 2,
+    Heal = 3,
+    Buff_Regeneration = 4,
+    Buff_Force = 5,
+    Buff_Lifesteal = 6,
+    Debuff_Poison = 7,
+    Debuff_Bleed = 8,
+    Debuff_Weaken = 9,
 }
 
 /// <summary>
