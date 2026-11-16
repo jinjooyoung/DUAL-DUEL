@@ -67,4 +67,9 @@ public class DataManager : MonoBehaviour
 
         return cardDatabase.GetListByRank(rank);
     }
+
+    public CharacterSO GetCharacter(int characterId)
+    {
+        return characterDatabaseSO != null ? characterDatabaseSO.GetCharacterById(characterId) : null;
+    }
 }

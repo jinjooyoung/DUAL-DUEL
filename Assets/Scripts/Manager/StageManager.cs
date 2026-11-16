@@ -257,4 +257,21 @@ public class StageManager : MonoBehaviour
                 return "BattleScene";
         }
     }
+
+    public void ResetRunData()
+    {
+        if (floors != null)
+        {
+            floors.Clear();
+        }
+
+        currentChapter = 1;
+        currentNode = null;
+        selectedNodeUI = null;
+
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.monster = null;
+        }
+    }
 }

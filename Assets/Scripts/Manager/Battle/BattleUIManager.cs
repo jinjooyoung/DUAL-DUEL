@@ -34,9 +34,8 @@ public class BattleUIManager : MonoBehaviour
     [SerializeField] private List<BuffIconUI> monsterBuffIcons = new List<BuffIconUI>();
 
     [Header("배틀 종료 패널")]
-    public GameObject endOfBattlePanel;
-    [SerializeField] private TextMeshProUGUI titleText;
-    [SerializeField] private TextMeshProUGUI reviewText;
+    public GameObject endOfWinBattlePanel;
+    public GameObject endOfDefBattlePanel;
 
     [Header("플로팅 텍스트 오브젝트")]
     [Tooltip("3D TextMeshPro가 붙은 플로팅 텍스트 프리팹")]
@@ -58,8 +57,8 @@ public class BattleUIManager : MonoBehaviour
 
         InitFloatingTextPool();
 
-        if (endOfBattlePanel != null)
-            endOfBattlePanel.SetActive(false);
+        if (endOfWinBattlePanel != null)
+            endOfWinBattlePanel.SetActive(false);
     }
 
     private void Start()
@@ -275,18 +274,12 @@ public class BattleUIManager : MonoBehaviour
 
     public void VictoryUI()
     {
-        titleText.text = "승리!";
-        reviewText.text = "";
-
-        OnEndOfBattlePanel();
+        OnWinEndOfBattlePanel();
     }
 
     public void DefeatUI()
     {
-        titleText.text = "패배!";
-        reviewText.text = "";
-
-        OnEndOfBattlePanel();
+        OnDefEndOfBattlePanel();
     }
 
     public void rewardPanel()
@@ -294,13 +287,18 @@ public class BattleUIManager : MonoBehaviour
         RewardCardUI rewardUI = FindFirstObjectByType<RewardCardUI>(FindObjectsInactive.Include);
         if (rewardUI != null)
         {
-            OnEndOfBattlePanel();
+            OnWinEndOfBattlePanel();
             rewardUI.OpenRewardPanel();
         }
     }
 
-    public void OnEndOfBattlePanel()
+    public void OnWinEndOfBattlePanel()
     {
-        if (endOfBattlePanel != null) endOfBattlePanel.SetActive(true);
+        if (endOfWinBattlePanel != null) endOfWinBattlePanel.SetActive(true);
+    }
+
+    public void OnDefEndOfBattlePanel()
+    {
+        if (endOfDefBattlePanel != null) endOfDefBattlePanel.SetActive(true);
     }
 }
