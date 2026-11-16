@@ -31,8 +31,8 @@ Material:
     m_Ints: []
     m_Floats:
     - _Compensation: 1
-    - _Intensity: 0.7
-    - _LineSpacing: 4
+    - _Intensity: 0.35
+    - _LineSpacing: 12
     - _LineThickness: 0.4
     - _PixelSnap: 1
     - _RollIntensity: 0.08
