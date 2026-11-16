@@ -35,35 +35,35 @@ MonoBehaviour:
     m_Metadata:
       m_Items: []
   - m_Id: 53290602503
-    m_Localized: Strike
+    m_Localized: Heavy Blow
     m_Metadata:
       m_Items: []
   - m_Id: 53290602504
-    m_Localized: Brute Force
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602505
-    m_Localized: Heavy Smash
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602506
-    m_Localized: Evade
-    m_Metadata:
-      m_Items: []
-  - m_Id: 53290602507
     m_Localized: Guard
     m_Metadata:
       m_Items: []
+  - m_Id: 53290602505
+    m_Localized: First Aid
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602506
+    m_Localized: Crush
+    m_Metadata:
+      m_Items: []
+  - m_Id: 53290602507
+    m_Localized: Iron Wall
+    m_Metadata:
+      m_Items: []
   - m_Id: 53290602508
-    m_Localized: Breath of Recovery
+    m_Localized: Setup Strike
     m_Metadata:
       m_Items: []
   - m_Id: 53290602509
-    m_Localized: Roar of Madness
+    m_Localized: Preemptive Strike
     m_Metadata:
       m_Items: []
   - m_Id: 53290602510
-    m_Localized: Venom Fang Curse
+    m_Localized: Follow-up
     m_Metadata:
       m_Items: []
   - m_Id: 10476415124385792
@@ -205,6 +205,58 @@ MonoBehaviour:
       m_Items: []
   - m_Id: 10493116599644168
     m_Localized: <size=125%>Finisher</size><br>Value x{0} if placed in the last slot.
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732544
+    m_Localized: Covering Fire
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732545
+    m_Localized: Defensive Support
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732546
+    m_Localized: Chain Reaction
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732547
+    m_Localized: Pincer Attack
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732548
+    m_Localized: Pincer Guard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732549
+    m_Localized: Vanguard
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732550
+    m_Localized: Combat Stance
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732551
+    m_Localized: Finishing Blow
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732552
+    m_Localized: Venom
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732553
+    m_Localized: Bleedout
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732554
+    m_Localized: Debilitate
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732555
+    m_Localized: Regeneration
+    m_Metadata:
+      m_Items: []
+  - m_Id: 12859397690732556
+    m_Localized: Vampirism
     m_Metadata:
       m_Items: []
   references:

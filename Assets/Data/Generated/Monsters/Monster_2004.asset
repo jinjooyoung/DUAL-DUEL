@@ -16,7 +16,7 @@ MonoBehaviour:
   monsterName: MONSTERNAME_2004
   monsterType: 1
   appearStartStage: 206
-  maxHp: 400
+  maxHp: 200
   gimmickType1: 2
   gimmickParam1: 5
   gimmickType2: 0

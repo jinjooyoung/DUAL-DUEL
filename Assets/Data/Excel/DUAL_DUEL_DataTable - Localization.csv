@@ -34,11 +34,24 @@ DEBUFFDESC_WEAKEN,<size=125%>약화</size><br>{0}턴 동안 카드 밸류가 {1}
 MONSTER_ATTACK_DESC,<size=125%>적의 공격</size><br>모든 카드 시전이 끝나면 적이 {0}만큼 공격합니다.,"<size=125%>Enemy Attack</size><br>After all cards are cast, the enemy attacks for {0}.",<size=125%>敵の攻撃</size><br>すべてのカードの発動後、敵が{0}の攻撃を行う。
 ,,,
 CARDNAME_0,잽,Jab,ジャブ
-CARDNAME_1,스트라이크,Strike,ストライク
-CARDNAME_2,브루트 포스,Brute Force,ブルートフォース
-CARDNAME_3,헤비 스매시,Heavy Smash,ヘビースマッシュ
-CARDNAME_4,흘리기,Evade,受け流し
-CARDNAME_5,가드,Guard,ガード
-CARDNAME_6,회복의 숨결,Breath of Recovery,回復の息吹
-CARDNAME_7,광기의 포효,Roar of Madness,狂気の咆哮
-CARDNAME_8,독니의 저주,Venom Fang Curse,毒牙の呪い
+CARDNAME_1,강타,Heavy Blow,強打
+CARDNAME_2,가드,Guard,ガード
+CARDNAME_3,응급 처치,First Aid,応急処置
+CARDNAME_4,분쇄,Crush,粉砕
+CARDNAME_5,철벽,Iron Wall,鉄壁
+CARDNAME_6,예비 타격,Setup Strike,仕込み打ち
+CARDNAME_7,선제 공격,Preemptive Strike,先制攻撃
+CARDNAME_8,추격,Follow-up,追撃
+CARDNAME_9,호위 사격,Covering Fire,援護射撃
+CARDNAME_10,방어 지원,Defensive Support,防御支援
+CARDNAME_11,연쇄,Chain Reaction,連鎖
+CARDNAME_12,협공,Pincer Attack,挟撃
+CARDNAME_13,협공 방어,Pincer Guard,挟撃防御
+CARDNAME_14,선봉,Vanguard,先鋒
+CARDNAME_15,전투 태세,Combat Stance,戦闘態勢
+CARDNAME_16,최후의 일격,Finishing Blow,とどめの一撃
+CARDNAME_17,맹독,Venom,猛毒
+CARDNAME_18,출혈 유도,Bleedout,出血誘発
+CARDNAME_19,쇠약,Debilitate,衰弱
+CARDNAME_20,재생,Regeneration,再生
+CARDNAME_21,흡혈귀,Vampirism,吸血
