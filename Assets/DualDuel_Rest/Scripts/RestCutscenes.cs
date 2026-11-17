@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -191,6 +191,7 @@ public class RestCutscenes : MonoBehaviour
     {
         Begin();
         cardView.SetParent(focusRoot, true);
+        LockCard(cardView);
         Vector2 from = cardView.anchoredPosition;
         float s0 = cardView.localScale.x;
 
@@ -213,9 +214,20 @@ public class RestCutscenes : MonoBehaviour
         if (flashSfx != null) _audio.PlayOneShot(flashSfx);
         Lens(0f); Zoom(1f);
         if (bridge != null) bridge.ApplyUpgrade(card);
-        Destroy(cardView.gameObject);
-        RectTransform view = bridge != null ? bridge.CreateCardView(card, focusRoot, false) : null;
-        if (view != null) { view.anchoredPosition = Vector2.zero; view.localScale = Vector3.one * focusScale; }
+        // 같은 카드 UI 에 강화된 값을 다시 그림 (UIViewerCard.RefreshValues). 안 되면 새로 만듦
+        RectTransform view = cardView;
+        if (bridge == null || !bridge.RefreshCardView(view, card))
+        {
+            Destroy(cardView.gameObject);
+            view = bridge != null ? bridge.CreateCardView(card, focusRoot, false) : null;
+            if (view != null) LockCard(view);
+        }
+        if (view != null)
+        {
+            view.anchoredPosition = Vector2.zero;
+            view.localScale = Vector3.one * focusScale;
+            view.localEulerAngles = Vector3.zero;
+        }
         yield return Wait(0.5f);
         yield return Run(1f, u => SetWhite(1f - EaseOutSine(u)));
 
@@ -249,6 +261,7 @@ public class RestCutscenes : MonoBehaviour
     {
         Begin();
         cardView.SetParent(focusRoot, true);
+        LockCard(cardView);
         Vector2 from = cardView.anchoredPosition;
         float s0 = cardView.localScale.x;
         Image cardWhite = MakeCardWhite(cardView);
@@ -421,6 +434,19 @@ public class RestCutscenes : MonoBehaviour
     }
 
     void SetWhite(float a) => white.color = new Color(1f, 1f, 1f, Mathf.Clamp01(a));
+
+    /// <summary>
+    /// 연출 중인 카드가 마우스를 받지 않게 함. UIViewerCard 프리팹의 TooltipTrigger 가
+    /// 컷씬 위(툴팁 캔버스 300 > 컷씬 180)에 툴팁을 띄우지 않도록, 이미 떠 있는 툴팁도 닫음
+    /// </summary>
+    static void LockCard(RectTransform card)
+    {
+        var group = card.GetComponent<CanvasGroup>();
+        if (group == null) group = card.gameObject.AddComponent<CanvasGroup>();
+        group.blocksRaycasts = false;
+        group.interactable = false;
+        if (TooltipPanel.Instance != null) TooltipPanel.Instance.HideTooltip();
+    }
 
     void Flicker(float a) => StartCoroutine(Run(0.06f, u => { if (white.color.a < 0.99f) SetWhite(a * (1f - u)); }));
 

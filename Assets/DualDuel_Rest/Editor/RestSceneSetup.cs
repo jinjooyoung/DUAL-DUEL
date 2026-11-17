@@ -122,14 +122,11 @@ public static class RestSceneSetup
         var rootGo = new GameObject(Root);
         Undo.RegisterCreatedObjectUndo(rootGo, "Rest Scene");
         RestSceneBridge bridge = Object.FindFirstObjectByType<RestSceneBridge>();
-        if (bridge == null)
-        {
-            var ex = rootGo.AddComponent<RestSceneBridgeExample>();
-            ex.cardSprite = LoadSprite("UI_CardPlaceholder");
-            ex.font = _font;
-            bridge = ex;
-            Debug.Log("[휴식 씬] 테스트용 RestSceneBridgeExample 을 붙였습니다. 실제 게임 데이터용 브리지로 교체하세요.");
-        }
+        if (bridge == null) bridge = rootGo.AddComponent<RestSceneBridgeGame>();
+        GameObject viewerCard = FindViewerCardPrefab();
+        if (bridge.viewerCardPrefab == null) bridge.viewerCardPrefab = viewerCard;
+        if (bridge.viewerCardPrefab == null)
+            Debug.LogWarning("[휴식 씬] UIViewerCard 가 붙은 카드 프리팹(UI_ViewerCard)을 찾지 못했습니다. RestSceneBridgeGame 의 Viewer Card Prefab 에 직접 넣어주세요.");
 
         var cut = rootGo.AddComponent<RestCutscenes>();
         cut.bridge = bridge;
@@ -151,6 +148,7 @@ public static class RestSceneSetup
         ctl.selection = sel.gameObject;
         ctl.healOption = heal; ctl.upgradeOption = upg; ctl.removeOption = rem;
         ctl.healPopup = healPop.gameObject; ctl.healText = healText; ctl.healConfirm = healOk; ctl.healCancel = healNo;
+        ctl.viewerCardPrefab = bridge.viewerCardPrefab;
         ctl.listOverlay = list.gameObject; ctl.listTitle = listTitle; ctl.listContent = content; ctl.listScroll = scroll; ctl.listClose = listClose;
         ctl.comparePopup = cmp.gameObject; ctl.compareBefore = before; ctl.compareAfter = after; ctl.upgradeConfirm = upOk; ctl.upgradeCancel = upNo;
         ctl.removePopup = rmv.gameObject; ctl.removeSlot = rmSlot; ctl.removeConfirm = rmOk; ctl.removeCancel = rmNo;
@@ -381,6 +379,21 @@ public static class RestSceneSetup
         }
         Debug.LogWarning($"[휴식 씬] 스프라이트 '{name}' 를 찾지 못했습니다.");
         return null;
+    }
+
+    /// <summary>UIViewerCard 가 붙은 프리팹. 이름이 UI_ViewerCard 인 것을 먼저 찾음</summary>
+    static GameObject FindViewerCardPrefab()
+    {
+        GameObject fallback = null;
+        foreach (string guid in AssetDatabase.FindAssets("t:Prefab"))
+        {
+            string path = AssetDatabase.GUIDToAssetPath(guid);
+            var go = AssetDatabase.LoadAssetAtPath<GameObject>(path);
+            if (go == null || go.GetComponent<UIViewerCard>() == null) continue;
+            if (Path.GetFileNameWithoutExtension(path) == "UI_ViewerCard") return go;
+            if (fallback == null) fallback = go;
+        }
+        return fallback;
     }
 
     static TMP_FontAsset FindFont()
