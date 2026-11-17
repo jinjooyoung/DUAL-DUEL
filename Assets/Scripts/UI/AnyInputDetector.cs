@@ -20,7 +20,7 @@ public class AnyInputDetector : MonoBehaviour
 
         if (Input.anyKeyDown)
         {
-            SceneManager.LoadScene("StageSelectScene");
+            SceneTransition.Load("StageSelectScene");
         }
     }
 }

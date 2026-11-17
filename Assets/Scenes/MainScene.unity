@@ -448,6 +448,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 432228783}
   m_CullTransparentMesh: 1
+--- !u!1 &464378673
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 464378675}
+  - component: {fileID: 464378674}
+  m_Layer: 0
+  m_Name: SceneTransition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &464378674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464378673}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f4dcb32d715e7449b057f1ff427ebaf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneTransition
+  outTime: 0.2
+  inTime: 0.1
+  minBlackTime: 0.02
+  stepsPerSecond: 24
+  rows: 120
+  rowsPerBand: 6
+  maxShift: 0.18
+  pixelStep: 4
+  noiseRows: 0.25
+  maxBlackout: 0.55
+  ghost: 0.012
+  tint: {r: 0.54, g: 1, b: 0.65, a: 1}
+  glitchSfx: {fileID: 0}
+  sfxVolume: 0.8
+  material: {fileID: 2100000, guid: 9c96a2dcf2131e045947abf4a1550e1a, type: 2}
+--- !u!4 &464378675
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 464378673}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -8.14815, y: -2.75, z: 50}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &562550381
 GameObject:
   m_ObjectHideFlags: 0
@@ -1531,3 +1590,4 @@ SceneRoots:
   - {fileID: 780090907}
   - {fileID: 1294903576}
   - {fileID: 1237522229}
+  - {fileID: 464378675}

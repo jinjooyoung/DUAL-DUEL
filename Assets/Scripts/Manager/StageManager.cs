@@ -173,7 +173,7 @@ public class StageManager : MonoBehaviour
         }
 
         string targetScene = GetSceneNameForType(executionType);
-        SceneManager.LoadScene(targetScene);
+        SceneTransition.Load(targetScene);
     }
 
     /// <summary>
@@ -238,7 +238,7 @@ public class StageManager : MonoBehaviour
 
         // 3. 스테이지 선택 씬으로 이동
         // (StageManager가 DontDestroyOnLoad이므로 OnSceneLoaded를 통해 자동으로 맵 UI가 갱신됩니다)
-        SceneManager.LoadScene("StageSelectScene");
+        SceneTransition.Load("StageSelectScene");
     }
 
     private string GetSceneNameForType(StageType type)
