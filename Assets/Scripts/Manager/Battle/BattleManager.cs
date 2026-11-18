@@ -49,6 +49,8 @@ public class CombatEntityStats
     public int bleedTurns;
     public int weakenTurns;
 
+    private bool[] statusAppliedThisTurn = new bool[STATUS_COUNT];  // 이번 턴에 새로 부여된 버프, 디버프를 기억해서 턴수-- 안 하도록
+
     public CombatEntityStats(int maxHp)
     {
         this.maxHp = maxHp;
@@ -78,6 +80,10 @@ public class CombatEntityStats
             value = Mathf.Min(value, LIFESTEAL_MAX);
 
         turns = STATUS_DURATION;
+
+        // 이번 턴에 새로 부여/갱신된 효과
+        statusAppliedThisTurn[(int)type] = true;
+
         return value - before;
     }
 
@@ -90,6 +96,14 @@ public class CombatEntityStats
         {
             StatusEffectType type = (StatusEffectType)i;
             ref int turns = ref StatusTurnsRef(type);
+
+            // 이번 턴에 새로 부여된 효과는 지속시간 감소 제외
+            if (statusAppliedThisTurn[i])
+            {
+                statusAppliedThisTurn[i] = false;
+                continue;
+            }
+
             if (turns < 1) continue;
 
             turns--;
