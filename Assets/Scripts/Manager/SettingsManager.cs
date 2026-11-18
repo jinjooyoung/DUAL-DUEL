@@ -43,6 +43,14 @@ public class SettingsManager : MonoBehaviour
         StartCoroutine(InitializeLanguageDropdown());
     }
 
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            TogglePopup();
+        }
+    }
+
     private void OnDestroy()
     {
         if (Instance != this) return;
