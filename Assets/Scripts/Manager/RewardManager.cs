@@ -9,7 +9,7 @@ public class RewardManager : MonoBehaviour
     public static RewardManager Instance { get; private set; }
 
     [Header("챕터별 등급 가중치")]
-    private readonly Dictionary<RankType, float> chapter1Weights = new()
+    public readonly Dictionary<RankType, float> chapter1Weights = new()
     {
         { RankType.Common, 25f },
         { RankType.Uncommon, 45f },
@@ -18,7 +18,7 @@ public class RewardManager : MonoBehaviour
         { RankType.Legendary, 0f }
     };
 
-    private readonly Dictionary<RankType, float> chapter2Weights = new()
+    public readonly Dictionary<RankType, float> chapter2Weights = new()
     {
         { RankType.Common, 15f },
         { RankType.Uncommon, 35f },
@@ -27,7 +27,7 @@ public class RewardManager : MonoBehaviour
         { RankType.Legendary, 1f }
     };
 
-    private readonly Dictionary<RankType, float> chapter3Weights = new()
+    public readonly Dictionary<RankType, float> chapter3Weights = new()
     {
         { RankType.Common, 10f },
         { RankType.Uncommon, 25f },
