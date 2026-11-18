@@ -526,6 +526,18 @@ public static class DOTweenManager
         seq.AppendCallback(() => onLaunch?.Invoke(dash));
         seq.Append(card.DOMove(originalPos + dir * advanceDist, dash).SetEase(Ease.InCubic));
 
+
+        // 3. 타격
+        seq.AppendCallback(() => onHitMoment?.Invoke());
+        seq.Append(card.DOScale(originalScale * 1.25f, 0.05f));
+
+        // 4. 복귀
+        seq.Append(card.DOScale(originalScale, back).SetEase(Ease.OutBack));
+        seq.Join(card.DOMove(originalPos, back).SetEase(Ease.OutCubic));
+
+        // 주의: Insert 로 긴 트윈을 끼우면 시퀀스 끝이 늘어나 그 뒤의 Append 가 밀린다.
+        //       그래서 '띠용' 회전은 모든 Append(돌진/타격/복귀)를 붙인 뒤 맨 마지막에 끼운다.
+        //       (먼저 끼우면 타격이 발사 후 0.1초가 아니라 회전이 끝나는 0.5초 뒤로 밀려 광선과 어긋남)
         // 띠용: 젖혀진 각도에서 출발하는 감쇠 스프링 (위치/크기 트윈과 따로 돌아 서로 덮어쓰지 않음)
         //   반주기 = 돌진 시간이라, 돌진이 끝나는 순간 광선 쪽으로 가장 많이 기울어짐
         //   wobbleDecay = 반주기마다 남는 비율 -> +100% -> -55% -> +30% -> -17% -> ... -> 0
@@ -540,14 +552,6 @@ public static class DOTweenManager
             float angle = lean * Mathf.Exp(-damping * t) * Mathf.Cos(omega * t) * settle;
             card.localRotation = originalRot * Quaternion.Euler(0f, 0f, angle);
         }).SetEase(Ease.Linear));
-
-        // 3. 타격
-        seq.AppendCallback(() => onHitMoment?.Invoke());
-        seq.Append(card.DOScale(originalScale * 1.25f, 0.05f));
-
-        // 4. 복귀
-        seq.Append(card.DOScale(originalScale, back).SetEase(Ease.OutBack));
-        seq.Join(card.DOMove(originalPos, back).SetEase(Ease.OutCubic));
         seq.OnKill(() =>
         {
             if (card != null)
