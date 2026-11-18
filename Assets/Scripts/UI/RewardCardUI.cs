@@ -13,6 +13,7 @@ public class RewardCardUI : MonoBehaviour
 
     [Header("카드별 하단 새로고침 버튼")]
     [SerializeField] private List<Button> rerollButtons = new List<Button>();
+    [SerializeField] private List<TextMeshProUGUI> texts = new List<TextMeshProUGUI>();
 
     [Header("남은 새로고침 횟수 텍스트")]
     [SerializeField] private TextMeshProUGUI remainRerollText;
@@ -124,6 +125,7 @@ public class RewardCardUI : MonoBehaviour
         {
             // 남은 전역 횟수가 있고 && 해당 슬롯을 아직 새로고침 안 했을 때만 활성화
             rerollButtons[i].interactable = hasGlobalReroll && !isSlotRerolled[i];
+            texts[i].color = rerollButtons[i].interactable == false ? Color.darkGray : Color.white;
         }
     }
 

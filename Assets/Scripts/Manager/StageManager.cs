@@ -164,6 +164,8 @@ public class StageManager : MonoBehaviour
             if (!TryAssignRandomMonster(executionType)) return;
         }
 
+        RewardManager.Instance.remainRerollCount = 1;           // 카드 보상 새로고침 1회 초기화
+
         // 3. 진입 확정: 방문 처리 + 동일 층 노드 비활성화
         currentNode.isVisited = true;
 

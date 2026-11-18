@@ -43,7 +43,7 @@ public class RewardManager : MonoBehaviour
     public List<CardSO> currentRewardCards = new List<CardSO>();
 
     [Header("전역 새로고침 제한")]
-    public int remainRerollCount = 5; // 게임 전체 동안 총 5회 제한
+    public int remainRerollCount = 1; // 한 전투당 새로고침 1회 가능. 전투 씬 진입시 1로 초기화
 
     private void Awake()
     {
