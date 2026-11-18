@@ -64,6 +64,8 @@ public class CardData
     public string cardType;         // 카드 타입 (Attack, Defense, Heal, Buff_Regeneration ... Debuff_Weaken)
     public int rank;                // 1~5 (일반 ~ 전설)
 
+    public int price;               // 상점 판매 가격
+
     public string nameKey;
     public string typeDescKey;
     public string gimmickDescKey;
@@ -98,6 +100,8 @@ public class CardSO : ScriptableObject
     public CardType cardType;
     public RankType rank;
     public Sprite artwork;
+
+    public int price;               // 상점 판매 가격
 
     public Sprite bgSprite;
     public Sprite typeIconSprite;
@@ -162,6 +166,8 @@ public class CardSO : ScriptableObject
         gimmickDescKey = data.gimmickDescKey;
         isExhaust = data.isExhaust;
         conditionParam = data.conditionParam;
+
+        price = data.price;
 
         cardType = ParseEnum(data.cardType, CardType.Attack, "cardType");
         conditionCategory = ParseEnum(data.conditionCategory, ConditionCategory.None, "conditionCategory");

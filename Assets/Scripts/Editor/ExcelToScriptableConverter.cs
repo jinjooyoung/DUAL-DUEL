@@ -257,6 +257,7 @@ public class ExcelToScriptableConverter : EditorWindow
             cardId = GetCellInt(row, "cardId"),
             cardType = GetCellString(row, "cardType"),
             rank = GetCellInt(row, "rank", 1),
+            price = GetCellInt(row, "price", 1),
             nameKey = GetCellString(row, "nameKey"),
             typeDescKey = GetCellString(row, "typeDescKey"),
             gimmickDescKey = GetCellString(row, "gimmickDescKey"),
@@ -299,6 +300,7 @@ public class ExcelToScriptableConverter : EditorWindow
             monsterType = GetCellString(row, "monsterType", "Normal"),   // "Elite " 같은 뒤 공백은 GetCellString에서 Trim
             appearStartStage = GetCellInt(row, "appearStartStage", 101),
             maxHp = GetCellInt(row, "maxHp"),
+            rewardGold = GetCellInt(row,"rewardGold", 50),
 
             gimmickType1 = GetCellString(row, "gimmickType1", "None"),
             gimmickParam1 = GetCellInt(row, "gimmickParam1"),

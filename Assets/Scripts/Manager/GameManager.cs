@@ -21,6 +21,7 @@ public class GameManager : MonoBehaviour
 
     [Header("런타임 데이터")]
     public int currentHP;
+    public int currentGold;
 
     private void Awake()
     {

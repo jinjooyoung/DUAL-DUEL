@@ -24,6 +24,7 @@ public class MonsterData
     public string monsterType;      // Normal / Elite / Boss
     public int appearStartStage;    // 등장 시작 스테이지 (챕터 * 100 + 층. 예: 203 = 2챕터 3층)
     public int maxHp;
+    public int rewardGold;
 
     public string gimmickType1;
     public int gimmickParam1;
@@ -38,6 +39,7 @@ public class MonsterSO : ScriptableObject
     public int monsterID;
     public string monsterName;      // 로컬라이징 키
     public StageType monsterType;   // 등장하는 전투 스테이지 타입 (Normal / Elite / Boss만 사용)
+    public int rewardGold;
 
     [Header("등장 조건")]
     [Tooltip("챕터 * 100 + 층 (예: 103 = 1챕터 3층부터 등장)")]
@@ -92,6 +94,7 @@ public class MonsterSO : ScriptableObject
         monsterName = data.monsterName;
         appearStartStage = data.appearStartStage;
         maxHp = data.maxHp;
+        rewardGold = data.rewardGold;
 
         monsterType = ParseEnum(data.monsterType, StageType.Normal, "monsterType");
         if (!IsBattleStageType(monsterType))
