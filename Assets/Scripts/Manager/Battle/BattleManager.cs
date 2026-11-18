@@ -1150,6 +1150,7 @@ public class BattleManager : MonoBehaviour
             BattleUIManager.Instance?.VictoryUI();
             SoundManager.Instance.PlayBGM(BGMType.Victory);
             GameManager.Instance.currentHP = playerStats.currentHp;
+            GameManager.Instance.currentGold += CurrentMonster.rewardGold;
         }
     }
 

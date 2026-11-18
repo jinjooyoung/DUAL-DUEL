@@ -354,10 +354,14 @@ MonoBehaviour:
   - instanceId: 10
     baseData: {fileID: 11400000, guid: e4568169e59702248a801cbdb898d11a, type: 2}
     upgradeLevel: 0
+  - instanceId: 11
+    baseData: {fileID: 11400000, guid: af8a08e39c5dd8240bd48893ef579398, type: 2}
+    upgradeLevel: 0
   startDeck: []
   character: {fileID: 11400000, guid: 3824bad56fec45d41a49f774bbc954dc, type: 2}
   monster: {fileID: 11400000, guid: 373cb5ebd5bab9040b7a451ea61f3a72, type: 2}
   currentHP: 0
+  currentGold: 0
 --- !u!4 &419783045
 Transform:
   m_ObjectHideFlags: 0

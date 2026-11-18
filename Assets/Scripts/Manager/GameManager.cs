@@ -52,9 +52,11 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void CharacterInit()
+    public void StatInit()
     {
         character = DataManager.Instance.GetCharacter(1001);
         currentHP = character.maxHp;
+
+        currentGold = 0;
     }
 }

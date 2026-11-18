@@ -36,7 +36,9 @@ public class BattleUIManager : MonoBehaviour
 
     [Header("배틀 종료 패널")]
     public GameObject endOfWinBattlePanel;
+    public TextMeshProUGUI winReviewText;
     public GameObject endOfDefBattlePanel;
+    public TextMeshProUGUI defReviewText;
 
     [Header("플로팅 텍스트 오브젝트")]
     [Tooltip("3D TextMeshPro가 붙은 플로팅 텍스트 프리팹")]
@@ -295,11 +297,24 @@ public class BattleUIManager : MonoBehaviour
 
     public void OnWinEndOfBattlePanel()
     {
-        if (endOfWinBattlePanel != null) endOfWinBattlePanel.SetActive(true);
+        if (endOfWinBattlePanel != null)
+        {
+            winReviewText.text = $"{BattleManager.Instance.CurrentMonster.rewardGold} 골드 획득!";
+            endOfWinBattlePanel.SetActive(true);
+        }
     }
 
     public void OnDefEndOfBattlePanel()
     {
-        if (endOfDefBattlePanel != null) endOfDefBattlePanel.SetActive(true);
+        if (endOfDefBattlePanel != null)
+        {
+            int deckCount = GameManager.Instance.deck.Count;
+            int gold = GameManager.Instance.currentGold;
+            int chapter = StageManager.Instance.currentChapter;
+            int floor = StageManager.Instance.currentNode.floor;
+
+            defReviewText.text = $"보유한 카드 : {deckCount}\n보유한 골드 : {gold}\n도달한 층 : {chapter}챕터 {floor}층";
+            endOfDefBattlePanel.SetActive(true);
+        }
     }
 }
