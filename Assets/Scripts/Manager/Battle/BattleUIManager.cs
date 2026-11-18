@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using UnityEditor.Localization.Plugins.XLIFF.V12;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -127,7 +128,7 @@ public class BattleUIManager : MonoBehaviour
     #region 플로팅 텍스트 호출 API
 
     /// <summary>
-    /// 데미지 플로팅 텍스트 (빨간색)
+    /// 데미지 플로팅 텍스트
     /// </summary>
     public void ShowDamageText(Vector3 worldPos, int damage)
     {
@@ -135,7 +136,7 @@ public class BattleUIManager : MonoBehaviour
         FloatingTextEffect effect = GetOrCreateFloatingText();
         if (effect != null)
         {
-            effect.Play($"-{damage}", new Color(1f, 0.25f, 0.2f), randomPos, Vector3.up, 0.45f, 0.6f);
+            effect.PlayDamage(damage, randomPos, Vector3.up, 0.5f, 0.6f);
         }
     }
 

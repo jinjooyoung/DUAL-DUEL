@@ -482,6 +482,86 @@ public static class DOTweenManager
     }
 
     /// <summary>
+    /// 밸류가 높은 카드의 차징 시전. CardExecute 와 같은 흐름에 '차징' 구간이 앞에 붙는다.
+    ///   1. 차징 (chargeTime)  뒤로 젖혀지며(이동 + 기울기) 좌우로 잘게 덜덜, 떨림은 점점 격해짐
+    ///   2. 발사                onLaunch(돌진 시간) 호출 -> 빛줄기는 여기서. 돌진하며 기울기가 '띠용' 하고 튕김
+    ///                          (광선 쪽으로 기울었다가 반동으로 다시 젖혀지고, 한 번 더 광선 쪽으로 살짝 기운 뒤 멈춤)
+    ///   3. 타격                onHitMoment 호출 -> 피해/흔들림은 여기서
+    ///   4. 복귀
+    /// onFinish 는 시퀀스가 끝나거나 중간에 죽을 때 항상 호출 (카드에 붙인 연출 정리용)
+    /// </summary>
+    public static Sequence CardExecuteCharged(Transform card, Vector3 forwardDir, float chargeTime, float backDist, float tiltDeg,
+        float shakeAmp, float shakeHz, float advanceDist = 0.3f, float dash = 0.1f, float back = 0.22f,
+        Action onHitMoment = null, Action<float> onLaunch = null, Action onFinish = null,
+        float wobbleTime = 0.5f, float wobbleDecay = 0.55f)
+    {
+        if (card == null) { onLaunch?.Invoke(dash); onHitMoment?.Invoke(); onFinish?.Invoke(); return DOTween.Sequence(); }
+
+        string tweenId = card.GetInstanceID() + ID_CARD_STATE;
+        DOTween.Kill(tweenId, true);
+
+        Vector3 originalPos = card.position;
+        Vector3 originalScale = card.localScale;
+        Quaternion originalRot = card.localRotation;
+        Vector3 dir = forwardDir.normalized;
+        Vector3 backPos = originalPos - dir * backDist;
+        float lean = (dir.x >= 0f ? 1f : -1f) * tiltDeg;     // 진행 방향 반대쪽으로 젖힘
+
+        Sequence seq = DOTween.Sequence().SetId(tweenId);
+
+        // 1. 차징: 한 트윈이 위치/기울기/크기를 함께 써서 서로 덮어쓰지 않게
+        seq.Append(DOVirtual.Float(0f, 1f, chargeTime, u =>
+        {
+            if (card == null) return;
+            float t = u * chargeTime;
+            float pull = 1f - (1f - u) * (1f - u) * (1f - u);                       // 빠르게 젖혀졌다가 버팀 (OutCubic)
+            float amp = shakeAmp * (0.35f + 0.65f * u * u);                          // 떨림이 점점 격해짐
+            float jitter = Mathf.Sin(t * shakeHz * Mathf.PI * 2f) + 0.5f * Mathf.Sin(t * shakeHz * 1.73f * Mathf.PI * 2f);
+            card.position = Vector3.Lerp(originalPos, backPos, pull) + Vector3.right * (jitter * amp / 1.5f);
+            card.localRotation = originalRot * Quaternion.Euler(0f, 0f, lean * pull);
+            card.localScale = originalScale * (1f + 0.08f * pull);
+        }).SetEase(Ease.Linear));
+
+        // 2. 발사: 돌진. 기울기는 아래의 '띠용' 회전이 따로 맡음
+        seq.AppendCallback(() => onLaunch?.Invoke(dash));
+        seq.Append(card.DOMove(originalPos + dir * advanceDist, dash).SetEase(Ease.InCubic));
+
+        // 띠용: 젖혀진 각도에서 출발하는 감쇠 스프링 (위치/크기 트윈과 따로 돌아 서로 덮어쓰지 않음)
+        //   반주기 = 돌진 시간이라, 돌진이 끝나는 순간 광선 쪽으로 가장 많이 기울어짐
+        //   wobbleDecay = 반주기마다 남는 비율 -> +100% -> -55% -> +30% -> -17% -> ... -> 0
+        //   마지막 25% 구간에서 부드럽게 0 으로 모음
+        float omega = Mathf.PI / Mathf.Max(0.01f, dash);
+        float damping = -Mathf.Log(Mathf.Clamp(wobbleDecay, 0.05f, 0.95f)) / Mathf.Max(0.01f, dash);
+        seq.Insert(chargeTime, DOVirtual.Float(0f, 1f, wobbleTime, u =>
+        {
+            if (card == null) return;
+            float t = u * wobbleTime;
+            float settle = u < 0.75f ? 1f : 1f - Mathf.SmoothStep(0f, 1f, (u - 0.75f) / 0.25f);
+            float angle = lean * Mathf.Exp(-damping * t) * Mathf.Cos(omega * t) * settle;
+            card.localRotation = originalRot * Quaternion.Euler(0f, 0f, angle);
+        }).SetEase(Ease.Linear));
+
+        // 3. 타격
+        seq.AppendCallback(() => onHitMoment?.Invoke());
+        seq.Append(card.DOScale(originalScale * 1.25f, 0.05f));
+
+        // 4. 복귀
+        seq.Append(card.DOScale(originalScale, back).SetEase(Ease.OutBack));
+        seq.Join(card.DOMove(originalPos, back).SetEase(Ease.OutCubic));
+        seq.OnKill(() =>
+        {
+            if (card != null)
+            {
+                card.position = originalPos;
+                card.localScale = originalScale;
+                card.localRotation = originalRot;
+            }
+            onFinish?.Invoke();
+        });
+        return seq;
+    }
+
+    /// <summary>
     /// 덱에서 손패로 카드가 날아와 안착하는 드로우 연출입니다.
     /// </summary>
     /// <param name="card">대상 카드 Transform</param>
@@ -646,6 +726,41 @@ public static class DOTweenManager
         return FloatingText(textComp, $"-{damage}", new Color(1f, 0.85f, 0.8f), Vector3.up, 0.4f, duration, 1.8f, Mathf.Lerp(0.9f, 1.5f, k), 0.06f);
     }
 
+    // 피해 숫자 단계 (FloatingTextEffect.PlayDamage 와 함께 사용)
+    public const int DamageTierMid = 6;       // 6 ~ 14  : 회색, 기본 크기
+    public const int DamageTierBig = 15;      // 15 ~ 29 : 밝은 회색, 더 크게, 펀치
+    public const int DamageTierHuge = 30;     // 30 ~    : 흰색, 가장 크게, 강한 펀치 (+ 스파크는 FloatingTextEffect 에서)
+
+    /// <summary>
+    /// 피해량 단계별 플로팅 숫자. FloatingText 를 그대로 쓰고 단계에 따라 색/크기/펀치만 바꾼다.
+    /// CRT 화면은 단색이라 색 대신 밝기(어두운 회색 -> 흰색)로 세기를 구분.
+    ///   ~5     어두운 회색, 조금 작게
+    ///   6~14   회색, 기본 크기 (기존 수치)
+    ///   15~29  밝은 회색, 조금 크게, 펀치
+    ///   30~    흰색, 가장 크게, 강한 펀치 + 흔들림
+    /// </summary>
+    public static Sequence DamageNumberTiered(TMP_Text textComp, int damage, Vector3 direction, float distance = 0.5f, float duration = 0.6f)
+    {
+        if (textComp == null) return null;
+        Color color; float startScale, endScale, punch = 0f, punchRot = 0f, whiteTime = 0f; int vibrato = 0;
+
+        if (damage < DamageTierMid)       { color = new Color(0.42f, 0.42f, 0.42f); startScale = 1.15f; endScale = 0.8f; }
+        else if (damage < DamageTierBig)  { color = new Color(0.65f, 0.65f, 0.65f); startScale = 1.3f;  endScale = 1f; }
+        else if (damage < DamageTierHuge) { color = new Color(0.86f, 0.86f, 0.86f); startScale = 1.6f;  endScale = 1.25f; punch = 0.3f; vibrato = 6; whiteTime = 0.05f; }
+        else                              { color = Color.white;                    startScale = 2f;    endScale = 1.6f;  punch = 0.55f; vibrato = 10; punchRot = 14f; }
+
+        Transform tr = textComp.transform;
+        Quaternion rot0 = tr.localRotation;
+        Sequence seq = FloatingText(textComp, $"-{damage}", color, direction, distance, duration, startScale, endScale, whiteTime);
+        if (seq == null) return null;
+
+        // 팝업이 끝날 즈음 펀치
+        if (punch > 0f) seq.Insert(duration * 0.25f, tr.DOPunchScale(Vector3.one * (punch * endScale), duration * 0.35f, vibrato, 0.6f));
+        if (punchRot > 0f) seq.Insert(duration * 0.25f, tr.DOPunchRotation(new Vector3(0f, 0f, punchRot), duration * 0.35f, vibrato));
+        seq.OnKill(() => { if (tr != null) tr.localRotation = rot0; });
+        return seq;
+    }
+
     /// <summary>
     /// 초록색 플로팅 텍스트 (FloatingText와 동일)
     /// </summary>
@@ -709,7 +824,12 @@ public static class DOTweenManager
         int vibrato;
 
         // 카드 밸류(대략 1~10)에 맞춘 단계. 예전 기준(10/20)으로는 항상 가장 약한 단계만 나왔음
-        if (damage >= 10)       // 크게
+        if (damage >= 15)       // 차징 공격: 15 에서 시작해 35 까지 피해량에 비례해 계속 강해짐 (최대 2.5배)
+        {
+            float m = 1f + Mathf.Clamp01((damage - 15) / 20f) * 1.5f;
+            duration = 0.35f + 0.15f * (m - 1f); camStrength = 0.35f * m; uiStrength = 40f * m; vibrato = 20;
+        }
+        else if (damage >= 10)  // 크게
         {
             duration = 0.3f; camStrength = 0.25f; uiStrength = 30f; vibrato = 18;
         }

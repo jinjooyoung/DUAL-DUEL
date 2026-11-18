@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using TMPro;
 using UnityEngine;
 
@@ -7,7 +7,7 @@ public class FloatingTextEffect : MonoBehaviour
     [SerializeField] private TextMeshPro tmpText;
 
     /// <summary>
-    /// �÷��� �ؽ�Ʈ �ʱ�ȭ �� DOTween ���� ����
+    /// 플로팅 텍스트 초기화 및 DOTween 연출 시작
     /// </summary>
     public void Play(string content, Color color, Vector3 spawnPosition, Vector3 moveDir, float distance = 0.5f, float duration = 0.6f)
     {
@@ -16,10 +16,10 @@ public class FloatingTextEffect : MonoBehaviour
         transform.position = spawnPosition;
         gameObject.SetActive(true);
 
-        // �̹� �ۼ��ص� DOTweenManager.FloatingText ���� ����
+        // 이미 작성해둔 DOTweenManager.FloatingText 연출 재사용
         Sequence seq = DOTweenManager.FloatingText(tmpText, content, color, moveDir, distance, duration);
 
-        // ���� �Ϸ� �� Destroy�� �ƴ� ������Ʈ ��Ȱ��ȭ (Ǯ ��ȯ)
+        // 연출 완료 시 Destroy가 아닌 오브젝트 비활성화 (풀 반환)
         if (seq != null)
         {
             seq.OnComplete(() =>
@@ -31,5 +31,28 @@ public class FloatingTextEffect : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+    }
+
+    /// <summary>
+    /// 피해 숫자 전용: 피해량에 따라 크기/밝기/펀치가 달라짐 (DOTweenManager.DamageNumberTiered)
+    ///   ~5 어두운 회색 작게 / 6~14 회색 기본 / 15~29 밝은 회색 크게 + 펀치 / 30~ 흰색 가장 크게 + 강한 펀치 + 스파크
+    /// 위의 Play 는 그대로 두었으니 회복, 버프 등 다른 텍스트는 기존처럼 Play 를 쓰면 된다.
+    /// </summary>
+    public void PlayDamage(int damage, Vector3 spawnPosition, Vector3 moveDir, float distance = 0.5f, float duration = 0.6f)
+    {
+        if (tmpText == null) tmpText = GetComponent<TextMeshPro>();
+
+        transform.position = spawnPosition;
+        gameObject.SetActive(true);
+
+        Sequence seq = DOTweenManager.DamageNumberTiered(tmpText, damage, moveDir, distance, duration);
+
+        // 30 이상: 숫자 주위로 스파크
+        if (damage >= DOTweenManager.DamageTierHuge && HitFeedback.Instance != null)
+            HitFeedback.Instance.SparkBurst(spawnPosition, 28, 4.5f);
+
+        // 연출 완료 시 Destroy가 아닌 오브젝트 비활성화 (풀 반환)
+        if (seq != null) seq.OnComplete(() => gameObject.SetActive(false));
+        else gameObject.SetActive(false);
     }
 }

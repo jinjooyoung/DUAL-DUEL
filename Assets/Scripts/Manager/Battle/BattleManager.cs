@@ -507,7 +507,7 @@ public class BattleManager : MonoBehaviour
         {
             ApplyDamage(target, finalDamage);
             BattleUIManager.Instance?.UpdateAllUI();
-        });
+        }, PredictHpDamage(target, finalDamage)); 
 
         yield return sequence.WaitForCompletion();
     }
@@ -696,21 +696,33 @@ public class BattleManager : MonoBehaviour
     // ---------- [타격 연출] ----------
 
     /// <summary>
-    /// 카드(또는 빈 슬롯) 시전 연출: 화면 예고 -> 젖힘 -> 돌진하며 빛줄기 -> 타격 순간 onHit
-    /// onHit 안에서 효과 적용과 UI 갱신을 해야 "찌르는 순간 맞는" 인과가 생김
+    /// 카드(또는 빈 슬롯) 시전 연출.
+    /// 예상 체력 피해가 HitFeedback.chargeThreshold(기본 15) 이상이면 차징 시전,
+    /// 아니면 기존처럼 예고 -> 젖힘 -> 돌진하며 빛줄기 -> 타격 순간 onHit
     /// </summary>
-    private Sequence PlayCast(Transform caster, bool isPlayerSlot, CombatEntityStats beamTarget, bool positive, Action onHit)
+    private Sequence PlayCast(Transform caster, bool isPlayerSlot, CombatEntityStats beamTarget, bool positive, Action onHit, int hpDamage = 0)
     {
-        HitFeedback.Instance?.Anticipate();
+        HitFeedback hf = HitFeedback.Instance;
         Transform targetTr = GetEntityTransform(beamTarget);
+        Vector3 dir = isPlayerSlot ? Vector3.right : Vector3.left;
+
+        // 실제 피해가 큰 공격: 차징 시전
+        if (hf != null && !positive)
+        {
+            HitFeedback.Charge charge = hf.GetCharge(hpDamage);
+            if (charge.active) return hf.PlayChargedCast(caster, dir, targetTr, charge, onHit);
+        }
+
+        // 기존 시전
+        if (hf != null) hf.Anticipate();
         return DOTweenManager.CardExecute(
             caster,
-            isPlayerSlot ? Vector3.right : Vector3.left,
+            dir,
             onHitMoment: onHit,
             onLaunch: dash =>
             {
-                if (caster != null && targetTr != null)
-                    HitFeedback.Instance?.Beam(caster.position, targetTr.position, dash, positive);
+                if (hf != null && caster != null && targetTr != null)
+                    hf.Beam(caster.position, targetTr.position, dash, positive);
             });
     }
 
@@ -806,12 +818,13 @@ public class BattleManager : MonoBehaviour
             int finalValue = Mathf.Max(0, cardValue);
             bool selfTarget = IsSelfTargetCard(cardData.cardType);
 
+            int hpDamage = cardData.cardType == CardType.Attack ? PredictHpDamage(target, finalValue) : 0;
             // 사용 연출: 젖힘 -> 돌진 -> 타격 순간에 효과 적용 + UI 갱신
             Sequence sequence = PlayCast(cardDisplay.transform, isPlayerSlot, selfTarget ? user : target, selfTarget, () =>
             {
                 ApplyCardEffect(cardData.cardType, user, target, finalValue);
                 BattleUIManager.Instance?.UpdateAllUI();
-            });
+            }, hpDamage);
 
             yield return sequence.WaitForCompletion();
 
@@ -995,12 +1008,13 @@ public class BattleManager : MonoBehaviour
         // 연계 시전도 대상 카드가 놓인 슬롯의 밸류 보정을 받음
         int finalValue = ApplySlotValueModifier(targetSlot, cardDisplay.cardInstance.GetValue());
 
+        int hpDamage = cardData.cardType == CardType.Attack ? PredictHpDamage(target, finalValue) : 0;
         bool selfTarget = IsSelfTargetCard(cardData.cardType);
         Sequence seq = PlayCast(cardDisplay.transform, isPlayer, selfTarget ? user : target, selfTarget, () =>
         {
             ApplyCardEffect(cardData.cardType, user, target, finalValue);
             BattleUIManager.Instance?.UpdateAllUI();
-        });
+        }, hpDamage);
 
         yield return seq.WaitForCompletion();
     }
@@ -1153,5 +1167,18 @@ public class BattleManager : MonoBehaviour
     {
         slotActionDelay = Mathf.Clamp(newDelay, 0.2f, 3.0f);
         Debug.Log($"[전투 매니저] 시전 딜레이 적용: {slotActionDelay:F2}초");
+    }
+
+    /// <summary>
+    /// ApplyDamage 를 했을 때 실제로 깎일 체력 (상태는 바꾸지 않음). 차징 연출 판단용.
+    /// ApplyDamage 의 계산(힘, 출혈, 방어도)을 바꾸면 여기도 같이 바꿔주세요.
+    /// </summary>
+    public int PredictHpDamage(CombatEntityStats target, int damage)
+    {
+        if (target == null) return 0;
+        CombatEntityStats attacker = GetOpponent(target);
+        int total = damage + (attacker != null ? attacker.force : 0) + target.bleed;
+        if (total <= 0 || target.guard >= total) return 0;   // 방어 성공: 체력 피해 없음
+        return total - target.guard;
     }
 }
