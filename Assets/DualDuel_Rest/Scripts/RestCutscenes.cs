@@ -13,13 +13,14 @@ using UnityEngine.UI;
 ///               2~3   흰 화면 (이 순간 회복 적용, 균열 사라짐)
 ///               3~6   흰 화면이 easeOutSine 으로 걷힘 -> 글리치 씬 전환
 /// 강화 (6.9초)  0~3   카드가 가운데로, 왜곡 + 줌인 easeInCubic, 마지막에 쑤욱 빨려듦
+///                     2~3 왜곡이 끝나기 1초 전부터 흰 화면이 차올라, 최대 왜곡 순간엔 이미 덮여 있음
 ///               3~3.5 번쩍 (강화 적용, 카드 교체)       3.5~4.5 흰 화면 easeOutSine 으로 걷힘
 ///               4.5~5.5 필름 같은 빛줄기가 대각선으로 훑음 (easeInOutExpo)
 ///               5.5~6.1 Z 회전 +8 -8 +8 -8 0 딸랑딸랑    6.1~6.9 대기 -> 글리치 씬 전환
-/// 제거 (9.8초)  0~3   왜곡 + 줌인 easeInCubic, 카드가 x ±0.1 로 초당 3번 덜덜
-///               3~4.3 화면과 카드가 easeInCubic 으로 하얘지며 더 크게 덜덜
-///               4.3   펑 (제거 적용)   4.3~5.8 흰 화면 유지   5.8~7.8 흰 화면 easeOutSine 으로 걷힘
-///               4.3~9.8 재처럼 흰 가루가 흩날려 사라짐 -> 글리치 씬 전환
+/// 제거 (8.5초)  0~3   왜곡 + 줌인 easeInCubic, 카드가 x ±0.1 로 초당 3번 덜덜
+///               2~3   왜곡이 계속 커지는 동안 화면과 카드가 easeInCubic 으로 하얘지며 더 크게, 더 빠르게 덜덜
+///               3     최대 왜곡 순간 펑 (제거 적용)   3~4.5 흰 화면 유지   4.5~6.5 흰 화면 easeOutSine 으로 걷힘
+///               3~8.5 재처럼 흰 가루가 흩날려 사라짐 -> 글리치 씬 전환
 /// </summary>
 public class RestCutscenes : MonoBehaviour
 {
@@ -46,6 +47,8 @@ public class RestCutscenes : MonoBehaviour
     [Tooltip("최대 왜곡 (Lens Distortion, 음수 = 빨려듦)")] public float maxLens = -0.9f;
     [Tooltip("줌인 최대 배율 (zoomTargets)")] public float maxZoom = 1.35f;
     [Tooltip("제거 연출의 덜덜 폭 (월드 단위)")] public float shakeAmplitude = 0.1f;
+    [Tooltip("왜곡이 끝나기 몇 초 전부터 흰 화면이 차오를지 (강화/제거). 최대 왜곡 순간엔 이미 덮여 있어 멈춘 왜곡이 보이지 않음")]
+    public float whiteLead = 1f;
 
     [Header("사운드 (선택)")]
     public AudioClip weldSfx;
@@ -206,6 +209,7 @@ public class RestCutscenes : MonoBehaviour
             cardView.localScale = Vector3.one * grow * suck;
             Zoom(1f + (maxZoom - 1f) * e);
             Lens(maxLens * e);
+            SetWhite(EaseInCubic(LeadIn(u, 3f)));   // 마지막 whiteLead 초 동안 0 -> 1
         });
 
         // 번쩍 0.5초: 강화 적용, 카드 교체
@@ -267,29 +271,26 @@ public class RestCutscenes : MonoBehaviour
         Image cardWhite = MakeCardWhite(cardView);
         Vector3 basePos = Vector3.zero;
 
-        // 0~3초: 왜곡 + 줌인, 초당 3번 덜덜
+        // 0~3초: 왜곡 + 줌인이 끝까지 계속 커짐. 마지막 whiteLead 초 동안 화면과 카드가 하얘지며
+        //        덜덜이 더 크고 빨라짐 -> 최대 왜곡 순간엔 흰 화면이 덮고 있어 멈춘 왜곡이 보이지 않음
+        float phase = 0f, prevT = 0f;
         yield return Run(3f, (u, t) =>
         {
             float e = EaseInCubic(u);
+            float w = EaseInCubic(LeadIn(u, 3f));
             focusDim.color = new Color(0f, 0f, 0f, 0.6f * Mathf.Clamp01(u * 4f));
             cardView.anchoredPosition = Vector2.Lerp(from, Vector2.zero, EaseOutCubic(Mathf.Clamp01(u * 6f)));
             basePos = cardView.position;
-            cardView.position = basePos + Vector3.right * (shakeAmplitude * Mathf.Sin(t * Mathf.PI * 2f * 3f));
+            // 진동수가 바뀌어도 튀지 않도록 위상을 누적
+            float hz = 3f + 4f * w;
+            phase += (t - prevT) * hz * Mathf.PI * 2f;
+            prevT = t;
+            cardView.position = basePos + Vector3.right * (shakeAmplitude * (1f + 1.5f * w) * Mathf.Sin(phase));
             cardView.localScale = Vector3.one * Mathf.Lerp(s0, focusScale, e);
+            cardWhite.color = new Color(1f, 1f, 1f, w);
             Zoom(1f + (maxZoom - 1f) * e);
             Lens(maxLens * e);
-        });
-        cardView.anchoredPosition = Vector2.zero;
-        basePos = cardView.position;
-
-        // 3~4.3초: 화면과 카드가 하얘지며 더 크게, 더 빠르게 덜덜
-        yield return Run(1.3f, (u, t) =>
-        {
-            float w = EaseInCubic(u);
             SetWhite(0.85f * w);
-            cardWhite.color = new Color(1f, 1f, 1f, w);
-            float amp = shakeAmplitude * (1f + 1.5f * w), hz = 3f + 4f * w;
-            cardView.position = basePos + Vector3.right * (amp * Mathf.Sin((3f + t) * Mathf.PI * 2f * hz));
         });
 
         // 펑: 제거 적용, 화면을 채우는 폭발, 흰 화면 1.5초
@@ -498,6 +499,13 @@ public class RestCutscenes : MonoBehaviour
     {
         for (float t = 0f; t < duration; t += Time.unscaledDeltaTime) { f(Mathf.Clamp01(t / duration), t); yield return null; }
         f(1f, duration);
+    }
+
+    /// <summary>길이 duration 인 구간의 진행도 u 에서, 마지막 whiteLead 초 동안 0 -> 1</summary>
+    float LeadIn(float u, float duration)
+    {
+        float lead = Mathf.Clamp(whiteLead, 0.01f, duration);
+        return Mathf.Clamp01((u * duration - (duration - lead)) / lead);
     }
 
     static float EaseInCubic(float x) => x * x * x;
