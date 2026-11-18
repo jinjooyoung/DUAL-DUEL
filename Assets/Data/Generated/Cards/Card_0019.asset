@@ -16,6 +16,7 @@ MonoBehaviour:
   cardType: 8
   rank: 2
   artwork: {fileID: 0}
+  price: 75
   bgSprite: {fileID: 21300000, guid: bf0515b8257f0724bb80830a1cf7f1fe, type: 3}
   typeIconSprite: {fileID: 21300000, guid: 6981497115964b347b56c8fbb3d1a357, type: 3}
   gimmikIconSprite: {fileID: 0}
