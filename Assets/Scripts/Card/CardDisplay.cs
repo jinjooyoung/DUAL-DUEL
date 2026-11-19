@@ -1,4 +1,4 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using UnityEngine;
 
 public class CardDisplay : MonoBehaviour
@@ -24,6 +24,7 @@ public class CardDisplay : MonoBehaviour
 
     private Vector3 originalPosition;
     private Vector3 originalScale = Vector3.one;
+    private bool isHovering;   // 호버 연출(확대 + 들림)이 적용된 상태인지
 
     [Header("레이어 마스크")]
     public LayerMask slotLayer;
@@ -43,6 +44,59 @@ public class CardDisplay : MonoBehaviour
     {
         // 풀로 돌아가며 꺼질 때 호버 기억 정리 (꺼진 카드에는 OnMouseExit 가 오지 않음)
         if (Hovered == this) Hovered = null;
+        isHovering = false;
+    }
+
+    private void Update()
+    {
+        // 안전장치: 드래그 중인데 턴이 실행되기 시작했거나 게임이 끝나면 드래그를 취소
+        // (그 상태에선 OnMouseUp 이 막혀서 isDragging 과 꺼진 콜라이더가 그대로 남고, 새로 드로우한 카드도 잡을 수 없게 됨)
+        if (!isDragging || BattleManager.Instance == null) return;
+        if (BattleManager.Instance.isTurnExecuting || BattleManager.Instance.isGameOver) CancelDrag();
+    }
+
+    /// <summary>
+    /// 드래그를 취소합니다: 모든 카드 콜라이더를 다시 켜고, 슬롯에서 집은 카드는 그 슬롯으로, 손패에서 집은 카드는 손패로 돌려보냄
+    /// </summary>
+    public void CancelDrag()
+    {
+        if (!isDragging) return;
+        isDragging = false;
+
+        // OnMouseDown 에서 꺼둔 콜라이더 복구 (자기 자신 포함)
+        if (BattleCardManager.Instance != null)
+        {
+            foreach (var card in BattleCardManager.Instance.cardPool)
+            {
+                if (card != null) ColliderOnOff(card, true);
+            }
+        }
+
+        if (currentSlot != null)
+        {
+            // 슬롯에서 집어 들었던 카드: 그 슬롯 자리로 (슬롯 연결은 그대로라 이번 턴에 그대로 발동)
+            DOTweenManager.CardPlace(transform, currentSlot.transform.position, currentSlot.transform.eulerAngles, originalScale, 0.15f, null);
+        }
+        else
+        {
+            // 손패에서 집어 들었던 카드: 손패 정렬 위치로 (ArrangeHand 가 위치를 맞춤)
+            DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, null);
+        }
+        Debug.Log("[CardDisplay] 드래그 중 턴이 시작되어 드래그를 취소했습니다.");
+    }
+
+    /// <summary>
+    /// 호버 연출(확대 + 들림)을 원래대로 되돌립니다.
+    /// 단축키로 턴을 끝낼 때처럼 OnMouseExit 가 isTurnExecuting 에 막혀 복귀하지 못하는 상황에서 호출
+    /// </summary>
+    public void CancelHover()
+    {
+        if (!isHovering) return;
+        isHovering = false;
+        if (isDragging || isPlaced || isTweening) return;
+
+        DOTween.Kill(GetInstanceID() + "_card");
+        DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
     }
 
     // 카드 데이터 설정 (외형 갱신은 CardVisual에 위임)
@@ -73,6 +127,7 @@ public class CardDisplay : MonoBehaviour
         currentSlot = null;    // 연결되어 있던 슬롯 참조 제거
         isDragging = false;    // 드래그 중 플래그 안전 초기화
         isTweening = false;    // 연출 중 아님
+        isHovering = false;    // 호버 상태도 초기화
         transform.localScale = originalScale;   // 크기 초기화
     }
 
@@ -100,6 +155,7 @@ public class CardDisplay : MonoBehaviour
 
         // 호버 시작 시 현재 손패 위치를 기준점으로 저장
         originalPosition = transform.position;
+        isHovering = true;
 
         DOTweenManager.CardHover(transform, originalPosition, originalScale, 1.08f, 0.2f, 0.12f, 0.04f, 0.8f);
     }
@@ -111,6 +167,7 @@ public class CardDisplay : MonoBehaviour
         if (BattleManager.Instance.isGameOver) return;
         if (BattleManager.Instance.isTurnExecuting) return;
         if (isDragging || isPlaced || isTweening) return;
+        isHovering = false;
         // 저장해 둔 손패 원래 위치(hoverOriginPos)와 원래 스케일, 회전값으로 깔끔하게 복귀
         DOTweenManager.CardHoverExit(transform, new Vector3(transform.position.x, originalPosition.y, transform.position.z), originalScale, Vector3.zero, 0.12f);
     }
@@ -122,6 +179,7 @@ public class CardDisplay : MonoBehaviour
         if (isTweening) return;
         DOTween.Kill(GetInstanceID() + "_card"); // 기존 호버 트윈 정리
 
+        isHovering = false;
         isDragging = true;
         if (TooltipPanel.Instance != null) TooltipPanel.Instance.HideTooltip();   // 드래그 시작 시 카드 툴팁 닫기
         SoundManager.Instance.PlaySFX(SFXType.CardPlay);
