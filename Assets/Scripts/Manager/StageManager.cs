@@ -61,7 +61,6 @@ public class StageManager : MonoBehaviour
         if (TutorialManager.Instance != null && PlayerPrefs.GetInt("TutorialStarted", 0) != 1)
         {
             TutorialManager.Instance.StartTutorialIfFirstRun();
-            TutorialManager.Instance.Play(0);
         }
     }
 
@@ -144,6 +143,15 @@ public class StageManager : MonoBehaviour
         if (infoPanel != null)
         {
             infoPanel.SetupPanel(currentNode);
+        }
+
+        Debug.Log($"[노드 클릭] floor={selectedNodeUI.nodeData.floor}, " +
+          $"매니저={(TutorialManager.Instance != null)}, " +
+          $"진행중={(TutorialManager.Instance != null && TutorialManager.Instance.IsRunning)}");
+
+        if (TutorialManager.Instance != null && selectedNodeUI.nodeData.floor == 1)
+        {
+            TutorialManager.Notify("StageClicked");
         }
     }
 

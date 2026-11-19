@@ -32,16 +32,48 @@ public class TutorialSceneSteps : MonoBehaviour
 
     private int index;
     private bool waiting;
+    private bool begun;
 
-    private void OnEnable() => TutorialManager.Notified += OnNotified;
-    private void OnDisable() => TutorialManager.Notified -= OnNotified;
+    private void OnEnable()
+    {
+        TutorialManager.Notified += OnNotified;
+        TutorialManager.Started += OnTutorialStarted;
+    }
+
+    private void OnDisable()
+    {
+        TutorialManager.Notified -= OnNotified;
+        TutorialManager.Started -= OnTutorialStarted;
+    }
 
     private IEnumerator Start()
     {
         TutorialManager tm = TutorialManager.Instance;
+        Debug.Log($"[Tutorial] {gameObject.scene.name}: TutorialSceneSteps 시작 (단계 {steps.Count}개, 매니저 {(tm != null)}, 진행 중 {(tm != null && tm.IsRunning)})");
         if (tm == null) { Debug.LogWarning("[Tutorial] TutorialManager 가 없습니다. 프리팹을 메인 씬(테스트하려면 이 씬에도)에 두세요."); yield break; }
-        if (!tm.IsRunning) yield break;   // 튜토리얼 진행 중이 아니면 아무것도 안 함
+        if (steps.Count == 0) { Debug.LogWarning("[Tutorial] Steps 가 비어 있습니다. 인스펙터에서 단계를 추가하세요."); yield break; }
 
+        // 아직 시작 전이면 끝내지 않고 기다림: 튜토리얼이 시작되는 순간 OnTutorialStarted 에서 이어감
+        // (같은 씬의 다른 스크립트가 시작을 부르는 순서와 상관없이 동작)
+        if (!tm.IsRunning)
+        {
+            Debug.Log("[Tutorial] 아직 튜토리얼 시작 전이라 시작되면 단계를 진행합니다.");
+            yield break;
+        }
+        yield return Begin();
+    }
+
+    // 튜토리얼이 이 씬에서 (스텝 스크립트보다 늦게) 시작된 경우
+    private void OnTutorialStarted()
+    {
+        if (!begun && isActiveAndEnabled) StartCoroutine(Begin());
+    }
+
+    // 씬 전환이 끝나기를 잠깐 기다렸다가 첫 단계 실행 (한 번만)
+    private IEnumerator Begin()
+    {
+        if (begun) yield break;
+        begun = true;
         yield return new WaitForSecondsRealtime(startDelay);
         RunStep();
     }
@@ -56,13 +88,24 @@ public class TutorialSceneSteps : MonoBehaviour
             return;
         }
         waiting = !string.IsNullOrEmpty(steps[index].waitAction);
-        if (!waiting) PlayStep();
+        if (waiting) Debug.Log($"[Tutorial] {gameObject.scene.name} 단계 {index}: '{steps[index].waitAction}' 행동을 기다리는 중");
+        else PlayStep();
     }
 
     // 기다리던 행동이 오면 재생
     private void OnNotified(string action)
     {
-        if (!waiting || index >= steps.Count || action != steps[index].waitAction) return;
+        if (index >= steps.Count) return;
+        if (!waiting)
+        {
+            Debug.Log($"[Tutorial] '{action}' 무시: 단계 {index} 는 아직 대사 중이거나 기다리는 행동이 없음 (대사창을 다 닫은 뒤에 행동해야 함)");
+            return;
+        }
+        if (action != steps[index].waitAction)
+        {
+            Debug.Log($"[Tutorial] '{action}' 무시: 단계 {index} 는 '{steps[index].waitAction}' 를 기다리는 중 (이름이 정확히 같아야 함)");
+            return;
+        }
         if (TutorialManager.Instance == null || !TutorialManager.Instance.IsRunning) return;
         waiting = false;
         PlayStep();
@@ -71,6 +114,7 @@ public class TutorialSceneSteps : MonoBehaviour
     // 대사 재생 -> 끝나면 다음 단계
     private void PlayStep()
     {
-        TutorialManager.Instance.Play(steps[index].startId, () => { index++; RunStep(); });
+        Debug.Log($"[Tutorial] {gameObject.scene.name} 단계 {index}: 대사 {steps[index].startId} 재생");
+        TutorialManager.Instance.Play(steps[index].startId, () => { Debug.Log($"[Tutorial] 단계 {index} 대사 끝"); index++; RunStep(); });
     }
 }

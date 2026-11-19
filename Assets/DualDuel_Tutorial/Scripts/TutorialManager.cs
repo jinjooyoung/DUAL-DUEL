@@ -26,6 +26,11 @@ public class TutorialManager : MonoBehaviour
     /// </summary>
     public static event Action<string> Notified;
 
+    /// <summary>
+    /// 튜토리얼이 시작되는 순간 (StartTutorialIfFirstRun 성공). 시작보다 먼저 준비된 TutorialSceneSteps 가 구독
+    /// </summary>
+    public static event Action Started;
+
     private const string FirstRunKey = "TutorialStarted";   // 0 = 튜토리얼 미완료, 1 = 끝까지 봤거나 스킵함
 
     [Header("데이터")]
@@ -45,6 +50,9 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private float charsPerSecond = 30f;
     [Tooltip("HUD/팝업(100) 위, CRT 스캔라인(200) 아래")]
     [SerializeField] private int sortingOrder = 195;
+
+    [Tooltip("켜면 카메라와 상관없이 화면 맨 위에 바로 그림 (대사창이 안 보일 때. 대신 CRT 스캔라인은 대사창 위에 안 덮임)")]
+    [SerializeField] private bool forceOverlay;
 
     [Header("테스트")]
     [Tooltip("켜면 PlayerPrefs 와 상관없이 매번 튜토리얼을 진행 (빌드 전에 꺼주세요)")]
@@ -112,9 +120,11 @@ public class TutorialManager : MonoBehaviour
             Debug.Log("[Tutorial] 이미 튜토리얼을 마쳐서 건너뜁니다. (다시 보려면 Tools > DUAL DUEL > 튜토리얼 최초 실행 상태로 초기화)");
             return;
         }
+        if (IsRunning) return;   // 이미 진행 중이면 다시 시작하지 않음 (여러 곳에서 불러도 안전)
         IsRunning = true;
         if (skipButton != null) skipButton.gameObject.SetActive(true);
-        Debug.Log("[Tutorial] 튜토리얼 시작");
+        Started?.Invoke();
+        Debug.Log($"[Tutorial] 튜토리얼 시작 (대사 테이블 {(dialogueTable != null ? dialogueTable.lines.Count + "줄" : "없음")})");
     }
 
     /// <summary>
@@ -152,6 +162,8 @@ public class TutorialManager : MonoBehaviour
         AttachCamera();
         if (dialogueRoot != null) dialogueRoot.SetActive(true);
         Show(line);
+        Debug.Log($"[Tutorial] Play({startId}) 대사창 열림 (대사창 오브젝트 {(dialogueRoot != null ? dialogueRoot.activeInHierarchy.ToString() : "연결 안 됨")}, " +
+                  $"캔버스 {(canvas != null ? canvas.renderMode.ToString() : "없음")}, 카메라 {(canvas != null && canvas.worldCamera != null ? canvas.worldCamera.name : "없음")}, 정렬 {sortingOrder})");
     }
 
     /// <summary>
@@ -159,7 +171,10 @@ public class TutorialManager : MonoBehaviour
     /// </summary>
     public static void Notify(string action)
     {
-        if (Instance == null || !Instance.IsRunning || string.IsNullOrEmpty(action)) return;
+        if (string.IsNullOrEmpty(action)) return;
+        if (Instance == null) { Debug.Log($"[Tutorial] Notify({action}) 무시: TutorialManager 가 없음"); return; }
+        if (!Instance.IsRunning) { Debug.Log($"[Tutorial] Notify({action}) 무시: 튜토리얼 진행 중이 아님"); return; }
+        Debug.Log($"[Tutorial] Notify({action})");
         Notified?.Invoke(action);
     }
 
@@ -303,14 +318,28 @@ public class TutorialManager : MonoBehaviour
     // 씬이 바뀌면 새 카메라에 붙임
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode) => AttachCamera();
 
-    // CRT 후처리를 받도록 메인 카메라 기준 캔버스로 (카메라가 없으면 오버레이)
+    // CRT 후처리를 받도록 메인 카메라 기준 캔버스로. 그 카메라가 대사창을 그릴 수 없으면 오버레이로
     private void AttachCamera()
     {
         if (canvas == null) return;
-        Camera cam = Camera.main;
-        canvas.renderMode = cam != null ? RenderMode.ScreenSpaceCamera : RenderMode.ScreenSpaceOverlay;
-        canvas.worldCamera = cam;
-        canvas.planeDistance = 50f;
         canvas.sortingOrder = sortingOrder;
+        Camera cam = Camera.main;
+
+        string reason = null;
+        if (forceOverlay) reason = "Force Overlay 켜짐";
+        else if (cam == null) reason = "MainCamera 태그가 붙은 카메라가 없음";
+        else if ((cam.cullingMask & (1 << gameObject.layer)) == 0) reason = $"카메라 '{cam.name}' 의 Culling Mask 에 '{LayerMask.LayerToName(gameObject.layer)}' 레이어가 없음";
+
+        if (reason != null)
+        {
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            if (!forceOverlay) Debug.LogWarning($"[Tutorial] {reason} -> 대사창을 오버레이로 그립니다.");
+            return;
+        }
+
+        canvas.renderMode = RenderMode.ScreenSpaceCamera;
+        canvas.worldCamera = cam;
+        // 카메라가 그리는 범위(Near ~ Far) 안에 캔버스를 둠
+        canvas.planeDistance = Mathf.Clamp(50f, cam.nearClipPlane + 0.1f, Mathf.Max(cam.nearClipPlane + 0.2f, cam.farClipPlane - 0.1f));
     }
 }
