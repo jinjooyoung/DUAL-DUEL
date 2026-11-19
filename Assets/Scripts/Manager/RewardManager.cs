@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
@@ -35,6 +35,12 @@ public class RewardManager : MonoBehaviour
         { RankType.Epic, 42.6f },
         { RankType.Legendary, 2f }
     };
+
+    [Header("전투 종류별 보상 보너스 가중치 (이번 보상 추첨에만 일시적으로 더함, 누적 가중치에는 남지 않음)")]
+    [SerializeField] private float eliteEpicBonus = 5f;         // 엘리트: 4등급(Epic) +5
+    [SerializeField] private float eliteLegendaryBonus = 1f;    // 엘리트: 5등급(Legendary) +1
+    [SerializeField] private float bossEpicBonus = 8f;          // 보스: 4등급(Epic) +8
+    [SerializeField] private float bossLegendaryBonus = 2f;     // 보스: 5등급(Legendary) +2
 
     private SoftPityProbabilityCorrector<RankType> rankCorrector;
     private bool isInitialized = false;
@@ -119,6 +125,34 @@ public class RewardManager : MonoBehaviour
         return rankCorrector.EvaluateNext();
     }
 
+    /// <summary>
+    /// 전투 보상용 추첨: 방금 싸운 몬스터가 엘리트/보스면 4, 5등급 가중치를 이번 한 번만 높여서 추첨
+    /// </summary>
+    public RankType EvaluateRewardRank()
+    {
+        if (rankCorrector == null) Initialize();
+        return rankCorrector.EvaluateNext(GetBattleBonus());
+    }
+
+    /// <summary>
+    /// 방금 싸운 몬스터 종류에 따른 보너스 가중치 (일반 전투 / 몬스터 정보 없음이면 null)
+    /// </summary>
+    private Dictionary<RankType, float> GetBattleBonus()
+    {
+        MonsterSO monster = GameManager.Instance != null ? GameManager.Instance.monster : null;
+        if (monster == null) return null;
+
+        switch (monster.monsterType)
+        {
+            case StageType.Elite:
+                return new Dictionary<RankType, float> { { RankType.Epic, eliteEpicBonus }, { RankType.Legendary, eliteLegendaryBonus } };
+            case StageType.Boss:
+                return new Dictionary<RankType, float> { { RankType.Epic, bossEpicBonus }, { RankType.Legendary, bossLegendaryBonus } };
+            default:
+                return null;
+        }
+    }
+
     public CardSO GetRandomCardByRank(RankType rank)
     {
         if (DataManager.Instance == null)
@@ -145,9 +179,13 @@ public class RewardManager : MonoBehaviour
     {
         currentRewardCards.Clear();
 
+        MonsterSO monster = GameManager.Instance != null ? GameManager.Instance.monster : null;
+        if (monster != null && monster.monsterType != StageType.Normal)
+            Debug.Log($"<color=cyan>[RewardManager] {monster.monsterType} 보상: 4, 5등급 가중치 일시 상승</color>");
+
         for (int i = 0; i < 3; i++)
         {
-            RankType rolledRank = EvaluateRank();
+            RankType rolledRank = EvaluateRewardRank();
             CardSO card = GetRandomCardByRank(rolledRank);
 
             // 안전장치: 혹시라도 null이 나오면 한 번 더 Common으로 Fallback
@@ -180,7 +218,7 @@ public class RewardManager : MonoBehaviour
 
         // 새로고침 차감 및 새 카드 추출
         remainRerollCount--;
-        RankType rolledRank = EvaluateRank();
+        RankType rolledRank = EvaluateRewardRank();   // 새로고침도 같은 전투의 보너스 적용
         CardSO newCard = GetRandomCardByRank(rolledRank) ?? GetRandomCardByRank(RankType.Common);
 
         currentRewardCards[index] = newCard;

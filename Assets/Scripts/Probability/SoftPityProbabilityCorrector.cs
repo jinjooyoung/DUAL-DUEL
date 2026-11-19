@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -52,16 +52,39 @@ public class SoftPityProbabilityCorrector<T>
     /// <returns>추첨된 등급 Key</returns>
     public T EvaluateNext()
     {
-        // 1. 현재 가중치 총합 검증
-        float totalCurrentWeight = currentWeights.Values.Sum();
+        return EvaluateNext(null);
+    }
+
+    /// <summary>
+    /// 이번 한 번만 bonus 를 더한 가중치로 추첨합니다 (엘리트/보스 보상 등).
+    /// 보너스는 복사한 표에만 더하므로 누적 가중치에 남지 않고,
+    /// 추첨 후 처리(고등급이면 리셋, 아니면 소프트 보정)는 원래 누적 가중치에 그대로 적용됩니다.
+    /// </summary>
+    /// <param name="bonus">등급별로 더할 값 (null 이면 보너스 없음)</param>
+    public T EvaluateNext(Dictionary<T, float> bonus)
+    {
+        // 0. 이번 추첨에만 쓸 표 (보너스가 없으면 현재 가중치 그대로)
+        Dictionary<T, float> rollTable = currentWeights;
+        if (bonus != null && bonus.Count > 0)
+        {
+            rollTable = new Dictionary<T, float>(currentWeights);
+            foreach (var pair in bonus)
+            {
+                rollTable.TryGetValue(pair.Key, out float weight);
+                rollTable[pair.Key] = weight + pair.Value;
+            }
+        }
+
+        // 1. 추첨할 표의 가중치 총합 검증
+        float totalCurrentWeight = rollTable.Values.Sum();
         if (totalCurrentWeight <= 0f)
         {
             Debug.LogError("[SoftPityProbabilityCorrector] 현재 가중치의 합이 0 이하입니다!");
-            return currentWeights.Keys.First();
+            return rollTable.Keys.First();
         }
 
-        // 2. 현재 가중치 기반으로 즉시 추첨
-        T selectedItem = RollByWeight(currentWeights);
+        // 2. 추첨 (보너스가 있으면 보너스를 더한 표로)
+        T selectedItem = RollByWeight(rollTable);
 
         // 3. 고등급 추첨 여부 판별
         int currentRank = Convert.ToInt32(selectedItem);
