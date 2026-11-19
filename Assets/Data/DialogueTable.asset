@@ -1,0 +1,116 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 0}
+  m_Name: DialogueTable
+  m_EditorClassIdentifier: Assembly-CSharp::DialogueTableSO
+  lines:
+  - id: 0
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC5B4\uC11C \uC640! \uC5EC\uAE30\uB294 \uC2A4\uD14C\uC774\uC9C0 \uC120\uD0DD
+      \uD654\uBA74\uC774\uC57C."
+    nextId: 1
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 1
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC55E\uC73C\uB85C \uC774 \uC9C0\uB3C4\uB97C \uB530\uB77C \uD55C \uCE78\uC529
+      \uB098\uC544\uAC00\uBA70\\n\uBAAC\uC2A4\uD130\uC640 \uCE74\uB4DC \uB300\uACB0\uC744
+      \uD558\uAC8C \uB420 \uAC70\uC57C."
+    nextId: 2
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 2
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uCE78\uB9C8\uB2E4 \uC804\uD22C, \uC0C1\uC810, \uD734\uC2DD \uAC19\uC740
+      \uC7A5\uC18C\uAC00 \uC788\uC5B4.\\n\uC544\uC774\uCF58\uC744 \uBCF4\uBA74 \uC5B4\uB5A4
+      \uACF3\uC778\uC9C0 \uC54C \uC218 \uC788\uC9C0."
+    nextId: 3
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 3
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC2A4\uD06C\uB864\uD574\uC11C \uC2A4\uD14C\uC774\uC9C0\uB97C \uD655\uC778\uD560
+      \uC218 \uC788\uC5B4!"
+    nextId: 4
+    portraitPath: Tutorial/Guide
+    expression: Smile
+  - id: 4
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC790, \uCCAB \uBC88\uC9F8 \uC2A4\uD14C\uC774\uC9C0\uB97C \uD074\uB9AD\uD574\uBCFC\uB798?"
+    nextId: -1
+    portraitPath: Tutorial/Guide
+    expression: Smile
+  - id: 5
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uD328\uB110\uC5D0 \uC120\uD0DD\uD55C \uC2A4\uD14C\uC774\uC9C0\uC758 \uC815\uBCF4\uAC00
+      \uB098\uC654\uC9C0?\\n\uC900\uBE44\uB418\uBA74 \uC785\uC7A5 \uBC84\uD2BC\uC744
+      \uB20C\uB7EC\uBD10!"
+    nextId: -1
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 10
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC804\uD22C\uAC00 \uC2DC\uC791\uB410\uC5B4! \uC67C\uCABD\uC774 \uB108,
+      \uC624\uB978\uCABD\uC774 \uC0C1\uB300 \uBAAC\uC2A4\uD130\uC57C."
+    nextId: 11
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 11
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uAC00\uC6B4\uB370 \uB2E4\uC12F \uCE78\uC774 \uCE74\uB4DC \uC2AC\uB86F\uC774\uC57C.\\n\uD134\uC774
+      \uB05D\uB098\uBA74 \uC67C\uCABD \uCE78\uBD80\uD130 \uCC28\uB840\uB300\uB85C
+      \uBC1C\uB3D9\uD574."
+    nextId: 12
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 12
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC544\uB798\uC5D0 \uC788\uB294 \uCE74\uB4DC\uAC00 \uB124 \uC190\uD328\uC57C."
+    nextId: 13
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 13
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC190\uD328\uC758 \uCE74\uB4DC\uB97C \uBE48 \uC2AC\uB86F\uC5D0 \uB04C\uC5B4\uB2E4
+      \uB193\uC544\uBCFC\uB798?"
+    nextId: -1
+    portraitPath: Tutorial/Guide
+    expression: Smile
+  - id: 20
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC798\uD588\uC5B4! \uCE74\uB4DC \uC544\uB798 \uC22B\uC790\uAC00 \uC774
+      \uCE74\uB4DC\uC758 \uBC38\uB958\uC57C."
+    nextId: 21
+    portraitPath: Tutorial/Guide
+    expression: Smile
+  - id: 21
+    characterName: 
+    text: "\uC900\uBE44\uAC00 \uB418\uBA74 \uC624\uB978\uCABD\uC758 Turn End \uBC84\uD2BC\uC744
+      \uB20C\uB7EC\uBD10."
+    nextId: -1
+    portraitPath: 
+    expression: 
+  - id: 30
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC2AC\uB86F\uC758 \uCE74\uB4DC\uAC00 \uC21C\uC11C\uB300\uB85C \uBC1C\uB3D9\uD588\uC9C0?\\n\uC774\uB807\uAC8C
+      \uCE74\uB4DC \uBC30\uCE58 \uC21C\uC11C\uB97C \uACE0\uBBFC\uD558\uB294 \uAC8C
+      \uD575\uC2EC\uC774\uC57C."
+    nextId: 31
+    portraitPath: Tutorial/Guide
+    expression: Normal
+  - id: 31
+    characterName: "\uB3C4\uC6B0\uBBF8"
+    text: "\uC774\uC81C \uD63C\uC790\uC11C\uB3C4 \uD560 \uC218 \uC788\uACA0\uC9C0?
+      \uD589\uC6B4\uC744 \uBE4C\uC5B4!"
+    nextId: -1
+    portraitPath: Tutorial/Guide
+    expression: Smile

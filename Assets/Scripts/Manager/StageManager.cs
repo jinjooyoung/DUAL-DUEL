@@ -57,6 +57,12 @@ public class StageManager : MonoBehaviour
         {
             InitializeStageSelectScene();
         }
+
+        if (TutorialManager.Instance != null && PlayerPrefs.GetInt("TutorialStarted", 0) != 1)
+        {
+            TutorialManager.Instance.StartTutorialIfFirstRun();
+            TutorialManager.Instance.Play(0);
+        }
     }
 
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
