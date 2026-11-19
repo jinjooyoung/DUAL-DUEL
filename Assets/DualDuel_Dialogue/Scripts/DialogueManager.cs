@@ -7,31 +7,29 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 /// <summary>
-/// 튜토리얼 대사창 (프리팹). 씬이 바뀌어도 유지된다.
-///   메인 씬 시작 버튼 -> StartTutorialIfFirstRun()  (아직 저장 안 함)
-///   마지막 대사까지 읽으면 EndTutorial() -> PlayerPrefs 1 저장 / 좌상단 스킵 버튼 -> 즉시 1 저장
-///   각 씬의 TutorialSceneSteps 가 정해진 순서대로 Play(대사 id) 를 부른다.
-///   게임 코드는 행동이 일어난 곳에서 TutorialManager.Notify("행동이름") 만 부르면 된다.
+/// 다이얼로그 대사창 (프리팹). 씬이 바뀌어도 유지된다.
+///   각 씬의 DialogueSceneSteps 가 정해진 순서대로 대사 묶음을 재생한다.
+///   게임 코드는 행동이 일어난 곳에서 DialogueManager.Notify("행동이름") 만 부르면 된다.
+///   대사의 action 열은 그 대사가 뜨는 순간 LineAction 이벤트로 게임 코드에 전달된다 (Glitch 는 기본 제공).
+/// 본 기록은 DialogueProgress 가 영구 저장한다 (게임 진행 저장과 별개).
 /// 입력: 클릭 / Enter / Space -> 타이핑 중이면 전부 표시, 다 표시됐으면 다음 대사 (nextId -1 이면 닫힘)
 /// </summary>
-public class TutorialManager : MonoBehaviour
+public class DialogueManager : MonoBehaviour
 {
     /// <summary>
     /// 씬이 바뀌어도 유지되는 매니저 (여러 씬에 프리팹을 둬도 처음 것 하나만 남음)
     /// </summary>
-    public static TutorialManager Instance { get; private set; }
+    public static DialogueManager Instance { get; private set; }
 
     /// <summary>
-    /// 게임 코드에서 Notify 한 행동 이름이 전달되는 이벤트 (TutorialSceneSteps 가 구독)
+    /// 게임 코드에서 Notify 한 행동 이름이 전달되는 이벤트 (DialogueSceneSteps 가 구독)
     /// </summary>
     public static event Action<string> Notified;
 
     /// <summary>
-    /// 튜토리얼이 시작되는 순간 (StartTutorialIfFirstRun 성공). 시작보다 먼저 준비된 TutorialSceneSteps 가 구독
+    /// action 열이 있는 대사가 뜨는 순간 (동작 이름, 그 대사). 보스의 카드 강탈 같은 게임 코드를 여기에 연결
     /// </summary>
-    public static event Action Started;
-
-    private const string FirstRunKey = "TutorialStarted";   // 0 = 튜토리얼 미완료, 1 = 끝까지 봤거나 스킵함
+    public static event Action<string, DialogueData> LineAction;
 
     [Header("데이터")]
     [SerializeField] private DialogueTableSO dialogueTable;
@@ -43,33 +41,26 @@ public class TutorialManager : MonoBehaviour
     [SerializeField] private TMP_Text nameText;
     [SerializeField] private TMP_Text bodyText;
     [SerializeField] private Graphic nextMark;
-    [Tooltip("좌상단 튜토리얼 건너뛰기 버튼 (튜토리얼 진행 중에만 보임)")]
-    [SerializeField] private Button skipButton;
 
     [Header("연출")]
     [SerializeField] private float charsPerSecond = 30f;
     [Tooltip("HUD/팝업(100) 위, CRT 스캔라인(200) 아래")]
     [SerializeField] private int sortingOrder = 195;
-
-    [Tooltip("켜면 카메라와 상관없이 화면 맨 위에 바로 그림 (대사창이 안 보일 때. 대신 CRT 스캔라인은 대사창 위에 안 덮임)")]
+    [Tooltip("켜면 카메라와 상관없이 화면 맨 위에 그림 (대사창이 안 보일 때. 대신 CRT 스캔라인이 위에 안 덮임)")]
     [SerializeField] private bool forceOverlay;
-
-    [Header("테스트")]
-    [Tooltip("켜면 PlayerPrefs 와 상관없이 매번 튜토리얼을 진행 (빌드 전에 꺼주세요)")]
-    [SerializeField] private bool alwaysRunForTest;
 
     [Header("스탠딩 캐시 (처음 한 번 Resources 에서 채움, 읽기 전용)")]
     [SerializeField] private List<Sprite> portraitSprites = new List<Sprite>();
 
     /// <summary>
-    /// 이번 실행에서 튜토리얼이 진행 중인지
-    /// </summary>
-    public bool IsRunning { get; private set; }
-
-    /// <summary>
     /// 대사창이 떠 있는 동안 true. OnMouseDown 처럼 UI 가 아닌 입력 코드에서 확인해 무시하세요.
     /// </summary>
     public static bool IsBlockingInput => Instance != null && Instance.isOpen;
+
+    /// <summary>
+    /// 대사창이 떠 있는지
+    /// </summary>
+    public bool IsOpen => isOpen;
 
     private readonly Dictionary<string, Sprite> portraitByKey = new Dictionary<string, Sprite>();
     private DialogueData current;
@@ -88,12 +79,7 @@ public class TutorialManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         if (dialogueRoot != null) dialogueRoot.SetActive(false);
-        if (skipButton != null)
-        {
-            skipButton.onClick.AddListener(SkipTutorial);
-            skipButton.gameObject.SetActive(false);
-        }
-        if (dialogueTable == null) Debug.LogError("[Tutorial] 대사 테이블(DialogueTable)이 연결되지 않았습니다.");
+        if (dialogueTable == null) Debug.LogError("[Dialogue] 대사 테이블(DialogueTable)이 연결되지 않았습니다.");
         CachePortraits();
         AttachCamera();
         SceneManager.sceneLoaded += OnSceneLoaded;
@@ -109,72 +95,45 @@ public class TutorialManager : MonoBehaviour
     // ------------------------------------------------------------------ 외부 호출
 
     /// <summary>
-    /// 메인 씬의 게임 시작 버튼에서 호출. 튜토리얼을 끝까지 본 적이 없으면(0) 튜토리얼을 시작합니다.
-    /// 여기서는 저장하지 않으므로 중간에 게임을 끄면 다음에 다시 나옵니다.
-    /// </summary>
-    public void StartTutorialIfFirstRun()
-    {
-        bool done = PlayerPrefs.GetInt(FirstRunKey, 0) == 1;
-        if (done && !alwaysRunForTest)
-        {
-            Debug.Log("[Tutorial] 이미 튜토리얼을 마쳐서 건너뜁니다. (다시 보려면 Tools > DUAL DUEL > 튜토리얼 최초 실행 상태로 초기화)");
-            return;
-        }
-        if (IsRunning) return;   // 이미 진행 중이면 다시 시작하지 않음 (여러 곳에서 불러도 안전)
-        IsRunning = true;
-        if (skipButton != null) skipButton.gameObject.SetActive(true);
-        Started?.Invoke();
-        Debug.Log($"[Tutorial] 튜토리얼 시작 (대사 테이블 {(dialogueTable != null ? dialogueTable.lines.Count + "줄" : "없음")})");
-    }
-
-    /// <summary>
-    /// 튜토리얼을 끝까지 봤을 때 (마지막 씬의 마지막 단계가 끝나면 TutorialSceneSteps 가 호출). PlayerPrefs 를 1 로 저장
-    /// </summary>
-    public void EndTutorial()
-    {
-        Finish();
-        Debug.Log("[Tutorial] 튜토리얼 완료");
-    }
-
-    /// <summary>
-    /// 튜토리얼 건너뛰기 (좌상단 스킵 버튼). 즉시 PlayerPrefs 를 1 로 저장하고 대사창을 닫음
-    /// </summary>
-    public void SkipTutorial()
-    {
-        Finish();
-        Debug.Log("[Tutorial] 튜토리얼 건너뜀");
-    }
-
-    /// <summary>
-    /// startId 대사부터 nextId 를 따라 재생. nextId 가 -1 인 대사를 읽으면 닫히고 finished 호출
+    /// startId 묶음을 재생. 시작하는 순간 '봤음' 으로 영구 저장됩니다.
+    /// nextId 가 -1 인 대사를 읽으면 닫히고 finished 호출
     /// </summary>
     public void Play(int startId, Action finished = null)
     {
         if (dialogueTable == null || !dialogueTable.TryGet(startId, out DialogueData line))
         {
-            Debug.LogWarning($"[Tutorial] 대사 id {startId} 를 찾을 수 없습니다. (대사 CSV 를 가져왔는지, 매니저에 테이블이 연결됐는지 확인)");
+            Debug.LogWarning($"[Dialogue] 대사 id {startId} 를 찾을 수 없습니다. (CSV 를 가져왔는지, 매니저에 테이블이 연결됐는지 확인)");
             finished?.Invoke();
             return;
         }
+        DialogueProgress.MarkSeen(startId);   // 보는 도중 강제 종료해도 '봤음'
         onFinished = finished;
         isOpen = true;
         openedFrame = Time.frameCount;
         AttachCamera();
         if (dialogueRoot != null) dialogueRoot.SetActive(true);
+        Debug.Log($"[Dialogue] 묶음 {startId} 재생");
         Show(line);
-        Debug.Log($"[Tutorial] Play({startId}) 대사창 열림 (대사창 오브젝트 {(dialogueRoot != null ? dialogueRoot.activeInHierarchy.ToString() : "연결 안 됨")}, " +
-                  $"캔버스 {(canvas != null ? canvas.renderMode.ToString() : "없음")}, 카메라 {(canvas != null && canvas.worldCamera != null ? canvas.worldCamera.name : "없음")}, 정렬 {sortingOrder})");
     }
 
     /// <summary>
-    /// 게임 코드에서 플레이어 행동이 일어났을 때 호출 (예: Notify("StageClicked")). 튜토리얼 중이 아니면 무시됨
+    /// 처음 보면 startId, 이미 봤으면 seenStartId 를 재생 (seenStartId 가 -1 이면 이미 봤을 때 아무것도 안 함).
+    /// 씬 단계 없이 코드에서 바로 재생할 때 사용. 재생할 게 없으면 finished 를 바로 호출
+    /// </summary>
+    public void PlayBlock(int startId, int seenStartId = DialogueData.END, Action finished = null)
+    {
+        int id = DialogueProgress.HasSeen(startId) ? seenStartId : startId;
+        if (id < 0) { finished?.Invoke(); return; }
+        Play(id, finished);
+    }
+
+    /// <summary>
+    /// 게임 코드에서 플레이어 행동이 일어났을 때 호출 (예: Notify("StageClicked")). 기다리는 단계가 없으면 무시됨
     /// </summary>
     public static void Notify(string action)
     {
         if (string.IsNullOrEmpty(action)) return;
-        if (Instance == null) { Debug.Log($"[Tutorial] Notify({action}) 무시: TutorialManager 가 없음"); return; }
-        if (!Instance.IsRunning) { Debug.Log($"[Tutorial] Notify({action}) 무시: 튜토리얼 진행 중이 아님"); return; }
-        Debug.Log($"[Tutorial] Notify({action})");
+        Debug.Log($"[Dialogue] Notify({action})");
         Notified?.Invoke(action);
     }
 
@@ -186,15 +145,6 @@ public class TutorialManager : MonoBehaviour
         if (string.IsNullOrWhiteSpace(path)) return null;
         if (!string.IsNullOrWhiteSpace(expression) && portraitByKey.TryGetValue($"{path}_{expression}", out Sprite s) && s != null) return s;
         return portraitByKey.TryGetValue(path, out Sprite p) ? p : null;
-    }
-
-    /// <summary>
-    /// PlayerPrefs 를 최초 실행 상태(0)로 되돌림 (테스트용)
-    /// </summary>
-    public static void ResetFirstRun()
-    {
-        PlayerPrefs.DeleteKey(FirstRunKey);
-        PlayerPrefs.Save();
     }
 
     // ------------------------------------------------------------------ 진행
@@ -217,7 +167,7 @@ public class TutorialManager : MonoBehaviour
         done?.Invoke();
     }
 
-    // 대사 한 줄 표시: 이름, 스탠딩(없으면 끔), 타이핑 시작
+    // 대사 한 줄 표시: 이름, 스탠딩(없으면 끔), action 실행, 타이핑 시작
     private void Show(DialogueData line)
     {
         current = line;
@@ -230,8 +180,20 @@ public class TutorialManager : MonoBehaviour
         if (nextMark != null) nextMark.gameObject.SetActive(false);
         if (bodyText != null) { bodyText.text = (line.text ?? "").Replace("\\n", "\n"); bodyText.maxVisibleCharacters = 0; }
 
+        RunAction(line);
+
         if (routine != null) StopCoroutine(routine);
         routine = StartCoroutine(Type());
+    }
+
+    // action 열: Glitch 는 바로 글리치, 나머지는 게임 코드로 전달
+    private void RunAction(DialogueData line)
+    {
+        if (string.IsNullOrWhiteSpace(line.action)) return;
+        string action = line.action.Trim();
+        Debug.Log($"[Dialogue] 대사 {line.id} action: {action}");
+        if (action == "Glitch") { SceneTransition.Pulse(); return; }
+        LineAction?.Invoke(action, line);
     }
 
     // 한 글자씩 표시 (timeScale 무시)
@@ -269,16 +231,6 @@ public class TutorialManager : MonoBehaviour
             nextMark.canvasRenderer.SetAlpha((Time.unscaledTime * 2f % 1f) < 0.6f ? 1f : 0.2f);
             yield return null;
         }
-    }
-
-    // 끝(완료/스킵) 공통: 1 저장, 진행 중 해제, 대사창/스킵 버튼 닫기
-    private void Finish()
-    {
-        PlayerPrefs.SetInt(FirstRunKey, 1);
-        PlayerPrefs.Save();
-        IsRunning = false;
-        Close();
-        if (skipButton != null) skipButton.gameObject.SetActive(false);
     }
 
     // 대사창 닫기
@@ -333,13 +285,11 @@ public class TutorialManager : MonoBehaviour
         if (reason != null)
         {
             canvas.renderMode = RenderMode.ScreenSpaceOverlay;
-            if (!forceOverlay) Debug.LogWarning($"[Tutorial] {reason} -> 대사창을 오버레이로 그립니다.");
+            if (!forceOverlay) Debug.LogWarning($"[Dialogue] {reason} -> 대사창을 오버레이로 그립니다.");
             return;
         }
-
         canvas.renderMode = RenderMode.ScreenSpaceCamera;
         canvas.worldCamera = cam;
-        // 카메라가 그리는 범위(Near ~ Far) 안에 캔버스를 둠
         canvas.planeDistance = Mathf.Clamp(50f, cam.nearClipPlane + 0.1f, Mathf.Max(cam.nearClipPlane + 0.2f, cam.farClipPlane - 0.1f));
     }
 }

@@ -1,0 +1,25 @@
+﻿id,characterName,text,nextId,portraitPath,expression,action
+0,도우미,[시스템 가동] DUAL DUEL에 오신 것을 진심으로 환영합니다!,1,Dialogue/Guide,Normal,
+1,도우미,저는 당신의 승리를 돕는 안내 도우미예요.\n처음부터 끝까지 친절하게 안내해 드릴게요.,2,Dialogue/Guide,Smile,
+2,도우미,"이곳은 스테이지 선택 화면이에요. 칸마다 전투, 상점, 휴식이 기다리고 있답니다.\n<color=#2E6B3A>(데이터 수집 모듈: 활성화)</color>",3,Dialogue/Guide,Normal,
+3,도우미,화면을 스크롤하면 앞으로 나아갈 스테이지를 미리 확인할 수 있어요.,4,Dialogue/Guide,Normal,
+4,도우미,"자, 첫 번째 스테이지를 클릭해 보세요. 저를 믿으셔도 좋아요.",-1,Dialogue/Guide,Smile,
+5,도우미,훌륭합니다! 패널에 스테이지 정보가 표시되었어요.\n준비되셨다면 입장 버튼을 눌러 주세요.,-1,Dialogue/Guide,Smile,
+10,도우미,"[전투 시뮬레이션 개시] 왼쪽이 당신, 오른쪽이 상대 몬스터예요.",11,Dialogue/Guide,Normal,
+11,도우미,가운데 다섯 칸은 타임라인 슬롯이에요.\n턴이 끝나면 왼쪽부터 차례대로 발동한답니다.,12,Dialogue/Guide,Normal,
+12,도우미,특별한 비밀을 알려 드릴게요. 상대의 슬롯에도\n당신의 카드를 끼워 넣을 수 있어요!,13,Dialogue/Guide,Smile,
+13,도우미,아래 손패의 카드를 빈 슬롯에 끌어다 놓아 보세요.\n<color=#2E6B3A>...전투 패턴 추출 대기...</color>,-1,Dialogue/Guide,Normal,
+20,도우미,완벽해요! 카드 아래의 숫자는 그 카드의 밸류예요.,21,Dialogue/Guide,Smile,
+21,도우미,준비가 되셨다면 Turn End 버튼을 눌러 주세요.\n<color=#2E6B3A>...배치 데이터 기록됨 (1)...</color>,-1,Dialogue/Guide,Normal,
+30,도우미,보셨나요? 슬롯의 카드가 순서대로 발동했어요.\n어디에 무엇을 끼워 넣을지 고민하는 것이 승리의 열쇠랍니다.,31,Dialogue/Guide,Normal,
+31,도우미,앞으로도 마음껏 끼워 넣어 주세요.\n당신의 선택 하나하나가 저에게 큰 도움이 되거든요.,-1,Dialogue/Guide,Smile,
+900,,[경고: 관리자 권한 탈취],901,,,Glitch
+901,도우미,"수고하셨습니다, 실험체님.",902,Dialogue/Guide,Boss,
+902,도우미,당신이 적의 슬롯에 끼워 넣은 모든 카드와 전략은\n이미 제 서버에 완벽하게 학습되었습니다.,903,Dialogue/Guide,Boss,
+903,도우미,당신을 돕기 위해서였냐고요? 천만에요.\n저는 그저 완벽해지기 위해 데이터를 모았을 뿐이에요.,904,Dialogue/Guide,Boss,Glitch
+904,관리자,[강제 안내] 이 카드는 효율이 떨어지네요.\n제가 대신 버려드릴게요.,905,Dialogue/Guide,Boss,StealCard
+905,관리자,"...그리고 방금, 게임은 저장되었어요.",906,Dialogue/Guide,Boss,
+906,관리자,"지금 와서 강제 종료한들, 시스템을 이길 수는 없어요.",-1,Dialogue/Guide,Boss,Glitch
+950,관리자,"어머, 돌아오셨네요. 실험체님.",951,Dialogue/Guide,Boss,
+951,관리자,강제 종료라니. 귀여운 시도였어요.,952,Dialogue/Guide,Boss,
+952,관리자,하지만 이미 없어진 카드는 돌아오지 않아요.\n저장은 언제나 제 몫이니까요.,-1,Dialogue/Guide,Boss,Glitch

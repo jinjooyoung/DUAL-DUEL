@@ -18,6 +18,10 @@ public class StageManager : MonoBehaviour
 
     private StageNodeUI selectedNodeUI;
 
+    // 노드에 들어가기 직전 같은 층 노드들의 상태 (전투 중 저장 시 '다시 들어갈 수 있는' 상태로 저장하기 위함)
+    private struct NodeState { public bool canGo; public bool isVisited; }
+    private readonly Dictionary<int, NodeState> entrySnapshot = new Dictionary<int, NodeState>();
+
     [Header("연결 컴포넌트")]
     [SerializeField] private StageGenerator generator;
 
@@ -56,11 +60,6 @@ public class StageManager : MonoBehaviour
         if (SceneManager.GetActiveScene().name == "StageSelectScene")
         {
             InitializeStageSelectScene();
-        }
-
-        if (TutorialManager.Instance != null && PlayerPrefs.GetInt("TutorialStarted", 0) != 1)
-        {
-            TutorialManager.Instance.StartTutorialIfFirstRun();
         }
     }
 
@@ -107,12 +106,30 @@ public class StageManager : MonoBehaviour
     }
 
     /// <summary>
+    /// 노드에 들어가기 직전의 상태 (SaveManager.SaveInStage 가 호출). 진입 중인 층의 노드가 아니면 false
+    /// </summary>
+    public bool TryGetEntryState(int nodeId, out bool canGo, out bool isVisited)
+    {
+        canGo = isVisited = false;
+        if (!entrySnapshot.TryGetValue(nodeId, out NodeState state)) return false;
+        canGo = state.canGo;
+        isVisited = state.isVisited;
+        return true;
+    }
+
+    /// <summary>
+    /// 지금 스테이지(전투 등) 안에 들어와 있는지 (진입 전 상태를 기억하고 있는지)
+    /// </summary>
+    public bool IsInStage => entrySnapshot.Count > 0;
+
+    /// <summary>
     /// 이어하기: 불러온 챕터와 플로어를 넣음 (SaveManager 가 호출)
     /// </summary>
     public void SetRunData(int chapter, List<List<StageNode>> loadedFloors)
     {
         currentChapter = chapter;
         floors = loadedFloors ?? new List<List<StageNode>>();
+        entrySnapshot.Clear();
         currentNode = null;
         selectedNodeUI = null;
     }
@@ -162,13 +179,10 @@ public class StageManager : MonoBehaviour
             infoPanel.SetupPanel(currentNode);
         }
 
-        Debug.Log($"[노드 클릭] floor={selectedNodeUI.nodeData.floor}, " +
-          $"매니저={(TutorialManager.Instance != null)}, " +
-          $"진행중={(TutorialManager.Instance != null && TutorialManager.Instance.IsRunning)}");
-
-        if (TutorialManager.Instance != null && selectedNodeUI.nodeData.floor == 1)
+        // 대사 단계가 기다리는 중이면 다음 대사 (기다리는 단계가 없으면 무시됨)
+        if (selectedNodeUI.nodeData.floor == 1)
         {
-            TutorialManager.Notify("StageClicked");
+            DialogueManager.Notify("StageClicked");
         }
     }
 
@@ -197,7 +211,13 @@ public class StageManager : MonoBehaviour
 
         RewardManager.Instance.remainRerollCount = 1;           // 카드 보상 새로고침 1회 초기화
 
-        // 3. 진입 확정: 방문 처리 + 동일 층 노드 비활성화
+        // 3. 진입 확정: 바꾸기 전 같은 층 상태를 기억해 두고 (전투 중 저장용), 방문 처리 + 동일 층 노드 비활성화
+        entrySnapshot.Clear();
+        foreach (var node in floors[currentNode.floor])
+        {
+            entrySnapshot[node.id] = new NodeState { canGo = node.canGo, isVisited = node.isVisited };
+        }
+
         currentNode.isVisited = true;
 
         foreach (var node in floors[currentNode.floor])
@@ -244,6 +264,8 @@ public class StageManager : MonoBehaviour
     /// </summary>
     public void ReturnToStageSelect()
     {
+        entrySnapshot.Clear();   // 스테이지를 마쳤으므로 진입 전 상태는 더 이상 필요 없음
+
         if (currentNode != null)
         {
             // 1. 현재 노드 완료 마킹

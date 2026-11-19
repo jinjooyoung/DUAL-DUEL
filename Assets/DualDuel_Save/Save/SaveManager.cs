@@ -9,6 +9,7 @@ using UnityEngine;
 /// 런 저장 / 이어하기. JsonUtility + AES 암호화 (.NET 기본 기능만 사용, 외부 패키지 없음).
 ///
 /// 저장: SaveManager.Save()          스테이지 선택 화면에 들어올 때마다 StageManager 가 호출
+/// 전투 중 저장: SaveManager.SaveInStage()  보스 카드 강탈처럼 되돌릴 수 없게 할 때 (들어온 노드는 다시 들어갈 수 있게 저장)
 /// 이어하기: SaveManager.ContinueGame()  메인 화면 이어하기 버튼 (SaveMenuButtons.OnClickContinue)
 /// 삭제: SaveManager.DeleteSave()     게임 오버 / 런 클리어 때 호출
 ///
@@ -47,20 +48,36 @@ public static class SaveManager
     /// </summary>
     public static bool Save()
     {
+        return Write(false);
+    }
+
+    /// <summary>
+    /// 스테이지(전투 등) 안에서 저장합니다. 덱/체력/골드/가중치는 지금 값, 들어온 노드가 있는 층은 '들어가기 직전' 상태로 저장해서
+    /// 이어하기 후 같은 노드에 다시 들어갈 수 있습니다. (보스의 카드 강탈 직후 호출: 카드는 사라진 채로 보스에 재도전)
+    /// 스테이지 밖이면 일반 저장과 같습니다. 성공하면 true
+    /// </summary>
+    public static bool SaveInStage()
+    {
+        return Write(true);
+    }
+
+    // 모으기 -> 암호화 -> 원자적 쓰기
+    private static bool Write(bool beforeEntry)
+    {
         if (pendingGlobals || pendingStage)
         {
             Debug.LogWarning("[Save] 불러온 데이터가 아직 다 적용되지 않아 저장을 건너뜁니다.");
             return false;
         }
 
-        SaveData data = Capture();
+        SaveData data = Capture(beforeEntry);
         if (data == null) return false;
 
         try
         {
             string json = JsonUtility.ToJson(data);
             WriteAtomic(Encrypt(json));
-            Debug.Log($"<color=green>[Save] 저장 완료 ({data.deck.Count}장, HP {data.currentHP}, 골드 {data.currentGold}, {data.currentChapter}챕터 {data.floors.Count}층)</color>");
+            Debug.Log($"<color=green>[Save] {(beforeEntry ? "스테이지 안에서 " : "")}저장 완료 ({data.deck.Count}장, HP {data.currentHP}, 골드 {data.currentGold}, {data.currentChapter}챕터 {data.floors.Count}층)</color>");
             return true;
         }
         catch (Exception e)
@@ -70,8 +87,8 @@ public static class SaveManager
         }
     }
 
-    // 매니저들에서 값 모으기
-    private static SaveData Capture()
+    // 매니저들에서 값 모으기 (beforeEntry: 들어온 층의 노드는 진입 직전 상태로)
+    private static SaveData Capture(bool beforeEntry)
     {
         GameManager gm = GameManager.Instance;
         StageManager sm = StageManager.Instance;
@@ -105,14 +122,22 @@ public static class SaveManager
                 var fs = new FloorSaveData();
                 foreach (StageNode node in floor)
                 {
+                    // 들어온 층의 노드만 진입 직전 상태로 바꾸고, 나머지는 지금 값 그대로
+                    bool canGo = node.canGo, isVisited = node.isVisited;
+                    if (beforeEntry && sm.TryGetEntryState(node.id, out bool entryCanGo, out bool entryVisited))
+                    {
+                        canGo = entryCanGo;
+                        isVisited = entryVisited;
+                    }
+
                     fs.nodes.Add(new NodeSaveData
                     {
                         id = node.id,
                         floor = node.floor,
                         xIndex = node.xIndex,
                         stageType = (int)node.stageType,
-                        canGo = node.canGo,
-                        isVisited = node.isVisited,
+                        canGo = canGo,
+                        isVisited = isVisited,
                         prevIds = Ids(node.prevStages),
                         nextIds = Ids(node.nextStages),
                     });

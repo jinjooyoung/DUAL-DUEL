@@ -9,15 +9,15 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// 튜토리얼 에디터 메뉴
-///   Tools > DUAL DUEL > 대사 CSV 가져오기              엑셀 Dialogue 시트를 'CSV UTF-8' 로 저장한 파일 -> DialogueTable 에셋
-///   Tools > DUAL DUEL > 튜토리얼 매니저 프리팹 만들기    대사창/스탠딩/TMP/스킵 버튼이 들어 있는 TutorialManager 프리팹 생성 (+ 열린 씬에 배치)
-///   Tools > DUAL DUEL > 튜토리얼 최초 실행 상태로 초기화  PlayerPrefs 를 0 으로 (테스트용)
+/// 다이얼로그 에디터 메뉴
+///   Tools > DUAL DUEL > 대사 CSV 가져오기            엑셀 Dialogue 시트를 'CSV UTF-8' 로 저장한 파일 -> DialogueTable 에셋
+///   Tools > DUAL DUEL > 다이얼로그 매니저 프리팹 만들기  대사창/스탠딩/TMP 가 들어 있는 DialogueManager 프리팹 생성
+///   Tools > DUAL DUEL > 저장 데이터 > ...              다이얼로그 기록 / 게임 진행 저장 / 둘 다 삭제
 /// </summary>
-public static class TutorialEditorTools
+public static class DialogueEditorTools
 {
     const string DefaultTablePath = "Assets/Data/DialogueTable.asset";
-    const string PrefabPath = "Assets/Prefabs/Tutorial/TutorialManager.prefab";
+    const string PrefabPath = "Assets/Prefabs/Dialogue/DialogueManager.prefab";
 
     [MenuItem("Tools/DUAL DUEL/대사 CSV 가져오기")]
     public static void ImportCsv()
@@ -31,7 +31,7 @@ public static class TutorialEditorTools
         // 헤더 이름으로 열 찾기 (열 순서가 바뀌어도 동작)
         string[] header = rows[0];
         int Col(string name) { for (int i = 0; i < header.Length; i++) if (header[i].Trim().Equals(name, System.StringComparison.OrdinalIgnoreCase)) return i; return -1; }
-        int cId = Col("id"), cName = Col("characterName"), cText = Col("text"), cNext = Col("nextId"), cPath = Col("portraitPath"), cExpr = Col("expression");
+        int cId = Col("id"), cName = Col("characterName"), cText = Col("text"), cNext = Col("nextId"), cPath = Col("portraitPath"), cExpr = Col("expression"), cAction = Col("action");
         if (cId < 0 || cText < 0 || cNext < 0)
         {
             EditorUtility.DisplayDialog("대사 CSV 가져오기", "id, text, nextId 열이 필요합니다.", "확인");
@@ -52,6 +52,7 @@ public static class TutorialEditorTools
                 nextId = int.TryParse(Get(cNext), out int next) ? next : DialogueData.END,   // 비어 있으면 끝(-1)
                 portraitPath = Get(cPath),
                 expression = Get(cExpr),
+                action = Get(cAction),
             });
         }
 
@@ -68,14 +69,14 @@ public static class TutorialEditorTools
         EditorUtility.SetDirty(table);
         AssetDatabase.SaveAssets();
         Selection.activeObject = table;
-        Debug.Log($"[튜토리얼] 대사 {lines.Count}줄을 {AssetDatabase.GetAssetPath(table)} 에 가져왔습니다.");
+        Debug.Log($"[다이얼로그] 대사 {lines.Count}줄을 {AssetDatabase.GetAssetPath(table)} 에 가져왔습니다.");
     }
 
-    [MenuItem("Tools/DUAL DUEL/튜토리얼 매니저 프리팹 만들기")]
+    [MenuItem("Tools/DUAL DUEL/다이얼로그 매니저 프리팹 만들기")]
     public static void CreatePrefab()
     {
         if (AssetDatabase.LoadAssetAtPath<GameObject>(PrefabPath) != null &&
-            !EditorUtility.DisplayDialog("튜토리얼 매니저 프리팹", $"{PrefabPath} 가 이미 있습니다.\n덮어쓰면 프리팹에서 직접 바꾼 위치/크기가 초기화됩니다.", "덮어쓰기", "취소"))
+            !EditorUtility.DisplayDialog("다이얼로그 매니저 프리팹", $"{PrefabPath} 가 이미 있습니다.\n덮어쓰면 프리팹에서 직접 바꾼 위치/크기가 초기화됩니다.", "덮어쓰기", "취소"))
             return;
 
         Sprite frame = FindAsset<Sprite>("UI_ScrollFrame", "t:Sprite");
@@ -83,7 +84,7 @@ public static class TutorialEditorTools
         Color nameColor = new Color(0.55f, 1f, 0.65f), textColor = new Color(0.8f, 1f, 0.85f);
 
         // 루트: 캔버스 (카메라는 실행 중에 매니저가 붙임)
-        var root = new GameObject("TutorialManager", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
+        var root = new GameObject("DialogueManager", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         root.layer = LayerMask.NameToLayer("UI");
         var canvas = root.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -136,21 +137,8 @@ public static class TutorialEditorTools
         mrt.localEulerAngles = new Vector3(0f, 0f, 45f);
         next.gameObject.SetActive(false);
 
-        // 좌상단 스킵 버튼 (대사창의 입력 막는 화면보다 위에 그려지도록 Dialogue 다음 순서)
-        Sprite btnSprite = FindAsset<Sprite>("UI_Button_Dark", "t:Sprite");
-        Image skipImg = AddImage(Child("SkipButton", root.transform), btnSprite, btnSprite != null ? Color.white : new Color(0.04f, 0.16f, 0.08f, 0.95f));
-        if (btnSprite != null) skipImg.type = Image.Type.Sliced;
-        skipImg.raycastTarget = true;
-        RectTransform srt = skipImg.rectTransform;
-        srt.anchorMin = srt.anchorMax = new Vector2(0f, 1f); srt.pivot = new Vector2(0f, 1f);
-        srt.sizeDelta = new Vector2(260f, 56f); srt.anchoredPosition = new Vector2(30f, -30f);
-        Button skip = skipImg.gameObject.AddComponent<Button>();
-        TMP_Text skipLabel = AddText(Child("Label", srt), font, 22f, textColor, TextAlignmentOptions.Center, "튜토리얼 건너뛰기");
-        Stretch(skipLabel.rectTransform);
-        skip.gameObject.SetActive(false);   // 튜토리얼 진행 중에만 매니저가 켬
-
         // 매니저 + 연결
-        var tm = root.AddComponent<TutorialManager>();
+        var tm = root.AddComponent<DialogueManager>();
         var so = new SerializedObject(tm);
         so.FindProperty("dialogueTable").objectReferenceValue = FindFirst<DialogueTableSO>("t:DialogueTableSO");
         so.FindProperty("canvas").objectReferenceValue = canvas;
@@ -159,7 +147,6 @@ public static class TutorialEditorTools
         so.FindProperty("nameText").objectReferenceValue = name;
         so.FindProperty("bodyText").objectReferenceValue = body;
         so.FindProperty("nextMark").objectReferenceValue = next;
-        so.FindProperty("skipButton").objectReferenceValue = skip;
         so.ApplyModifiedPropertiesWithoutUndo();
         dialogue.gameObject.SetActive(false);   // 평소엔 꺼져 있음
 
@@ -168,24 +155,45 @@ public static class TutorialEditorTools
         Object.DestroyImmediate(root);
         Selection.activeObject = prefab;
         EditorGUIUtility.PingObject(prefab);
-        Debug.Log($"[튜토리얼] 프리팹을 만들었습니다: {PrefabPath}" +
+        Debug.Log($"[다이얼로그] 프리팹을 만들었습니다: {PrefabPath}" +
                   (frame == null ? " (UI_ScrollFrame 스프라이트를 찾지 못해 단색 대사창으로 만들었습니다)" : ""));
 
-        if (Object.FindFirstObjectByType<TutorialManager>(FindObjectsInactive.Include) == null &&
-            EditorUtility.DisplayDialog("튜토리얼 매니저 프리팹", "열린 씬에 배치할까요? (게임의 첫 씬, 메인 씬에 하나만 두면 됩니다)", "배치", "나중에"))
+        if (Object.FindFirstObjectByType<DialogueManager>(FindObjectsInactive.Include) == null &&
+            EditorUtility.DisplayDialog("다이얼로그 매니저 프리팹", "열린 씬에 배치할까요? (게임의 첫 씬, 메인 씬에 하나만 두면 됩니다)", "배치", "나중에"))
         {
             var inst = (GameObject)PrefabUtility.InstantiatePrefab(prefab);
-            Undo.RegisterCreatedObjectUndo(inst, "TutorialManager");
+            Undo.RegisterCreatedObjectUndo(inst, "DialogueManager");
             EditorSceneManager.MarkSceneDirty(inst.scene);
             Selection.activeGameObject = inst;
         }
     }
 
-    [MenuItem("Tools/DUAL DUEL/튜토리얼 최초 실행 상태로 초기화")]
-    public static void ResetFirstRun()
+    [MenuItem("Tools/DUAL DUEL/저장 데이터/다이얼로그 기록 삭제 (본 대사 초기화)")]
+    public static void DeleteDialogueProgress()
     {
-        TutorialManager.ResetFirstRun();
-        Debug.Log("[튜토리얼] 튜토리얼 미완료 상태(0)로 초기화했습니다. 다음 게임 시작 때 튜토리얼이 나옵니다.");
+        if (!EditorUtility.DisplayDialog("다이얼로그 기록 삭제", "본 대사 기록(dialogue.sav)을 지웁니다.\n모든 대사 묶음을 처음 보는 것으로 돌아갑니다.", "삭제", "취소")) return;
+        DialogueProgress.ResetAll();
+    }
+
+    [MenuItem("Tools/DUAL DUEL/저장 데이터/게임 진행 저장 삭제 (이어하기 초기화)")]
+    public static void DeleteRunSave()
+    {
+        if (!EditorUtility.DisplayDialog("게임 진행 저장 삭제", "진행 중인 런 저장(run.sav)을 지웁니다.", "삭제", "취소")) return;
+        SaveManager.DeleteSave();
+    }
+
+    [MenuItem("Tools/DUAL DUEL/저장 데이터/모두 삭제")]
+    public static void DeleteAll()
+    {
+        if (!EditorUtility.DisplayDialog("저장 데이터 모두 삭제", "다이얼로그 기록과 게임 진행 저장을 모두 지웁니다.", "삭제", "취소")) return;
+        DialogueProgress.ResetAll();
+        SaveManager.DeleteSave();
+    }
+
+    [MenuItem("Tools/DUAL DUEL/저장 데이터/저장 폴더 열기")]
+    public static void OpenSaveFolder()
+    {
+        EditorUtility.RevealInFinder(Application.persistentDataPath);
     }
 
     // ------------------------------------------------------------------ helpers
