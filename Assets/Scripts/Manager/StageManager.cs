@@ -13,6 +13,9 @@ public class StageManager : MonoBehaviour
 
     [Header("런타임 맵 데이터")]
     public int currentChapter = 1;
+
+    [Header("스테이지 선택 화면 카메라 위치 (씬으로 들어가기 전에 저장, 돌아오면 StageMapCameraController 가 복원)")]
+    public Vector3 scrollPos;
     public List<List<StageNode>> floors = new List<List<StageNode>>();
     public StageNode currentNode; // 현재 선택/진입한 노드
 
@@ -157,6 +160,7 @@ public class StageManager : MonoBehaviour
 
         floors = generator.GenerateMap(mapWidth, mapHeight, weights);
         currentNode = null;
+        scrollPos = new Vector3(10, -1, 50);   // 새 맵은 처음 위치부터
     }
 
     /// <summary>
@@ -224,6 +228,9 @@ public class StageManager : MonoBehaviour
         {
             node.canGo = false;
         }
+
+        // 4. 돌아왔을 때 같은 위치를 보도록 지금 카메라 위치 저장
+        if (Camera.main != null) scrollPos = Camera.main.transform.position;
 
         string targetScene = GetSceneNameForType(executionType);
         SceneTransition.Load(targetScene);
@@ -323,6 +330,7 @@ public class StageManager : MonoBehaviour
         currentChapter = 1;
         currentNode = null;
         selectedNodeUI = null;
+        scrollPos = Vector3.zero;
 
         if (GameManager.Instance != null)
         {

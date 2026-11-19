@@ -4,18 +4,18 @@ using UnityEngine.EventSystems;
 [RequireComponent(typeof(Collider))]
 public class StageMapCameraController : MonoBehaviour
 {
-    [Header("Å¸°Ù Ä«¸Ş¶ó")]
+    [Header("íƒ€ê²Ÿ ì¹´ë©”ë¼")]
     [SerializeField] private Camera targetCamera;
 
-    [Header("ÀÌµ¿ °¨µµ ¼³Á¤")]
-    [SerializeField] private float dragSpeed = 1.0f;     // ¸¶¿ì½º µå·¡±× °¨µµ
-    [SerializeField] private float scrollSpeed = 5.0f;   // ¸¶¿ì½º ÈÙ °¨µµ
-    [SerializeField] private float smoothTime = 0.1f;    // °¨¼Ó º¸°£ ½Ã°£
+    [Header("ì´ë™ ê°ë„ ì„¤ì •")]
+    [SerializeField] private float dragSpeed = 1.0f;     // ë§ˆìš°ìŠ¤ ë“œë˜ê·¸ ê°ë„
+    [SerializeField] private float scrollSpeed = 5.0f;   // ë§ˆìš°ìŠ¤ íœ  ê°ë„
+    [SerializeField] private float smoothTime = 0.1f;    // ê°ì† ë³´ê°„ ì‹œê°„
 
-    [Header("ÁÂÇ¥ ¼³Á¤")]
-    [SerializeField] private float minX = 10f;           // ÃÖ¼Ò ½ÃÀÛ XÁÂÇ¥
-    [SerializeField] private float fixedY = -1f;         // °íÁ¤ YÁÂÇ¥ (-1f)
-    private float maxX = 10f;                            // ¸¶Áö¸· ³ëµå ±âÁØ ÃÖ´ë XÁÂÇ¥
+    [Header("ì¢Œí‘œ ì„¤ì •")]
+    [SerializeField] private float minX = 10f;           // ìµœì†Œ ì‹œì‘ Xì¢Œí‘œ
+    [SerializeField] private float fixedY = -1f;         // ê³ ì • Yì¢Œí‘œ (-1f)
+    private float maxX = 59.5f;                            // ë§ˆì§€ë§‰ ë…¸ë“œ ê¸°ì¤€ ìµœëŒ€ Xì¢Œí‘œ
 
     private Vector3 dragOriginWorld;
     private float targetCameraX;
@@ -29,28 +29,36 @@ public class StageMapCameraController : MonoBehaviour
             targetCamera = Camera.main;
         }
 
-        // 1. Ä«¸Ş¶ó ¹× ¹è°æÀÇ ÃÊ±â À§Ä¡¸¦ (10, -1)·Î ¼³Á¤
-        targetCameraX = minX;
+        // 1. ìµœëŒ€ ì´ë™ ê°€ëŠ¥ Xì¢Œí‘œ ë¨¼ì € ê³„ì‚° (ë³µì›í•  ìœ„ì¹˜ë¥¼ ì´ë™ ë²”ìœ„ ì•ˆìœ¼ë¡œ ë§ì¶”ë ¤ë©´ í•„ìš”)
+        CalculateMaxX();
+
+        // 2. ì‹œì‘ ìœ„ì¹˜: ìŠ¤í…Œì´ì§€ ë§¤ë‹ˆì €ì— ì €ì¥ëœ ìœ„ì¹˜ê°€ ìˆìœ¼ë©´ ê±°ê¸°ë¡œ, ì—†ìœ¼ë©´ ì²˜ìŒ ìœ„ì¹˜(minX)
+        float startX = minX;
+        if (StageManager.Instance != null)
+        {
+            startX = Mathf.Clamp(StageManager.Instance.scrollPos.x, minX, maxX);
+        }
+
+        // 3. Update ê°€ ë§¤ í”„ë ˆì„ targetCameraX ë¡œ ëŒì–´ë‹¹ê¸°ë¯€ë¡œ, ì¹´ë©”ë¼ ìœ„ì¹˜ë¿ ì•„ë‹ˆë¼ ëª©í‘œê°’ë„ ê°™ì€ ìœ„ì¹˜ë¡œ
+        targetCameraX = startX;
+        currentVelocityX = 0f;
         Vector3 camPos = targetCamera.transform.position;
-        camPos.x = minX;
+        camPos.x = startX;
         camPos.y = fixedY;
         targetCamera.transform.position = camPos;
 
         UpdateBackgroundPosition();
-
-        // 2. ÃÖ´ë ÀÌµ¿ °¡´É XÁÂÇ¥ °è»ê
-        CalculateMaxX();
     }
 
     private void Update()
     {
-        // UI ¿ä¼Ò¸¦ Å¬¸¯ ÁßÀÏ ¶§´Â ¸Ê µå·¡±×/½ºÅ©·Ñ Â÷´Ü
+        // UI ìš”ì†Œë¥¼ í´ë¦­ ì¤‘ì¼ ë•ŒëŠ” ë§µ ë“œë˜ê·¸/ìŠ¤í¬ë¡¤ ì°¨ë‹¨
         if (EventSystem.current != null && EventSystem.current.IsPointerOverGameObject())
         {
             return;
         }
 
-        // 3. ¸¶¿ì½º ÈÙ ÀÔ·Â Ã³¸® (ÈÙ ¾Æ·¡: ¿À¸¥ÂÊ, ÈÙ À§: ¿ŞÂÊ)
+        // 3. ë§ˆìš°ìŠ¤ íœ  ì…ë ¥ ì²˜ë¦¬ (íœ  ì•„ë˜: ì˜¤ë¥¸ìª½, íœ  ìœ„: ì™¼ìª½)
         float scrollInput = Input.GetAxis("Mouse ScrollWheel");
         if (Mathf.Abs(scrollInput) > 0.001f)
         {
@@ -58,12 +66,12 @@ public class StageMapCameraController : MonoBehaviour
             targetCameraX = Mathf.Clamp(targetCameraX, minX, maxX);
         }
 
-        // 4. Ä«¸Ş¶ó XÃà ÀÌµ¿ º¸°£ ¹× YÁÂÇ¥ -1 °íÁ¤
+        // 4. ì¹´ë©”ë¼ Xì¶• ì´ë™ ë³´ê°„ ë° Yì¢Œí‘œ -1 ê³ ì •
         Vector3 currentCamPos = targetCamera.transform.position;
         float newCamX = Mathf.SmoothDamp(currentCamPos.x, targetCameraX, ref currentVelocityX, smoothTime);
         targetCamera.transform.position = new Vector3(newCamX, fixedY, currentCamPos.z);
 
-        // 5. ¹è°æ ¿ÀºêÁ§Æ®ÀÇ À§Ä¡¸¦ Ä«¸Ş¶ó¿Í µ¿±âÈ­ (X´Â ¿¬µ¿, Y´Â -1 °íÁ¤, Z´Â ¹è°æ °íÀ¯°ª À¯Áö)
+        // 5. ë°°ê²½ ì˜¤ë¸Œì íŠ¸ì˜ ìœ„ì¹˜ë¥¼ ì¹´ë©”ë¼ì™€ ë™ê¸°í™” (XëŠ” ì—°ë™, YëŠ” -1 ê³ ì •, ZëŠ” ë°°ê²½ ê³ ìœ ê°’ ìœ ì§€)
         UpdateBackgroundPosition();
     }
 
@@ -97,7 +105,7 @@ public class StageMapCameraController : MonoBehaviour
     }
 
     /// <summary>
-    /// ¹è°æ ¿ÀºêÁ§Æ®ÀÇ XY ÁÂÇ¥¸¦ Ä«¸Ş¶ó¿Í µ¿ÀÏÇÏ°Ô (X´Â Ä«¸Ş¶óX, Y´Â fixedY) À¯Áö
+    /// ë°°ê²½ ì˜¤ë¸Œì íŠ¸ì˜ XY ì¢Œí‘œë¥¼ ì¹´ë©”ë¼ì™€ ë™ì¼í•˜ê²Œ (XëŠ” ì¹´ë©”ë¼X, YëŠ” fixedY) ìœ ì§€
     /// </summary>
     private void UpdateBackgroundPosition()
     {
