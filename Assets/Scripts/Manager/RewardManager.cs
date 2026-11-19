@@ -2,13 +2,13 @@ using System.Collections.Generic;
 using UnityEngine;
 
 /// <summary>
-/// ÀüÅõ ½Â¸® ÈÄ Ä«µå º¸»ó µ¥ÀÌÅÍ ¹× »õ·Î°íÄ§ ¼ö·®À» ÃÑ°ıÇÏ´Â Àü¿ª ½Ì±ÛÅæ ¸Å´ÏÀú
+/// ì „íˆ¬ ìŠ¹ë¦¬ í›„ ì¹´ë“œ ë³´ìƒ ë°ì´í„° ë° ìƒˆë¡œê³ ì¹¨ ìˆ˜ëŸ‰ì„ ì´ê´„í•˜ëŠ” ì „ì—­ ì‹±ê¸€í†¤ ë§¤ë‹ˆì €
 /// </summary>
 public class RewardManager : MonoBehaviour
 {
     public static RewardManager Instance { get; private set; }
 
-    [Header("Ã©ÅÍº° µî±Ş °¡ÁßÄ¡")]
+    [Header("ì±•í„°ë³„ ë“±ê¸‰ ê°€ì¤‘ì¹˜")]
     public readonly Dictionary<RankType, float> chapter1Weights = new()
     {
         { RankType.Common, 25f },
@@ -39,11 +39,11 @@ public class RewardManager : MonoBehaviour
     private SoftPityProbabilityCorrector<RankType> rankCorrector;
     private bool isInitialized = false;
 
-    [Header("ÇöÀç º¸»ó ÃßÃ· µ¥ÀÌÅÍ")]
+    [Header("í˜„ì¬ ë³´ìƒ ì¶”ì²¨ ë°ì´í„°")]
     public List<CardSO> currentRewardCards = new List<CardSO>();
 
-    [Header("Àü¿ª »õ·Î°íÄ§ Á¦ÇÑ")]
-    public int remainRerollCount = 1; // ÇÑ ÀüÅõ´ç »õ·Î°íÄ§ 1È¸ °¡´É. ÀüÅõ ¾À ÁøÀÔ½Ã 1·Î ÃÊ±âÈ­
+    [Header("ì „ì—­ ìƒˆë¡œê³ ì¹¨ ì œí•œ")]
+    public int remainRerollCount = 1; // í•œ ì „íˆ¬ë‹¹ ìƒˆë¡œê³ ì¹¨ 1íšŒ ê°€ëŠ¥. ì „íˆ¬ ì”¬ ì§„ì…ì‹œ 1ë¡œ ì´ˆê¸°í™”
 
     private void Awake()
     {
@@ -65,7 +65,7 @@ public class RewardManager : MonoBehaviour
 
         rankCorrector = new SoftPityProbabilityCorrector<RankType>(chapter1Weights, (int)RankType.Rare);
         isInitialized = true;
-        Debug.Log("<color=green>[RewardManager] º¸»ó ÃßÃ·±â ÃÊ±âÈ­ ¿Ï·á</color>");
+        Debug.Log("<color=green>[RewardManager] ë³´ìƒ ì¶”ì²¨ê¸° ì´ˆê¸°í™” ì™„ë£Œ</color>");
     }
 
     public void SetChapter(int chapter)
@@ -80,6 +80,39 @@ public class RewardManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// ì±•í„°ì— ë§ëŠ” ì›ë³¸ ê°€ì¤‘ì¹˜ í…Œì´ë¸”
+    /// </summary>
+    public Dictionary<RankType, float> GetChapterWeights(int chapter)
+    {
+        switch (chapter)
+        {
+            case 2: return chapter2Weights;
+            case 3: return chapter3Weights;
+            default: return chapter1Weights;
+        }
+    }
+
+    /// <summary>
+    /// ì €ì¥ìš©: ë³´ìƒ ì¶”ì²¨ê¸°ì˜ í˜„ì¬ ê°€ì¤‘ì¹˜ [í‚¤, ê°’, ...]
+    /// </summary>
+    public float[] ExportRankWeights()
+    {
+        if (rankCorrector == null) Initialize();
+        return rankCorrector.ExportCurrentWeights();
+    }
+
+    /// <summary>
+    /// ë¶ˆëŸ¬ì˜¤ê¸°: ì €ì¥ëœ ì±•í„°ì˜ í…Œì´ë¸”ë¡œ ì¶”ì²¨ê¸°ë¥¼ ë§Œë“¤ê³  í˜„ì¬ ê°€ì¤‘ì¹˜ë¥¼ ë®ì–´ì”€
+    /// (ì›ë³¸ì„ ì±•í„° í…Œì´ë¸”ë¡œ í•´ì•¼ ê³ ë“±ê¸‰ì´ ë‚˜ì™€ ë¦¬ì…‹ë  ë•Œ ê·¸ ì±•í„° ê°’ìœ¼ë¡œ ëŒì•„ê°)
+    /// </summary>
+    public void ImportRankWeights(int chapter, float[] data)
+    {
+        rankCorrector = new SoftPityProbabilityCorrector<RankType>(GetChapterWeights(chapter), (int)RankType.Rare);
+        rankCorrector.ImportCurrentWeights(data);
+        isInitialized = true;
+    }
+
     public RankType EvaluateRank()
     {
         if (rankCorrector == null) Initialize();
@@ -90,14 +123,14 @@ public class RewardManager : MonoBehaviour
     {
         if (DataManager.Instance == null)
         {
-            Debug.LogError("<color=red>[RewardManager] DataManager.Instance°¡ nullÀÔ´Ï´Ù!</color>");
+            Debug.LogError("<color=red>[RewardManager] DataManager.Instanceê°€ nullì…ë‹ˆë‹¤!</color>");
             return null;
         }
 
         List<CardSO> cardList = DataManager.Instance.GetCardsByRank(rank);
         if (cardList == null || cardList.Count == 0)
         {
-            Debug.LogWarning($"<color=yellow>[RewardManager] '{rank}' µî±Ş Ä«µå°¡ ºñ¾îÀÖ½À´Ï´Ù.</color>");
+            Debug.LogWarning($"<color=yellow>[RewardManager] '{rank}' ë“±ê¸‰ ì¹´ë“œê°€ ë¹„ì–´ìˆìŠµë‹ˆë‹¤.</color>");
             return null;
         }
 
@@ -106,7 +139,7 @@ public class RewardManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Ä«µå 3ÀåÀ» ÀÏ°ı ÃßÃ·ÇÏ¿© ÀÓ½Ã º¸»ó ¸®½ºÆ®¸¦ ±¸¼ºÇÕ´Ï´Ù.
+    /// ì¹´ë“œ 3ì¥ì„ ì¼ê´„ ì¶”ì²¨í•˜ì—¬ ì„ì‹œ ë³´ìƒ ë¦¬ìŠ¤íŠ¸ë¥¼ êµ¬ì„±í•©ë‹ˆë‹¤.
     /// </summary>
     public void GenerateRewardCards()
     {
@@ -117,47 +150,47 @@ public class RewardManager : MonoBehaviour
             RankType rolledRank = EvaluateRank();
             CardSO card = GetRandomCardByRank(rolledRank);
 
-            // ¾ÈÀüÀåÄ¡: È¤½Ã¶óµµ nullÀÌ ³ª¿À¸é ÇÑ ¹ø ´õ CommonÀ¸·Î Fallback
+            // ì•ˆì „ì¥ì¹˜: í˜¹ì‹œë¼ë„ nullì´ ë‚˜ì˜¤ë©´ í•œ ë²ˆ ë” Commonìœ¼ë¡œ Fallback
             if (card == null)
             {
                 card = GetRandomCardByRank(RankType.Common);
             }
 
             currentRewardCards.Add(card);
-            Debug.Log($"<color=cyan>[RewardManager] {i}¹ø ½½·Ô Ä«µå ¼¼ÆÃ: {card?.nameKey} (µî±Ş: {rolledRank})</color>");
+            Debug.Log($"<color=cyan>[RewardManager] {i}ë²ˆ ìŠ¬ë¡¯ ì¹´ë“œ ì„¸íŒ…: {card?.nameKey} (ë“±ê¸‰: {rolledRank})</color>");
         }
     }
 
     /// <summary>
-    /// Æ¯Á¤ ÀÎµ¦½ºÀÇ Ä«µå ½½·Ô¸¸ »õ·Î ÃßÃ·ÇÏ¿© µ¤¾î¾º¿ó´Ï´Ù.
+    /// íŠ¹ì • ì¸ë±ìŠ¤ì˜ ì¹´ë“œ ìŠ¬ë¡¯ë§Œ ìƒˆë¡œ ì¶”ì²¨í•˜ì—¬ ë®ì–´ì”Œì›ë‹ˆë‹¤.
     /// </summary>
     public bool RerollCardSlot(int index)
     {
         if (remainRerollCount <= 0)
         {
-            Debug.LogWarning("[RewardManager] ³²Àº »õ·Î°íÄ§ È½¼ö°¡ ¾ø½À´Ï´Ù!");
+            Debug.LogWarning("[RewardManager] ë‚¨ì€ ìƒˆë¡œê³ ì¹¨ íšŸìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤!");
             return false;
         }
 
         if (index < 0 || index >= currentRewardCards.Count)
         {
-            Debug.LogError($"[RewardManager] Àß¸øµÈ ¸®·Ñ ÀÎµ¦½ºÀÔ´Ï´Ù: {index}");
+            Debug.LogError($"[RewardManager] ì˜ëª»ëœ ë¦¬ë¡¤ ì¸ë±ìŠ¤ì…ë‹ˆë‹¤: {index}");
             return false;
         }
 
-        // »õ·Î°íÄ§ Â÷°¨ ¹× »õ Ä«µå ÃßÃâ
+        // ìƒˆë¡œê³ ì¹¨ ì°¨ê° ë° ìƒˆ ì¹´ë“œ ì¶”ì¶œ
         remainRerollCount--;
         RankType rolledRank = EvaluateRank();
         CardSO newCard = GetRandomCardByRank(rolledRank) ?? GetRandomCardByRank(RankType.Common);
 
         currentRewardCards[index] = newCard;
-        Debug.Log($"<color=yellow>[RewardManager] {index}¹ø ½½·Ô »õ·Î°íÄ§ ¼º°ø! -> {newCard.nameKey} (³²Àº È½¼ö: {remainRerollCount})</color>");
+        Debug.Log($"<color=yellow>[RewardManager] {index}ë²ˆ ìŠ¬ë¡¯ ìƒˆë¡œê³ ì¹¨ ì„±ê³µ! -> {newCard.nameKey} (ë‚¨ì€ íšŸìˆ˜: {remainRerollCount})</color>");
 
         return true;
     }
 
     /// <summary>
-    /// ÇÃ·¹ÀÌ¾î°¡ Ä«µå¸¦ ¼±ÅÃÇßÀ» ¶§ GameManagerÀÇ µ¦¿¡ CardInstance ÇüÅÂ·Î Ãß°¡
+    /// í”Œë ˆì´ì–´ê°€ ì¹´ë“œë¥¼ ì„ íƒí–ˆì„ ë•Œ GameManagerì˜ ë±ì— CardInstance í˜•íƒœë¡œ ì¶”ê°€
     /// </summary>
     public void SelectCard(int index)
     {
@@ -171,7 +204,7 @@ public class RewardManager : MonoBehaviour
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.deck.Add(newInstance);
-                Debug.Log($"<color=green>[RewardManager] µ¦ Ãß°¡ ¿Ï·á! {chosenSO.nameKey} (ÇöÀç ÃÑ µ¦ ¼ö·®: {GameManager.Instance.deck.Count})</color>");
+                Debug.Log($"<color=green>[RewardManager] ë± ì¶”ê°€ ì™„ë£Œ! {chosenSO.nameKey} (í˜„ì¬ ì´ ë± ìˆ˜ëŸ‰: {GameManager.Instance.deck.Count})</color>");
             }
         }
 

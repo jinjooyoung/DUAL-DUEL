@@ -6,6 +6,6 @@ public class MainMenuController : MonoBehaviour
 {
     public void StartGame()
     {
-        SceneManager.LoadScene("StageSelectScene");
+        SceneTransition.Load("StageSelectScene");
     }
 }

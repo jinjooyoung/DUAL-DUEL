@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -78,6 +78,9 @@ public class StageManager : MonoBehaviour
 
     public void InitializeStageSelectScene()
     {
+        // 이어하기로 불러온 맵이 있으면 먼저 넣음 (메인 화면에는 StageManager 가 없어서 여기서 적용)
+        SaveManager.ApplyPending();
+
         if (floors == null || floors.Count == 0)
         {
             CreateNewRunData();
@@ -98,6 +101,20 @@ public class StageManager : MonoBehaviour
         {
             panel.SetStartButtonInteractable(false);
         }
+
+        // 스테이지 선택 화면에 올 때마다 저장 (새 런 시작, 전투/상점/휴식에서 복귀)
+        SaveManager.Save();
+    }
+
+    /// <summary>
+    /// 이어하기: 불러온 챕터와 플로어를 넣음 (SaveManager 가 호출)
+    /// </summary>
+    public void SetRunData(int chapter, List<List<StageNode>> loadedFloors)
+    {
+        currentChapter = chapter;
+        floors = loadedFloors ?? new List<List<StageNode>>();
+        currentNode = null;
+        selectedNodeUI = null;
     }
 
     private void InitializeGameplayScene()

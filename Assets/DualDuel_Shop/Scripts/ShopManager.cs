@@ -92,6 +92,25 @@ public class ShopManager : MonoBehaviour
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetOnPlay() => ResetShopRoll();
 
+    /// <summary>저장용: 상점 추첨기의 현재 가중치 [키, 값, ...]. 상점에 한 번도 안 갔으면 null</summary>
+    public static float[] ExportRankWeights()
+    {
+        return corrector != null ? corrector.ExportCurrentWeights() : null;
+    }
+
+    /// <summary>불러오기: 저장된 챕터의 테이블로 상점 추첨기를 만들고 현재 가중치를 덮어씀 (저장값이 없으면 초기 상태로)</summary>
+    public static void ImportRankWeights(int chapter, float[] data)
+    {
+        if (data == null || data.Length == 0 || RewardManager.Instance == null)
+        {
+            ResetShopRoll();
+            return;
+        }
+        corrector = new SoftPityProbabilityCorrector<RankType>(RewardManager.Instance.GetChapterWeights(chapter), (int)RankType.Rare);
+        corrector.ImportCurrentWeights(data);
+        isInitialized = true;
+    }
+
     /// <summary>RewardManager.EvaluateRank 와 같은 방식 (상점 추첨기 사용)</summary>
     public RankType EvaluateRank()
     {

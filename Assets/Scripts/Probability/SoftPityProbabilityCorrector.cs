@@ -190,6 +190,34 @@ public class SoftPityProbabilityCorrector<T>
     }
 
     /// <summary>
+    /// 저장용: 현재(보정된) 가중치를 [키1, 값1, 키2, 값2 ...] 숫자 배열로 내보냅니다. (키 = Enum 정수값)
+    /// </summary>
+    public float[] ExportCurrentWeights()
+    {
+        var list = new List<float>();
+        foreach (var pair in currentWeights)
+        {
+            list.Add(Convert.ToInt32(pair.Key));
+            list.Add(pair.Value);
+        }
+        return list.ToArray();
+    }
+
+    /// <summary>
+    /// 불러오기: [키, 값, ...] 배열로 현재 가중치를 덮어씁니다. (원본 가중치는 생성할 때 넣은 테이블 그대로)
+    /// </summary>
+    public void ImportCurrentWeights(float[] data)
+    {
+        if (data == null) return;
+        for (int i = 0; i + 1 < data.Length; i += 2)
+        {
+            int keyInt = Mathf.RoundToInt(data[i]);
+            if (!Enum.IsDefined(typeof(T), keyInt)) continue;
+            currentWeights[(T)Enum.ToObject(typeof(T), keyInt)] = data[i + 1];
+        }
+    }
+
+    /// <summary>
     /// 현재 보정 진행 상태 디버깅용 메서드
     /// </summary>
     public string GetStatusReport()
