@@ -58,6 +58,16 @@ public class RestCutscenes : MonoBehaviour
 
     public bool IsPlaying { get; private set; }
 
+    [Header("건너뛰기")]
+    [Tooltip("연출 중 이 키를 누르면 남은 연출을 건너뛰고 바로 스테이지로 (효과는 그대로 적용)")]
+    public KeyCode skipKey = KeyCode.Space;
+    [Tooltip("연출 시작 직후 이 시간 동안은 건너뛰기를 받지 않음 (확인 버튼을 누른 입력이 바로 건너뛰기로 이어지지 않게)")]
+    public float skipGuardTime = 0.25f;
+
+    Action _pendingEffect;   // 아직 적용하지 않은 회복/강화/제거 (건너뛰면 여기서 적용)
+    bool _left;              // 씬 이동을 이미 시작했는지 (두 번 부르지 않게)
+    float _skipAllowedAt;
+
     // ------------------------------------------------------------------ runtime state
 
     Volume _volume;
@@ -116,6 +126,9 @@ public class RestCutscenes : MonoBehaviour
 
     void Update()
     {
+        // 연출 중 건너뛰기: 아직 적용 안 된 효과를 적용하고 바로 스테이지로
+        if (IsPlaying && !_left && Time.unscaledTime >= _skipAllowedAt && Input.GetKeyDown(skipKey)) Skip();
+
         float dt = Time.unscaledDeltaTime;
         _spike = Mathf.MoveTowards(_spike, 0f, dt * 6f);
         if (_volume != null && _volume.weight > 0f)
@@ -132,7 +145,7 @@ public class RestCutscenes : MonoBehaviour
 
     public IEnumerator PlayHeal()
     {
-        Begin();
+        Begin(() => { if (bridge != null) bridge.ApplyHeal(bridge.HealAmount); });
         weldStage.SetActive(true);
         if (cracks != null) cracks.SetActive(true);
         for (int i = 0; i < arms.Length; i++) { arms[i].target = idleTargets[i]; arms[i].Solve(); }
@@ -170,7 +183,7 @@ public class RestCutscenes : MonoBehaviour
         SetWhite(1f);
         _spike = 1.5f;
         if (flashSfx != null) _audio.PlayOneShot(flashSfx);
-        if (bridge != null) bridge.ApplyHeal(bridge.HealAmount);
+        ApplyEffect();   // 회복 (이미 건너뛰며 적용했으면 아무것도 안 함)
         if (cracks != null) cracks.SetActive(false);
         for (int i = 0; i < arms.Length; i++) arms[i].target = idleTargets[i];
         yield return Wait(1f);
@@ -192,7 +205,7 @@ public class RestCutscenes : MonoBehaviour
 
     public IEnumerator PlayUpgrade(RectTransform cardView, object card)
     {
-        Begin();
+        Begin(() => { if (bridge != null) bridge.ApplyUpgrade(card); });
         cardView.SetParent(focusRoot, true);
         LockCard(cardView);
         Vector2 from = cardView.anchoredPosition;
@@ -217,7 +230,7 @@ public class RestCutscenes : MonoBehaviour
         _spike = 1.5f;
         if (flashSfx != null) _audio.PlayOneShot(flashSfx);
         Lens(0f); Zoom(1f);
-        if (bridge != null) bridge.ApplyUpgrade(card);
+        ApplyEffect();   // 강화 (이미 건너뛰며 적용했으면 아무것도 안 함)
         // 같은 카드 UI 에 강화된 값을 다시 그림 (UIViewerCard.RefreshValues). 안 되면 새로 만듦
         RectTransform view = cardView;
         if (bridge == null || !bridge.RefreshCardView(view, card))
@@ -263,7 +276,7 @@ public class RestCutscenes : MonoBehaviour
 
     public IEnumerator PlayRemove(RectTransform cardView, object card)
     {
-        Begin();
+        Begin(() => { if (bridge != null) bridge.RemoveCard(card); });
         cardView.SetParent(focusRoot, true);
         LockCard(cardView);
         Vector2 from = cardView.anchoredPosition;
@@ -295,7 +308,7 @@ public class RestCutscenes : MonoBehaviour
 
         // 펑: 제거 적용, 화면을 채우는 폭발, 흰 화면 1.5초
         if (explodeSfx != null) _audio.PlayOneShot(explodeSfx);
-        if (bridge != null) bridge.RemoveCard(card);
+        ApplyEffect();   // 제거 (이미 건너뛰며 적용했으면 아무것도 안 함)
         Vector2 ashOrigin = Vector2.zero;
         Vector2 ashSize = cardView.rect.size * cardView.localScale.x;
         cardView.gameObject.SetActive(false);
@@ -412,9 +425,12 @@ public class RestCutscenes : MonoBehaviour
 
     // ------------------------------------------------------------------ helpers
 
-    void Begin()
+    void Begin(Action effect)
     {
         IsPlaying = true;
+        _pendingEffect = effect;
+        _left = false;
+        _skipAllowedAt = Time.unscaledTime + skipGuardTime;
         group.gameObject.SetActive(true);
         group.alpha = 1f;
         group.blocksRaycasts = true;
@@ -427,8 +443,27 @@ public class RestCutscenes : MonoBehaviour
         _bloom.threshold.overrideState = false;
     }
 
+    // 효과를 한 번만 적용 (연출의 그 순간 또는 건너뛸 때, 먼저 오는 쪽)
+    void ApplyEffect()
+    {
+        Action effect = _pendingEffect;
+        _pendingEffect = null;
+        effect?.Invoke();
+    }
+
+    // 건너뛰기: 효과 적용 -> 바로 씬 이동 (연출 코루틴은 씬이 바뀔 때까지 돌아도 효과/이동은 다시 일어나지 않음)
+    void Skip()
+    {
+        Debug.Log("[RestCutscenes] 연출 건너뛰기");
+        ApplyEffect();
+        Leave();
+    }
+
     void Leave()
     {
+        if (_left) return;   // 건너뛰기와 연출 끝이 겹쳐도 씬 이동은 한 번만
+        _left = true;
+
         // 컷씬은 끄지 않은 채로 글리치 전환 (지금 화면이 찢어지며 넘어감)
         if (bridge != null) bridge.LeaveRest();
         else Debug.Log("[RestCutscenes] 브리지가 없어 씬 전환을 건너뜀");

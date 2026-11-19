@@ -83,10 +83,8 @@ public abstract class RestSceneBridge : MonoBehaviour
     /// <summary>모든 연출이 끝난 뒤. 기본은 글리치 전환으로 스테이지 선택 씬 로드</summary>
     public virtual void LeaveRest()
     {
-        // 스테이지 복귀
-        if (StageManager.Instance != null)
-        {
-            StageManager.Instance.ReturnToStageSelect();
-        }
+        // 상점과 같이 StageManager 를 거쳐야 현재 노드 완료 + 다음 노드 개방 + (스테이지 선택 화면에서) 저장이 됨
+        if (StageManager.Instance != null) StageManager.Instance.ReturnToStageSelect();
+        else SceneTransition.Load(stageSelectScene);   // 휴식 씬 단독 테스트 등
     }
 }
