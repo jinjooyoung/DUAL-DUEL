@@ -1,8 +1,13 @@
-﻿using DG.Tweening;
+using DG.Tweening;
 using UnityEngine;
 
 public class CardDisplay : MonoBehaviour
 {
+    /// <summary>
+    /// 지금 마우스가 올라가 있는 카드 (없으면 null). 단축키 배치(CardSlotHotkeys)에서 사용
+    /// </summary>
+    public static CardDisplay Hovered { get; private set; }
+
     [Header("카드 데이터(SO)")]
     public CardInstance cardInstance;
     public int cardIndex;
@@ -32,6 +37,12 @@ public class CardDisplay : MonoBehaviour
     void Start()
     {
         slotLayer = LayerMask.GetMask("Slot");
+    }
+
+    private void OnDisable()
+    {
+        // 풀로 돌아가며 꺼질 때 호버 기억 정리 (꺼진 카드에는 OnMouseExit 가 오지 않음)
+        if (Hovered == this) Hovered = null;
     }
 
     // 카드 데이터 설정 (외형 갱신은 CardVisual에 위임)
@@ -81,6 +92,8 @@ public class CardDisplay : MonoBehaviour
     // 마우스 호버 연출 (슬롯에 꽂히지 않고, 드래그 중이 아닐 때만)
     private void OnMouseEnter()
     {
+        Hovered = this;   // 연출 여부와 상관없이 '마우스가 올라간 카드' 는 기억
+
         if (BattleManager.Instance.isGameOver) return;
         if (BattleManager.Instance.isTurnExecuting) return;
         if (isDragging || isPlaced || isTweening) return;
@@ -93,6 +106,8 @@ public class CardDisplay : MonoBehaviour
 
     private void OnMouseExit()
     {
+        if (Hovered == this) Hovered = null;
+
         if (BattleManager.Instance.isGameOver) return;
         if (BattleManager.Instance.isTurnExecuting) return;
         if (isDragging || isPlaced || isTweening) return;
@@ -152,54 +167,12 @@ public class CardDisplay : MonoBehaviour
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
 
-        // 마우스 뗀 자리에 슬롯이 있는 경우
+        // 마우스 뗀 자리에 슬롯이 있는 경우 (배치 처리는 단축키와 같은 TryPlaceToSlot 사용)
         if (Physics.Raycast(ray, out hit, Mathf.Infinity, slotLayer))
         {
             BattleSlot targetSlot = hit.collider.GetComponent<BattleSlot>();
-
-            // [RestrictCardType] 배치 금지 타입이면 슬롯 배치 자체를 하지 않고 아래 핸드 복귀 처리로 넘어감
-            if (targetSlot != null && IsPlacementRestricted())
-            {
-                targetSlot = null;
-            }
-
-            if (targetSlot != null)
-            {
-                // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
-                if (targetSlot == currentSlot)
-                {
-                    DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
-                    return;
-                }
-
-                // 기존에 다른 슬롯에 꽂혀있던 카드라면 이전 슬롯과의 연결을 먼저 끊음
-                DetachFromCurrentSlot();
-
-                // [분기 B] 목표 슬롯이 이미 다른 카드로 차 있는 경우 (바운스/교체)
-                if (targetSlot.isOccupied && targetSlot.currentCard != null)
-                {
-                    targetSlot.currentCard.DetachFromCurrentSlot();
-                }
-
-                // [분기 C] 목표 슬롯에 새 카드 안착
-                isPlaced = true;
-                currentSlot = targetSlot;
-                targetSlot.PlaceCard(this);
-
-                // 슬롯에 카드가 성공적으로 놓였을 때 호출
-                if (BattleCardManager.Instance != null && this.cardInstance != null)
-                {
-                    // 손패 데이터 리스트에서 즉시 제거 (실제 오브젝트는 슬롯에 존재)
-                    BattleCardManager.Instance.handCards.Remove(this.cardInstance);
-                    BattleUIManager.Instance?.UpdateDeckUI();
-                }
-
-                // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
-                DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
-                DOTweenManager.SlotCardPlaced(targetSlot.transform);
-
-                return;
-            }
+            if (TryPlaceToSlot(targetSlot)) return;
+            // 배치 금지 타입이면 false -> 아래 핸드 복귀 처리로 넘어감
         }
 
         SoundManager.Instance.PlaySFX(SFXType.CardPlace);
@@ -215,6 +188,57 @@ public class CardDisplay : MonoBehaviour
         }
 
         DOTweenManager.CardDragEnd(transform, originalScale, 0.1f, () => ColliderOnOff(this, true));
+    }
+
+    /// <summary>
+    /// 이 카드를 targetSlot 에 놓습니다 (드래그로 놓을 때와 단축키 배치가 같이 사용).
+    /// 놓았으면(같은 슬롯에 다시 놓은 경우 포함) true, 슬롯이 없거나 배치 금지 타입이면 false
+    /// </summary>
+    public bool TryPlaceToSlot(BattleSlot targetSlot)
+    {
+        if (targetSlot == null) return false;
+
+        // [RestrictCardType] 배치 금지 타입이면 슬롯 배치 자체를 하지 않음
+        if (IsPlacementRestricted()) return false;
+
+        DOTween.Kill(GetInstanceID() + "_card"); // 호버 트윈 정리 (단축키로 놓을 때 호버 확대가 남지 않게)
+
+        // [분기 A] 원래 꽂혀있던 동일 슬롯에 그대로 다시 내려놓은 경우
+        if (targetSlot == currentSlot)
+        {
+            DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
+            return true;
+        }
+
+        // 기존에 다른 슬롯에 꽂혀있던 카드라면 이전 슬롯과의 연결을 먼저 끊음
+        DetachFromCurrentSlot();
+
+        // [분기 B] 목표 슬롯이 이미 다른 카드로 차 있는 경우 (바운스/교체)
+        if (targetSlot.isOccupied && targetSlot.currentCard != null)
+        {
+            targetSlot.currentCard.DetachFromCurrentSlot();
+        }
+
+        // [분기 C] 목표 슬롯에 새 카드 안착
+        isPlaced = true;
+        currentSlot = targetSlot;
+        targetSlot.PlaceCard(this);
+
+        // 슬롯에 카드가 성공적으로 놓였을 때 호출
+        if (BattleCardManager.Instance != null && this.cardInstance != null)
+        {
+            // 손패 데이터 리스트에서 즉시 제거 (실제 오브젝트는 슬롯에 존재)
+            BattleCardManager.Instance.handCards.Remove(this.cardInstance);
+            BattleUIManager.Instance?.UpdateDeckUI();
+        }
+
+        // 슬롯 안착 자석 연출 + 슬롯 펀치 반응
+        DOTweenManager.CardPlace(transform, targetSlot.transform.position, targetSlot.transform.eulerAngles, originalScale, 0.15f, () => ColliderOnOff(this, true));
+        DOTweenManager.SlotCardPlaced(targetSlot.transform);
+
+        // 대사 단계가 카드 배치를 기다리는 중이면 다음 대사 (기다리는 단계가 없으면 무시됨)
+        DialogueManager.Notify("CardPlaced");
+        return true;
     }
 
     /// <summary>

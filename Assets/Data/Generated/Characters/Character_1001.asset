@@ -18,5 +18,5 @@ MonoBehaviour:
   playStyleText: CHARPLAYST_1001
   startDeckID: 0000000001000000020000000400000005000000080000000a0000000c000000
   signatureCardID: 1
-  maxHp: 50
+  maxHp: 80
   startingLife: 3
