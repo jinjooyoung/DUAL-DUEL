@@ -730,7 +730,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26640048afb4175e3332010cfeafdf16, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DialogueManager
-  dialogueTable: {fileID: 0}
+  dialogueTable: {fileID: 11400000, guid: eb4a5b0c5dfa2d74aa93b13a7c74dd82, type: 2}
   canvas: {fileID: 3170582691293569711}
   dialogueRoot: {fileID: 3229433076304879279}
   portrait: {fileID: 3997010126994047564}
