@@ -7552,16 +7552,7 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 6174069579834009124, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 6318097807337332953}
-    - targetCorrespondingSourceObject: {fileID: 5127455494432506798, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 6318097807337332952}
-    - targetCorrespondingSourceObject: {fileID: 6690462481018545650, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-      insertIndex: 3
-      addedObject: {fileID: 6318097807337332951}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
 --- !u!114 &6318097807337332941 stripped
 MonoBehaviour:
@@ -7607,102 +7598,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f4688fdb7df04437aeb418b961361dc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.TextMeshPro::TMPro.TextMeshProUGUI
---- !u!1 &6318097807337332945 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6690462481018545650, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6318097807337332946 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6442316527418765932, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!1 &6318097807337332947 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5127455494432506798, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6318097807337332948 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5129404725145051992, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332947}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!1 &6318097807337332949 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 6174069579834009124, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &6318097807337332950 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 1519882363332043378, guid: 48f2049f96c023b4691728b827640a8e, type: 3}
-  m_PrefabInstance: {fileID: 6318097807337332940}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Button
---- !u!114 &6318097807337332951
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332945}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cf19b651c907c449a9c6b6ec01beb50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonTextColorChanger
-  targetButton: {fileID: 6318097807337332946}
-  targetText: {fileID: 6318097807337332942}
-  enabledColor: {r: 0, g: 0, b: 0, a: 1}
-  disabledColor: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &6318097807337332952
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332947}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cf19b651c907c449a9c6b6ec01beb50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonTextColorChanger
-  targetButton: {fileID: 6318097807337332948}
-  targetText: {fileID: 6318097807337332943}
-  enabledColor: {r: 0, g: 0, b: 0, a: 1}
-  disabledColor: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &6318097807337332953
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6318097807337332949}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cf19b651c907c449a9c6b6ec01beb50, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ButtonTextColorChanger
-  targetButton: {fileID: 6318097807337332950}
-  targetText: {fileID: 6318097807337332944}
-  enabledColor: {r: 0, g: 0, b: 0, a: 1}
-  disabledColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!1001 &7344189372924013639
 PrefabInstance:
   m_ObjectHideFlags: 0
