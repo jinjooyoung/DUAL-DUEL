@@ -298,6 +298,14 @@ public class BattleUIManager : MonoBehaviour
     {
         if (endOfWinBattlePanel != null)
         {
+            if (GameManager.Instance.monster.monsterType == StageType.Boss)
+            {
+                winReviewText.text = $"플레이해 주셔서 감사합니다!\n현재 공개된 데모 버전은 1챕터까지입니다.\n[ESC] 설정창에서 간단한 플레이 후기를 남겨주시면\n더 완성도 높은 정식 버전을 만드는 데 큰 힘이 됩니다!";
+                endOfWinBattlePanel.SetActive(true);
+
+                return;
+            }
+
             winReviewText.text = $"{BattleManager.Instance.CurrentMonster.rewardGold} 골드 획득!";
             endOfWinBattlePanel.SetActive(true);
         }
