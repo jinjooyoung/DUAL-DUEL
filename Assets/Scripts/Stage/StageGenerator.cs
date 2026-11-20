@@ -133,7 +133,7 @@ public class StageGenerator : MonoBehaviour
         {
             foreach (var node in floors[f])
             {
-                if (f == 0)
+                if (f == 1)
                 {
                     node.stageType = StageType.Normal;
                 }

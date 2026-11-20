@@ -265,6 +265,10 @@ public class BattleManager : MonoBehaviour
     private void Start()
     {
         BattleUIManager.Instance.UpdateAllUI();
+
+        if (GameManager.Instance.monster.gimmickType1 == GimmickType.BlindSlot) DialogueManager.Notify("FirstBlindGimmick");
+        if (GameManager.Instance.monster.gimmickType1 == GimmickType.ScaleSlotValue) DialogueManager.Notify("FirstValueGimmick");
+        if (GameManager.Instance.monster.gimmickType1 == GimmickType.RestrictCardType) DialogueManager.Notify("FirstBossGimmick");
     }
 
     /// <summary>
@@ -373,6 +377,9 @@ public class BattleManager : MonoBehaviour
                 break;
             }
         }
+        
+        if (StageManager.Instance.currentNode.floor == 1) DialogueManager.Notify("FirstTurnEnd");
+
         if (isGameOver) yield break;
 
         // 1-0. 모든 카드 시전 종료 -> 버프/디버프 유지 턴수 일괄 -1 (0이 되면 수치 초기화)

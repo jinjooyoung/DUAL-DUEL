@@ -10,6 +10,9 @@ using UnityEngine;
 ///   Start Id: 처음 볼 때 재생할 묶음
 ///   이미 봤으면: Play Alt When Seen 이 꺼져 있으면 건너뜀 (기다리지도 않음), 켜져 있으면 Seen Start Id 를 재생
 ///
+/// 씬 시작 직후(Start Delay 동안) 온 알림은 기억했다가, 첫 단계들을 시작할 때 기다리던 행동이면 바로 재생
+/// (예: BattleManager.Start 에서 바로 Notify 해도 놓치지 않음). 첫 단계들을 시작한 뒤에는 기억을 지움.
+///
 /// 예) 스테이지 선택 씬:  (없음, 0)  ->  (StageClicked, 5)
 /// 예) 전투 씬 보스용:    (BossBattleStart, 900, 이미 봤으면 950)   <- 보스 코드에서 Notify("BossBattleStart")
 /// </summary>
@@ -35,6 +38,8 @@ public class DialogueSceneSteps : MonoBehaviour
     private int index;
     private bool waiting;
     private int waitingBlock = -1;
+    private bool started;                                               // Start Delay 가 끝나 단계를 시작했는지
+    private readonly List<string> earlyActions = new List<string>();    // 시작 전에 온 알림
 
     private void OnEnable() => DialogueManager.Notified += OnNotified;
     private void OnDisable() => DialogueManager.Notified -= OnNotified;
@@ -44,7 +49,9 @@ public class DialogueSceneSteps : MonoBehaviour
         if (DialogueManager.Instance == null) { Debug.LogWarning("[Dialogue] DialogueManager 가 없습니다. 프리팹을 첫 씬(테스트하려면 이 씬에도)에 두세요."); yield break; }
         if (steps.Count == 0) { Debug.LogWarning($"[Dialogue] {name}: Steps 가 비어 있습니다."); yield break; }
         yield return new WaitForSecondsRealtime(startDelay);
+        started = true;
         RunStep();
+        earlyActions.Clear();   // 시작 직후 단계들이 쓰고 남은 알림은 버림 (이후엔 '미리 한 행동은 기억 안 함' 규칙)
     }
 
     // 현재 단계: 재생할 묶음을 정하고 (이미 봤으면 대체 묶음 또는 건너뜀), 기다릴 행동이 있으면 대기
@@ -64,6 +71,14 @@ public class DialogueSceneSteps : MonoBehaviour
 
             waitingBlock = block;
             waiting = !string.IsNullOrEmpty(step.waitAction);
+
+            // 시작 전에 이미 온 알림이면 기다리지 않고 바로 재생
+            if (waiting && earlyActions.Remove(step.waitAction))
+            {
+                Debug.Log($"[Dialogue] {gameObject.scene.name} 단계 {index}: '{step.waitAction}' 는 씬 시작 직후 이미 알림이 와서 바로 재생");
+                waiting = false;
+            }
+
             if (waiting) Debug.Log($"[Dialogue] {gameObject.scene.name} 단계 {index}: '{step.waitAction}' 를 기다리는 중 (묶음 {block})");
             else PlayStep();
             return;
@@ -73,6 +88,12 @@ public class DialogueSceneSteps : MonoBehaviour
     // 기다리던 행동이 오면 재생
     private void OnNotified(string action)
     {
+        // 아직 Start Delay 중이면 기억해 둠 (첫 단계들을 시작할 때 확인)
+        if (!started)
+        {
+            earlyActions.Add(action);
+            return;
+        }
         if (!waiting || index >= steps.Count || action != steps[index].waitAction) return;
         waiting = false;
         PlayStep();

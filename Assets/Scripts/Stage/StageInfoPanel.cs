@@ -81,7 +81,7 @@ public class StageInfoPanel : MonoBehaviour
             case StageType.Elite: return "강력한 엘리트 몬스터를 처치하고 더 큰 보상을 얻습니다.";
             case StageType.Boss: return "구역의 최종 보스와 결전을 치릅니다.";
             case StageType.Rest: return "휴식을 취하거나 덱의 카드를 정비(강화/삭제)합니다.";
-            case StageType.Shop: return "골드를 소모하여 카드 및 아이템을 구매합니다.";
+            case StageType.Shop: return "골드를 소모하여 카드를 구매합니다.";
             case StageType.Random: return "어떤 조우가 일어날지 알 수 없는 미지의 장소입니다.";
             default: return "";
         }

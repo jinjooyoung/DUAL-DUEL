@@ -256,6 +256,8 @@ public class CardDisplay : MonoBehaviour
     {
         if (targetSlot == null) return false;
 
+        if (cardInstance.baseData.cardType == CardType.Defense) DialogueManager.Notify("GuardCard");
+
         // [RestrictCardType] 배치 금지 타입이면 슬롯 배치 자체를 하지 않음
         if (IsPlacementRestricted()) return false;
 

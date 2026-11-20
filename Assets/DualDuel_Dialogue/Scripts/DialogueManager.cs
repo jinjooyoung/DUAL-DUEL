@@ -13,6 +13,7 @@ using UnityEngine.UI;
 ///   대사의 action 열은 그 대사가 뜨는 순간 LineAction 이벤트로 게임 코드에 전달된다 (Glitch 는 기본 제공).
 /// 본 기록은 DialogueProgress 가 영구 저장한다 (게임 진행 저장과 별개).
 /// 입력: 클릭 / Enter / Space -> 타이핑 중이면 전부 표시, 다 표시됐으면 다음 대사 (nextId -1 이면 닫힘)
+/// 대사창이 열려 있을 때 다른 묶음이 요청되면 덮어쓰지 않고 줄을 세워, 지금 묶음이 끝난 뒤 차례로 재생한다.
 /// </summary>
 public class DialogueManager : MonoBehaviour
 {
@@ -63,6 +64,10 @@ public class DialogueManager : MonoBehaviour
     public bool IsOpen => isOpen;
 
     private readonly Dictionary<string, Sprite> portraitByKey = new Dictionary<string, Sprite>();
+
+    // 대사창이 열려 있는 동안 요청된 묶음 (지금 묶음이 끝나면 차례로 재생)
+    private struct PlayRequest { public int startId; public Action finished; }
+    private readonly Queue<PlayRequest> queue = new Queue<PlayRequest>();
     private DialogueData current;
     private Action onFinished;
     private Coroutine routine;
@@ -96,10 +101,18 @@ public class DialogueManager : MonoBehaviour
 
     /// <summary>
     /// startId 묶음을 재생. 시작하는 순간 '봤음' 으로 영구 저장됩니다.
-    /// nextId 가 -1 인 대사를 읽으면 닫히고 finished 호출
+    /// nextId 가 -1 인 대사를 읽으면 닫히고 finished 호출.
+    /// 이미 다른 묶음이 떠 있으면 덮어쓰지 않고 줄을 세웠다가 그 묶음이 끝난 뒤 재생합니다.
     /// </summary>
     public void Play(int startId, Action finished = null)
     {
+        if (isOpen)
+        {
+            queue.Enqueue(new PlayRequest { startId = startId, finished = finished });
+            Debug.Log($"[Dialogue] 묶음 {startId} 대기 (지금 묶음이 끝나면 재생, 대기 {queue.Count}개)");
+            return;
+        }
+
         if (dialogueTable == null || !dialogueTable.TryGet(startId, out DialogueData line))
         {
             Debug.LogWarning($"[Dialogue] 대사 id {startId} 를 찾을 수 없습니다. (CSV 를 가져왔는지, 매니저에 테이블이 연결됐는지 확인)");
@@ -164,7 +177,16 @@ public class DialogueManager : MonoBehaviour
 
         Action done = onFinished;
         Close();
-        done?.Invoke();
+        done?.Invoke();      // 이 안에서 다음 묶음을 바로 Play 할 수도 있음 (그러면 대기열은 그 뒤에)
+        PlayNextQueued();
+    }
+
+    // 대기 중인 묶음이 있고 대사창이 비어 있으면 다음 묶음 재생
+    private void PlayNextQueued()
+    {
+        if (isOpen || queue.Count == 0) return;
+        PlayRequest next = queue.Dequeue();
+        Play(next.startId, next.finished);
     }
 
     // 대사 한 줄 표시: 이름, 스탠딩(없으면 끔), action 실행, 타이핑 시작

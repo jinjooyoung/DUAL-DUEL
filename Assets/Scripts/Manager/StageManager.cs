@@ -188,6 +188,15 @@ public class StageManager : MonoBehaviour
         {
             DialogueManager.Notify("StageClicked");
         }
+
+        if (selectedNodeUI.nodeData.stageType == StageType.Shop)
+            DialogueManager.Notify("ShopClicked");
+
+        if (selectedNodeUI.nodeData.stageType == StageType.Rest)
+            DialogueManager.Notify("RestClicked");
+
+        if (selectedNodeUI.nodeData.stageType == StageType.Random)
+            DialogueManager.Notify("RandomClicked");
     }
 
     /// <summary>

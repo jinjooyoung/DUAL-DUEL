@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: ccbcc91c8084b90419dc08780d763547
+guid: 9e0c238be4f11fe4d9d2d7d91b69a73c
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -6140834153564893884
-    second: gameBackground_0
+      213: -1906399209765955153
+    second: BattleBG_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -113,13 +113,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: gameBackground_0
+      name: BattleBG_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1672
-        height: 941
+        width: 1832
+        height: 1036
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -128,8 +128,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 44d8d247fdf57caa0800000000000000
-      internalID: -6140834153564893884
+      spriteID: fa990dde40c1b85e0800000000000000
+      internalID: -1906399209765955153
       vertices: []
       indices: 
       edges: []
