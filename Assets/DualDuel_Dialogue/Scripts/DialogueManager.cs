@@ -14,6 +14,7 @@ using UnityEngine.UI;
 /// 본 기록은 DialogueProgress 가 영구 저장한다 (게임 진행 저장과 별개).
 /// 입력: 클릭 / Enter / Space -> 타이핑 중이면 전부 표시, 다 표시됐으면 다음 대사 (nextId -1 이면 닫힘)
 /// 대사창이 열려 있을 때 다른 묶음이 요청되면 덮어쓰지 않고 줄을 세워, 지금 묶음이 끝난 뒤 차례로 재생한다.
+/// 대사창이 떠 있는 동안 DialogueInputBlocker 가 카메라 앞을 투명 콜라이더로 덮어 카드/노드 마우스 조작을 막는다.
 /// </summary>
 public class DialogueManager : MonoBehaviour
 {
@@ -73,6 +74,7 @@ public class DialogueManager : MonoBehaviour
     private Coroutine routine;
     private bool isOpen, isTyping;
     private int openedFrame = -1;
+    private DialogueInputBlocker inputBlocker;   // 카드/노드 마우스 조작 막기 (씬이 바뀌어도 유지)
 
     // ------------------------------------------------------------------ 수명
 
@@ -87,6 +89,7 @@ public class DialogueManager : MonoBehaviour
         if (dialogueTable == null) Debug.LogError("[Dialogue] 대사 테이블(DialogueTable)이 연결되지 않았습니다.");
         CachePortraits();
         AttachCamera();
+        inputBlocker = DialogueInputBlocker.Create();
         SceneManager.sceneLoaded += OnSceneLoaded;
     }
 
@@ -95,6 +98,7 @@ public class DialogueManager : MonoBehaviour
         if (Instance != this) return;
         Instance = null;
         SceneManager.sceneLoaded -= OnSceneLoaded;
+        if (inputBlocker != null) Destroy(inputBlocker.gameObject);
     }
 
     // ------------------------------------------------------------------ 외부 호출
@@ -125,6 +129,7 @@ public class DialogueManager : MonoBehaviour
         openedFrame = Time.frameCount;
         AttachCamera();
         if (dialogueRoot != null) dialogueRoot.SetActive(true);
+        if (inputBlocker != null) inputBlocker.SetBlocking(true);   // 카드/노드 마우스 조작 막기
         Debug.Log($"[Dialogue] 묶음 {startId} 재생");
         Show(line);
     }
@@ -264,6 +269,7 @@ public class DialogueManager : MonoBehaviour
         current = null;
         onFinished = null;
         if (dialogueRoot != null) dialogueRoot.SetActive(false);
+        if (inputBlocker != null) inputBlocker.SetBlocking(false);  // 다시 조작 가능
     }
 
     // ------------------------------------------------------------------ 준비
