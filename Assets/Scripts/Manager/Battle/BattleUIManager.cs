@@ -29,6 +29,9 @@ public class BattleUIManager : MonoBehaviour
     [Header("몬스터 표정")]
     [SerializeField] private CharacterExpression monsterExpression;
 
+    [Header("타입 제한 시 띄울 아이콘")]
+    [SerializeField] private Image typeIcon;
+
     [Header("버프/디버프 아이콘 (순서 고정: 재생, 힘, 흡혈, 중독, 출혈, 약화)")]
     [SerializeField] private List<BuffIconUI> playerBuffIcons = new List<BuffIconUI>();
     [SerializeField] private List<BuffIconUI> monsterBuffIcons = new List<BuffIconUI>();
@@ -94,6 +97,9 @@ public class BattleUIManager : MonoBehaviour
         {
             if (monsterHpSlider != null) monsterHpSlider.maxValue = BattleManager.Instance.monsterStats.currentHp;
         }
+
+        if (GameManager.Instance.monster.gimmickType1 == GimmickType.RestrictCardType) RestrictCardTypeMonsterUI(1);
+        else if (GameManager.Instance.monster.gimmickType2 == GimmickType.RestrictCardType) RestrictCardTypeMonsterUI(2);
 
         UpdateCombatStatsUI();
     }
@@ -323,5 +329,14 @@ public class BattleUIManager : MonoBehaviour
             defReviewText.text = $"보유한 카드 : {deckCount}\n보유한 골드 : {gold}\n도달한 층 : {chapter}챕터 {floor}층";
             endOfDefBattlePanel.SetActive(true);
         }
+    }
+
+    public void RestrictCardTypeMonsterUI(int param)
+    {
+        CardType type = param == 1 ? (CardType)GameManager.Instance.monster.gimmickParam1 : (CardType)GameManager.Instance.monster.gimmickParam2;
+        string resourcePath = $"Cards/Public/{type}";
+
+        typeIcon.gameObject.SetActive(true);
+        typeIcon.sprite = Resources.Load<Sprite>(resourcePath);
     }
 }

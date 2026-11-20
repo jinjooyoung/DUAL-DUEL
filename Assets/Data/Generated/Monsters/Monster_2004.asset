@@ -15,7 +15,7 @@ MonoBehaviour:
   monsterID: 2004
   monsterName: MONSTERNAME_2004
   monsterType: 1
-  rewardGold: 70
+  rewardGold: 100
   appearStartStage: 206
   maxHp: 180
   gimmickType1: 2
