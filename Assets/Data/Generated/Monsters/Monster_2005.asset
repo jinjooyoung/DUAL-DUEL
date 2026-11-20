@@ -17,7 +17,7 @@ MonoBehaviour:
   monsterType: 2
   rewardGold: 150
   appearStartStage: 101
-  maxHp: 400
+  maxHp: 250
   gimmickType1: 4
   gimmickParam1: 1
   gimmickType2: 0
