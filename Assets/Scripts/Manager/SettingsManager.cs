@@ -218,4 +218,9 @@ public class SettingsManager : MonoBehaviour
     {
         if (settingPopup != null) settingPopup.SetActive(!settingPopup.activeSelf);
     }
+
+    public void BackToMain()
+    {
+        SceneTransition.Load("MainScene");
+    }
 }

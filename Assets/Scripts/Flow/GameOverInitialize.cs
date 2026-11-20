@@ -9,7 +9,7 @@ public class GameOverInitialize : MonoBehaviour
         SceneTransition.Load("MainScene");      // 메인으로
     }
 
-    private void GameOverInit()
+    public void GameOverInit()
     {
         // 카드 랭크 누적 삭제
         // (Initialize 는 처음 한 번만 동작해서 누적이 지워지지 않음 -> SetChapter(1) 이 1챕터 테이블로 바꾸며 누적도 초기화)

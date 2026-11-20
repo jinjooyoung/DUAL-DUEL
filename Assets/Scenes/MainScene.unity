@@ -532,7 +532,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1790113104}
         m_TargetAssemblyTypeName: MainMenuController, Assembly-CSharp
-        m_MethodName: StartGame
+        m_MethodName: StartNewGame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2037,6 +2037,7 @@ GameObject:
   - component: {fileID: 1790113102}
   - component: {fileID: 1790113103}
   - component: {fileID: 1790113104}
+  - component: {fileID: 1790113105}
   m_Layer: 0
   m_Name: MainMenuController
   m_TagString: Untagged
@@ -2084,6 +2085,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67e6aab8ce5204d4cbdbad393a71ce3d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuController
+  GOI: {fileID: 0}
+--- !u!114 &1790113105
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1790113100}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5adb03ef10090d4cb53deb2f8559e0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameOverInitialize
 --- !u!1 &1962959410
 GameObject:
   m_ObjectHideFlags: 0
