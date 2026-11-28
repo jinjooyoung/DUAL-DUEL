@@ -69,8 +69,8 @@ MonoBehaviour:
 
 '
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: e48d81020762c7946ac70f95631c3c78, type: 2}
-  m_sharedMaterial: {fileID: 3403671416660078228, guid: e48d81020762c7946ac70f95631c3c78, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -493,18 +493,6 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -556,10 +544,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuffIcon (2)
       objectReference: {fileID: 0}
-    - target: {fileID: 2284598639165507936, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: statusType
-      value: 2
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -609,18 +593,6 @@ PrefabInstance:
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -674,22 +646,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuffIcon (3)
       objectReference: {fileID: 0}
-    - target: {fileID: 2284598639165507936, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: statusType
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.g
-      value: 0.048284404
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -739,18 +695,6 @@ PrefabInstance:
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -804,10 +748,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuffIcon (1)
       objectReference: {fileID: 0}
-    - target: {fileID: 2284598639165507936, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: statusType
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -857,18 +797,6 @@ PrefabInstance:
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -922,22 +850,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: BuffIcon (4)
       objectReference: {fileID: 0}
-    - target: {fileID: 2284598639165507936, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: statusType
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.g
-      value: 0.048284404
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.r
-      value: 1
-      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -987,18 +899,6 @@ PrefabInstance:
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_SizeDelta.y
       value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
@@ -1249,18 +1149,6 @@ PrefabInstance:
       value: 30
       objectReference: {fileID: 0}
     - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.x
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_LocalScale.z
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 1107967906010147639, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -1311,22 +1199,6 @@ PrefabInstance:
     - target: {fileID: 1995581106717099830, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
       propertyPath: m_Name
       value: BuffIcon (5)
-      objectReference: {fileID: 0}
-    - target: {fileID: 2284598639165507936, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: statusType
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.g
-      value: 0.048284404
-      objectReference: {fileID: 0}
-    - target: {fileID: 8194104912204484370, guid: c063b568a90170d4b9b74f2bc18385a4, type: 3}
-      propertyPath: m_Color.r
-      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

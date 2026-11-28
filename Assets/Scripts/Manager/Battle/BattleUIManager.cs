@@ -230,7 +230,7 @@ public class BattleUIManager : MonoBehaviour
             if (playerStatText != null)
             {
                 playerStatText.text =
-                    $"HP  {stats.currentHp}/{playerHpSlider.maxValue} +{stats.guard}";
+                    $"HP    {stats.currentHp}/{playerHpSlider.maxValue}\nDEF    {stats.guard}";
             }
 
             if (playerHpSlider != null)
@@ -247,7 +247,7 @@ public class BattleUIManager : MonoBehaviour
             if (monsterStatText != null)
             {
                 monsterStatText.text =
-                    $"HP  {stats.currentHp}/{monsterHpSlider.maxValue} +{stats.guard}";
+                    $"HP    {stats.currentHp}/{monsterHpSlider.maxValue}\nDEF   {stats.guard}";
             }
 
             if (monsterHpSlider != null)
